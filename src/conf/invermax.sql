@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-10-2024 a las 20:35:18
+-- Tiempo de generación: 23-10-2024 a las 23:19:28
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -61,23 +61,13 @@ CREATE TABLE `caracteristicas_planes` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `categorias_zonas`
---
-
-CREATE TABLE `categorias_zonas` (
-  `id_categoria` int(11) NOT NULL,
-  `categoria` varchar(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Posibles categorías de las zonas';
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `ciudades`
 --
 
 CREATE TABLE `ciudades` (
   `cod_ciudad` int(11) NOT NULL,
-  `nombre_ciudad` varchar(20) NOT NULL
+  `nombre_ciudad` varchar(20) NOT NULL,
+  `id_municipio` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -97,6 +87,17 @@ CREATE TABLE `customers` (
   `perfil` varchar(25) NOT NULL COMMENT 'Tipo de customer. Pueden ser constructora,inmobiliaria,agente inmobiliario,propietario',
   `id_usuario` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene a los usuarios tipo inmobiliaria';
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `departamentos`
+--
+
+CREATE TABLE `departamentos` (
+  `id_municipio` int(11) NOT NULL,
+  `municipio` varchar(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -281,8 +282,7 @@ CREATE TABLE `zonas` (
   `id_zona` int(11) NOT NULL,
   `nombre` varchar(25) NOT NULL,
   `icono` varchar(25) NOT NULL,
-  `tipo_zona` varchar(25) NOT NULL COMMENT 'Zonas de interés o zonas comunes',
-  `id_categoria` int(11) NOT NULL
+  `tipo_zona` varchar(25) NOT NULL COMMENT 'Zonas de interés o zonas comunes'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Zonas de interes o comunes para los inmuebles ';
 
 -- --------------------------------------------------------
@@ -322,16 +322,11 @@ ALTER TABLE `caracteristicas_planes`
   ADD KEY `id_caracteristica` (`id_caracteristica`);
 
 --
--- Indices de la tabla `categorias_zonas`
---
-ALTER TABLE `categorias_zonas`
-  ADD PRIMARY KEY (`id_categoria`);
-
---
 -- Indices de la tabla `ciudades`
 --
 ALTER TABLE `ciudades`
-  ADD PRIMARY KEY (`cod_ciudad`);
+  ADD PRIMARY KEY (`cod_ciudad`),
+  ADD KEY `id_municipio` (`id_municipio`);
 
 --
 -- Indices de la tabla `customers`
@@ -341,6 +336,12 @@ ALTER TABLE `customers`
   ADD UNIQUE KEY `codigo_inmobiliaria` (`codigo_customer`),
   ADD KEY `id_inmobiliaria` (`id_customer`),
   ADD KEY `id_usuario` (`id_usuario`);
+
+--
+-- Indices de la tabla `departamentos`
+--
+ALTER TABLE `departamentos`
+  ADD PRIMARY KEY (`id_municipio`);
 
 --
 -- Indices de la tabla `detalles_inmuebles`
@@ -436,8 +437,7 @@ ALTER TABLE `videos`
 -- Indices de la tabla `zonas`
 --
 ALTER TABLE `zonas`
-  ADD PRIMARY KEY (`id_zona`),
-  ADD KEY `id_categoria` (`id_categoria`);
+  ADD PRIMARY KEY (`id_zona`);
 
 --
 -- Indices de la tabla `zonas_inmuebles`
@@ -463,12 +463,6 @@ ALTER TABLE `caracteristicas`
   MODIFY `id_caracteristica` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `categorias_zonas`
---
-ALTER TABLE `categorias_zonas`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT de la tabla `ciudades`
 --
 ALTER TABLE `ciudades`
@@ -479,6 +473,12 @@ ALTER TABLE `ciudades`
 --
 ALTER TABLE `customers`
   MODIFY `id_customer` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `departamentos`
+--
+ALTER TABLE `departamentos`
+  MODIFY `id_municipio` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detalles_inmuebles`
@@ -576,6 +576,12 @@ ALTER TABLE `caracteristicas_planes`
   ADD CONSTRAINT `caracteristicas_planes_ibfk_3` FOREIGN KEY (`id_plan`) REFERENCES `planes` (`id_plan`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `ciudades`
+--
+ALTER TABLE `ciudades`
+  ADD CONSTRAINT `ciudades_ibfk_1` FOREIGN KEY (`id_municipio`) REFERENCES `departamentos` (`id_municipio`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `customers`
 --
 ALTER TABLE `customers`
@@ -618,6 +624,12 @@ ALTER TABLE `inmuebles_en_ascenso`
   ADD CONSTRAINT `inmuebles_en_ascenso_ibfk_2` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `interesados`
+--
+ALTER TABLE `interesados`
+  ADD CONSTRAINT `interesados_ibfk_1` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `proyectos`
 --
 ALTER TABLE `proyectos`
@@ -636,12 +648,6 @@ ALTER TABLE `suscripciones`
 ALTER TABLE `videos`
   ADD CONSTRAINT `videos_ibfk_1` FOREIGN KEY (`id_detalle_inmueble`) REFERENCES `detalles_inmuebles` (`id_detalle`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `videos_ibfk_2` FOREIGN KEY (`id_blog`) REFERENCES `blogs` (`id_blog`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `zonas`
---
-ALTER TABLE `zonas`
-  ADD CONSTRAINT `zonas_ibfk_1` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_zonas` (`id_categoria`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `zonas_inmuebles`
