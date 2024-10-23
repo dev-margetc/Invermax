@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const sequelize = require('./conf/database'); // Importar la conexión 
+//const sequelize = require('./conf/database'); // Importar la conexión a la BD
 
 
 //Configuración aplicacion
