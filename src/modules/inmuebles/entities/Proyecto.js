@@ -1,31 +1,31 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../../conf/database');
 
-const Ciudad = sequelize.define('Ciudad', {
+const Proyecto = sequelize.define('Proyecto', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     allowNull: false,
-    field: 'cod_ciudad'
+    field: 'id_proyecto'
   },
-  nombre: {
-    type: DataTypes.STRING,
+  fechaEntrega: {
+    type: DataTypes.DATE,
     allowNull: false,
     field: 'nombre_ciudad'
   },
-  idDepartamento: {
+  idInmueble: {
     type: DataTypes.INTEGER,
     references:{
-        model: 'departamentos',  // Nombre de la tabla
-        key: 'id_departamento'
+        model: 'inmuebles',  // Nombre de la tabla
+        key: 'id_inmueble'
     },
     allowNull: false,
-    field: 'id_departamento'
+    field: 'id_inmueble'
   }
 }, {
-  tableName: 'ciudades',
+  tableName: 'proyectos',
   timestamps: false,
   freezeTableName: true, // Evita que Sequelize pluralice el nombre de la tabla
 });
 
-module.exports = Ciudad;
+module.exports = Proyecto;
