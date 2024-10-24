@@ -2,20 +2,37 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-//const sequelize = require('./conf/database'); // Importar la conexión a la BD
+const sequelize = require('./conf/database'); // Importar la conexión a la BD
+
+
+// Importar y ejecutar las asociaciones de los modelos
+require('../src/modules/inmuebles/associations/associations');
+
+
+const inmueblesRoutes = require('./modules/inmuebles/routes/InmueblesRoutes'); // Importar las rutas de inmuebles
 
 
 //Configuración aplicacion
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(cors()); 
+const corsOptions = {
+    origin: 'http://tu-frontend.com', // Cambia esto al dominio de tu frontend
+    optionsSuccessStatus: 200
+};
 
-    
+app.use(express.json());
+app.use(cors(corsOptions)); 
+
+//Ruta por defecto    
 app.get('/', (req, res) => {
     res.send('Servidor funcionando correctamente');
 });
+
+// Usar las rutas del modulo de inmuebles
+app.use('/inmuebles', inmueblesRoutes);
+
+
 
 // Escuchar peticiones en el puerto solicitado
 app.listen(PORT, () => {

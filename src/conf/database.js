@@ -4,6 +4,7 @@ const { Sequelize } = require('sequelize');
 // No es necesario cargar dotenv en producción
 require('dotenv').config({ path: __dirname + '/.env' });
 
+
  
 const sequelize = new Sequelize(
     process.env.DB_NAME,
@@ -12,9 +13,15 @@ const sequelize = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
-        logging: false, // Cambiar a `console.log` si se quieren ver las consultas SQL en consola
+        logging: console.log, // Cambiar a `console.log` si se quieren ver las consultas SQL en consola, si no false
+        define: {
+            // Opciones globales
+            freezeTableName: true, // Esto desactiva la pluralización
+        },
     }
 );
+
+
 
 // Probar la conexión
 (async () => {
