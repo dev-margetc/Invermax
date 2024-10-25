@@ -8,7 +8,7 @@ const getDepartamentosConCiudades = async (req, res) => {
         include: [{ // Incluye las ciudades asociadas
           model: Ciudad,
           as: 'ciudades', // Se usa el alias definido en la relacion
-          attributes: ['id', 'nombre', 'idDepartamento'] // Solo devuelve estos campos
+          attributes: ['codCiudad', 'nombreCiudad', 'idDepartamento'] // Solo devuelve estos campos
       }] 
         
       });

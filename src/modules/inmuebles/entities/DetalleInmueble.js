@@ -5,13 +5,14 @@ const sequelize = require('../../../conf/database');
 const PARQUEADEROS = ['si, carros', 'si, motos', 'no'];
 
 const DetalleInmueble = sequelize.define('DetalleInmueble', {
-  id: {
+  idDetalle: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     allowNull: false,
+    autoIncrement: true, // Declara que es autoincremental
     field: 'id_detalle'
   },
-  valor: {
+  valorInmueble: {
     type: DataTypes.DECIMAL(12,2),
     allowNull: false,
     field: 'valor_inmueble'
@@ -48,7 +49,7 @@ const DetalleInmueble = sequelize.define('DetalleInmueble', {
           msg: `Valor no valido. Las opciones permitidas son: ${PARQUEADEROS.join(', ')}.`
         }
       },
-    field: 'cantidad_habitaciones'
+    field: 'parqueadero'
   },
   idInmueble: {
     type: DataTypes.INTEGER,

@@ -6,30 +6,31 @@ const sequelize = require('../../../conf/database');
 const UBICACIONES = ['rural', 'urbana'];
 
 const Interesado = sequelize.define('Interesado', {
-    id: {
+    idInteresado: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true, // Declara que es autoincremental
         field: 'id_interesado'
     },
-    nombre: {
+    nombreInteresado: {
         type: DataTypes.STRING,
         allowNull: false,
         field: 'nombre'
     },
-    telefono: {
+    telefonoInteresado: {
         type: DataTypes.STRING,
         allowNull: false,
         field: 'telefono'
     },
 
-    correo: {
+    correoInteresado: {
         type: DataTypes.STRING,
         allowNull: false,
         field: 'correo'
     },
 
-    ubicacion: {
+    ubicacionInteresado: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -40,18 +41,20 @@ const Interesado = sequelize.define('Interesado', {
         },
         field: 'ubicacion'
     },
-    estadoCivil: {
+    estadoCivilInteresado: {
         type: DataTypes.STRING,
         allowNull: false,
         field: 'estadoCivil'
     },
 
-    subsidio: { //Subsidio: 0- No, 1-si
+    subsidioInteresado: { //Subsidio: 0- No, 1-si
         type: DataTypes.TINYINT(1),
         allowNull: false,
-        isIn: {
-            args: [[0, 1]],  // Valores permitidos
-            msg: "El valor de 'subsidio' no es correcto"
+        validate: {
+            isIn: {
+                args: [[0, 1]],  // Valores permitidos
+                msg: "El valor de 'subsidio' no es correcto"
+            }
         },
         field: 'subsidio'
     },

@@ -2,13 +2,14 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../../../conf/database');
 
 const Departamento = sequelize.define('Departamento', {
-  id: {
+  idDepartamento: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     allowNull: false,
+    autoIncrement: true, // Declara que es autoincremental
     field: 'id_departamento'
   },
-  nombre: {
+  nombreDepartamento: {
     type: DataTypes.STRING,
     allowNull: false,
     field: 'nombre_departamento'

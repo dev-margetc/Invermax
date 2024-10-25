@@ -5,18 +5,19 @@ const sequelize = require('../../../conf/database');
 const TIPOS = ['zona de interés', 'zona común'];
 
 const Zona = sequelize.define('Zona', {
-  id: {
+  idZona: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     allowNull: false,
+    autoIncrement: true, // Declara que es autoincremental
     field: 'id_zona'
   },
-  nombre: {
+  nombreZona: {
     type: DataTypes.STRING,
     allowNull: false,
     field: 'nombre'
   },
-  icono: {
+  iconoZona: {
     type: DataTypes.STRING,
     allowNull: true,
     field: 'icono'
