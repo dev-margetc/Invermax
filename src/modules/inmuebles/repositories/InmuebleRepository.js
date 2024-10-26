@@ -5,72 +5,54 @@ const DetalleInmueble = require("../entities/DetalleInmueble");
 const Inmueble = require("../entities/Inmueble");
 const Proyecto = require("../entities/Proyecto")
 
-const insertarInmuebleBasico = async (datosInmueble) => {
+//Crea un inmueble con sus detalles y proyecto si es el caso
+//Recibe los datos con detalles y una confirmación de si es proyecto
+const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
   const transaction = await sequelize.transaction(); // Iniciar la transacción
   try {
 
     //Crear el inmueble
-    const inmueble =await Inmueble.create({
+    const inmueble = await Inmueble.create({
       ...datosInmueble, // Desestructura los campos que coinciden
       detalles: datosInmueble.detalles // Se manejan luego los detalles
-    },{transaction});
+    }, { transaction });
 
     // Se obtiene el id del inmueble creado
     const inmuebleId = inmueble.idInmueble;
 
-    //Se inserta el primer y unico detalle
-    const detalle = datosInmueble.detalles[0];
+    //Si el inmueble es tipo proyecto se inserta
+    idProyecto = null;
+    if (isProyecto) {
+      const proyecto = await Proyecto.create({
+        ...datosInmueble.proyecto,
+        idInmueble: inmuebleId
+      }, { transaction })
 
-    await DetalleInmueble.create({
-      ...detalle,
-      idInmueble: inmuebleId // Usar el id del inmueble insertado
-    },{transaction})
-
-    await transaction.commit(); // Confirmar la transacción
-    return "Inmueble con detalles creado correctamente."
-  } catch (error) {
-    await transaction.rollback(); // Revertir la transacción en caso de error
-    throw error;
-  }
-};
-
-const insertarInmuebleProyecto = async (datosInmueble) => {
-  const transaction = await sequelize.transaction(); // Iniciar la transacción
-  try {
-    await Inmueble.create({
-      codigoInmueble: datosInmueble.codigoInmueble,
-      estadoInmueble: datosInmueble.estadoInmueble,
-      modalidadInmueble: datosInmueble.modalidadInmueble,
-      tituloInmueble: datosInmueble.tituloInmueble,
-      estrato: datosInmueble.estrato,
-      administracion: datosInmueble.administracion,
-      tipoVivienda: datosInmueble.tipoVivienda,
-      idCustomer: datosInmueble.idCustomer,
-      codigoCiudad: datosInmueble.codigoCiudad,
-      idTipoInmueble: datosInmueble.idTipoInmueble,
-      frameMaps: datosInmueble.frameMaps,
-      descripcionInmueble: datosInmueble.descripcionInmueble,
-      estadoPublicacionInmueble: datosInmueble.estadoPublicacionInmueble,
-      DetalleInmueble: datosInmueble.detalles, //Detalles de los inmuebles (al ser de proyecto)
-      Proyecto: datosInmueble.proyecto  //Detalles del proyecto
+      //Se obtiene el id del proyecto si fue creado
+      idProyecto = proyecto.idProyecto;
     }
-      , {
-        transaction,
-        include: [
-          { model: DetalleInmueble, as: "detalles" },
-          { model: DetalleInmueble, as: "proyecto" }
-        ]
-      });
 
+    // Iterar sobre los detalles y crear cada registro en DetalleInmueble
+    const detalles = datosInmueble.detalles;
+    for (const detalle of detalles) {
+      await DetalleInmueble.create({
+        ...detalle,
+        idInmueble: inmuebleId, // Usar el id del inmueble insertado
+        idProyecto: idProyecto //Id del proyecto insertado o NULL
+      }, { transaction });
+    }
     await transaction.commit(); // Confirmar la transacción
-    return "Inmueble con detalles creado correctamente."
+    msg = "Inmueble con detalles creado correctamente.";
+    if (isProyecto) {
+      msg = "Proyecto creado correctamente."
+    }
+    return msg;
   } catch (error) {
     await transaction.rollback(); // Revertir la transacción en caso de error
     throw error;
   }
-
 };
 
 module.exports = {
-  insertarInmuebleBasico, insertarInmuebleProyecto
+  insertarInmuebleDetalles
 }

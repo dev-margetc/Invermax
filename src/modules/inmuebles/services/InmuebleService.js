@@ -27,12 +27,7 @@ const insertarInmueble = async (datosInmueble) => {
         datosInmueble.inmueble.estadoPublicacionInmueble = "borrador";
 
         /*Si es valido se crea el inmueble con los detalles*/
-        msg= "";
-        if (tipoInmueble.tipoInmueble === 'proyecto') {
-            msg = inmuebleRepository.insertarInmuebleProyecto();
-        } else {
-            msg = await inmuebleRepository.insertarInmuebleBasico(datosInmueble.inmueble);
-        }
+        msg = await inmuebleRepository.insertarInmuebleDetalles(datosInmueble.inmueble, tipoInmueble.tipoInmueble === 'proyecto');
         return msg;
 
     } catch (error) {

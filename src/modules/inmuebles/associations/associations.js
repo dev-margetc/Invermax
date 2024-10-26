@@ -8,6 +8,8 @@ const Inmueble = require("../entities/Inmueble");
 const Proyecto = require('../entities/Proyecto');
 const Interesado = require('../entities/Interesado');
 const DetalleInmueble = require('../entities/DetalleInmueble');
+const Foto = require('../entities/Foto');
+const Video = require('../entities/Video');
 
 // Un departamento tiene muchas ciudades
 Departamento.hasMany(Ciudad, { foreignKey: 'id_departamento', as: 'ciudades' }); //La fk es de ciudad
@@ -54,7 +56,20 @@ Proyecto.belongsTo(Inmueble, { foreignKey: 'id_proyecto', as: 'inmueble' });
 Inmueble.hasMany(Interesado, { foreignKey: 'id_inmueble', as: 'interesados' });
 
 
-
-
 // Un interesado pertenece a solo un inmueble
 Interesado.belongsTo(Inmueble, { foreignKey: 'id_inmueble', as: 'inmueble' });
+
+
+// Un DetalleInmueble tiene varias fotos
+DetalleInmueble.hasMany(Foto, { foreignKey: 'id_detalle', as: 'fotos' });
+
+//Una foto pertenece a un detalle
+Foto.belongsTo(DetalleInmueble, { foreignKey: 'id_detalle', as: 'detalle' });
+
+// Un DetalleInmueble tiene varios videos
+DetalleInmueble.hasMany(Video, { foreignKey: 'id_detalle', as: 'videos' });
+
+//Un video pertenece a un detalle
+Video.belongsTo(DetalleInmueble, { foreignKey: 'id_detalle', as: 'detalle' });
+
+
