@@ -28,13 +28,15 @@ DetalleInmueble.belongsTo(Inmueble, { foreignKey: 'id_inmueble', as: 'inmueble' 
 // Un inmueble puede tener asociadas varias zonas
 Inmueble.belongsToMany(Zona, {
   through: ZonaInmueble, // Mapeo de la intermedia
-  foreignKey: 'id_inmueble' // Llave foranea relacionada en la intermedia
+  foreignKey: 'id_inmueble', // Llave foranea relacionada en la intermedia
+  as: "zonas"
 });
 
 // Una zona puede tener asociados varios inmuebles
-Inmueble.belongsToMany(Zona, {
+Zona.belongsToMany(Inmueble, {
   through: ZonaInmueble, // Mapeo de la intermedia
-  foreignKey: 'id_inmueble' // Llave foranea relacionada en la intermedia
+  foreignKey: 'id_zona',
+  as: "inmuebles" // Llave foranea relacionada en la intermedia
 });
 
 // Un tipo puede tener varios inmuebles asociados

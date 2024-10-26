@@ -5,6 +5,10 @@ const sequelize = require('../../../conf/database');
 //Tipos de ubicaciones
 const UBICACIONES = ['rural', 'urbana'];
 
+
+//Tipos de estados civiles
+const ESTADOS = ['soltero', 'casado', 'divorciado', 'viudo', 'union libre'];
+
 const Interesado = sequelize.define('Interesado', {
     idInteresado: {
         type: DataTypes.INTEGER,
@@ -44,7 +48,13 @@ const Interesado = sequelize.define('Interesado', {
     estadoCivilInteresado: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'estadoCivil'
+        validate: {
+            isIn: {
+                args: [ESTADOS],
+                msg: `Estado no valido. Los estados permitidos son: ${ESTADOS.join(', ')}.`
+            }
+        },
+        field: 'estado_Civil'
     },
 
     subsidioInteresado: { //Subsidio: 0- No, 1-si

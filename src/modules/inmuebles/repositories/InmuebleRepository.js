@@ -53,6 +53,16 @@ const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
   }
 };
 
+const asociarZona = async (inmueble, zona) => {
+  try{
+    await inmueble.addZonas(zona);
+    return "Inmueble relacionado con las zonas correctamente"
+  }catch(error){
+    throw error; 
+  }
+}
+
 module.exports = {
-  insertarInmuebleDetalles
+  insertarInmuebleDetalles,
+  asociarZona
 }

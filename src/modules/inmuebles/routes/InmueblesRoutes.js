@@ -6,6 +6,7 @@ const upload = require('../../../middleware/uploadConfig');
 const ciudadController = require("../controllers/CiudadController");
 const inmuebleController = require("../controllers/InmuebleController");
 const detalleInmuebleController = require("../controllers/DetalleController");
+const interesadoController = require("../controllers/InteresadoController");
 
 
 // Definir una ruta para obtener todos los departamentos con sus ciudades
@@ -14,10 +15,13 @@ router.get('/departamentos-ciudades', ciudadController.getDepartamentosConCiudad
 // ruta para insertar un inmueble
 router.post('/insertar-inmueble', inmuebleController.insertInmueble);
 
-// ruta para insertar una foto para un detalle inmueble
-router.post('/subir-foto-detalle', upload.single('archivo'),detalleInmuebleController.insertFoto); //No enviar el archivo de primero
+// ruta para insertar una foto/video para un detalle inmueble
+router.post('/subir-multimedia-detalle', upload.single('archivo'),detalleInmuebleController.insertMultimedia); //No enviar el archivo de primero
 
-// ruta para insertar un video para un detalle inmueble
-router.post('/subir-video', inmuebleController.insertInmueble);
+// Ruta para asociar una zona a un inmueble
+router.post('/agregar-zona', inmuebleController.agregarZona);
+
+// Ruta para insertar un interesado
+router.post('/registrar-interesado', interesadoController.registrarInteresado);
 
 module.exports = router;

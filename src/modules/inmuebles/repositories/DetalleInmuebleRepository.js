@@ -37,11 +37,11 @@ const insertarVideo = async (idDetalle, rutaVideo)=>{
     const transaction = await sequelize.transaction(); // Iniciar la transacción
     try {
         await Video.create({
-            urlFoto: rutaFoto,
+            urlFoto: rutaVideo,
             idDetalleInmueble: idDetalle
         });
         await transaction.commit();
-        return "Video de inmueble subida correctamente";
+        return "Video de inmueble subido correctamente";
     }catch(error){
         await transaction.rollback(); // Revertir en caso de error
         throw error;
@@ -49,5 +49,5 @@ const insertarVideo = async (idDetalle, rutaVideo)=>{
 }
 
 module.exports = {
-    insertDetalle, insertarFoto
+    insertDetalle, insertarFoto, insertarVideo
 }

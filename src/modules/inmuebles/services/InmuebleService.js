@@ -1,6 +1,8 @@
 /*Se aplica la lógica de negocio a los datos traidos por el repositorio. 
 Tambien se encarga de interactuar con otros servicios*/
+const Inmueble = require("../entities/Inmueble");
 const TipoInmueble = require("../entities/TipoInmueble");
+const Zona = require("../entities/Zona");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 
 
@@ -35,6 +37,28 @@ const insertarInmueble = async (datosInmueble) => {
     }
 }
 
+//Agregar zona
+const agregarZona = async (datos) => {
+    try {
+        //idZona puede ser una lista de id de zonas
+        const { idZona, idInmueble } = datos;
+
+        // Buscar por ID el inmueble
+        const inmueble = await Inmueble.findByPk(idInmueble);
+
+        if (!inmueble) {
+            throw new Error("Inmueble no encontrado");
+        }
+
+        /*Si es valido se inserta en la intermedia definida en asociaciones*/
+        msg = await inmuebleRepository.asociarZona(inmueble, idZona);
+        return msg;
+
+    } catch (error) {
+        console.log(error.name);
+        return manejarErrorSequelize(error, "inmueble-insert");
+    }
+}
 
 //Manejar los errores
 function manejarErrorSequelize(error, def) {
@@ -42,15 +66,19 @@ function manejarErrorSequelize(error, def) {
     if (def == "inmueble-insert") {
         msgVal = "Ya existe ese código de inmueble en el sistema";
     }
+
     switch (error.name) {
         case "SequelizeUniqueConstraintError":
             return { error: true, type: 'VALIDATION_ERROR', message: msgVal };
         case "SequelizeValidationError":
             return { error: true, type: 'VALIDATION_ERROR', message: error.message };
+        case "SequelizeForeignKeyConstraintError":
+            return { error: true, type: 'VALIDATION_ERROR', message: "Error en la inserción. Error de relaciones: "+error.message };
         default:
             return { error: true, type: 'UNKNOWN', message: error.message };
     }
 }
 module.exports = {
-    insertarInmueble
+    insertarInmueble,
+    agregarZona
 }

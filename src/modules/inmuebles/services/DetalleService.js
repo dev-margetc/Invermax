@@ -4,7 +4,7 @@ const foto = require("../entities/Foto");
 const DetalleInmueble = require("../entities/DetalleInmueble");
 const detalleRepo = require("../repositories/DetalleInmuebleRepository");
 
-const insertarFotoDetalle = async (detalleId, rutaFoto, tipoArchivo) => {
+const insertarMultimediaDetalle = async (detalleId, rutaFoto, tipoArchivo) => {
     try {
 
         // Verificar que exista el id del detalle
@@ -19,7 +19,7 @@ const insertarFotoDetalle = async (detalleId, rutaFoto, tipoArchivo) => {
         if (tipoArchivo === 'foto') {
             msg = await detalleRepo.insertarFoto(detalleId, rutaFoto);
         } else if (tipoArchivo === 'video') {
-            msg = await detalleRepo.insertarFoto(detalleId, rutaFoto);
+            msg = await detalleRepo.insertarVideo(detalleId, rutaFoto);
         } else {
             throw new Error("Tipo de archivo no especificado");
         }      
@@ -30,26 +30,7 @@ const insertarFotoDetalle = async (detalleId, rutaFoto, tipoArchivo) => {
     }
 }
 
-const insertarVideoDetalle = async (detalleId, rutaVideo) => {
-    try {
-
-        // Verificar que exista el id del detalle
-        const detalle = await DetalleInmueble.findByPk(detalleId);
-
-        if (!detalle) {
-            throw new Error("Detalle no encontrado");
-        }
-
-        /*Si es valido se crea la foto*/
-        msg = await detalleRepo.insertarFoto(detalleId, rutaFoto);
-        console.log(msg);
-        return msg;
-
-    } catch (error) {
-        throw error;
-    }
-}
 
 module.exports = {
-    insertarFotoDetalle
+    insertarMultimediaDetalle
 }

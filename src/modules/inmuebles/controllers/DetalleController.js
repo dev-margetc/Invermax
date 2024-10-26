@@ -3,12 +3,12 @@
 const detalleService = require('../services/DetalleService'); //Importar el servicio 
 const fs = require('fs'); // Para manejar la eliminación de archivos
 
-// Asignar una foto a un detalle
-const insertFoto = async (req, res) => {
+// Asignar una foto/video a un detalle
+const insertMultimedia = async (req, res) => {
     const rutaFoto = req.file.path; // Ruta del archivo subido
     try {
         const { idDetalle, tipoArchivo } = req.body;
-        msg = await detalleService.insertarFotoDetalle(idDetalle, rutaFoto, tipoArchivo);  
+        msg = await detalleService.insertarMultimediaDetalle(idDetalle, rutaFoto, tipoArchivo);  
         return res.status(200).json({ message: msg }); // Asegúrate de enviar una respuesta aquí
     } catch (err) {
 
@@ -27,6 +27,6 @@ const insertFoto = async (req, res) => {
 };
 
 module.exports = {
-    insertFoto
+    insertMultimedia
 }; 
 
