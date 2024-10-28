@@ -10,6 +10,7 @@ const Interesado = require('../entities/Interesado');
 const DetalleInmueble = require('../entities/DetalleInmueble');
 const Foto = require('../entities/Foto');
 const Video = require('../entities/Video');
+const VistaInmueblesPublicados = require('../entities/VistaInmueblesPublicados');
 
 // Un departamento tiene muchas ciudades
 Departamento.hasMany(Ciudad, { foreignKey: 'id_departamento', as: 'ciudades' }); //La fk es de ciudad
@@ -39,11 +40,15 @@ Zona.belongsToMany(Inmueble, {
   as: "inmuebles" // Llave foranea relacionada en la intermedia
 });
 
+// Asociacion de la intermedia
+Inmueble.hasMany(ZonaInmueble, { foreignKey: 'id_inmueble', as: 'zonasInmueble' });
+
+
 // Un tipo puede tener varios inmuebles asociados
 TipoInmueble.hasMany(Inmueble, { foreignKey: 'id_tipo_inmueble', as: 'inmuebles' });
 
 // Un inmueble tiene asociado un tipo
-Inmueble.belongsTo(TipoInmueble, { foreignKey: 'id_tipo_inmueble', as: 'tipo_inmueble' });
+Inmueble.belongsTo(TipoInmueble, { foreignKey: 'id_tipo_inmueble', as: 'tipoInmueble' });
 
 // Un inmueble solo tiene un proyecto asociado
 Inmueble.hasOne(Proyecto, {
@@ -61,17 +66,26 @@ Inmueble.hasMany(Interesado, { foreignKey: 'id_inmueble', as: 'interesados' });
 // Un interesado pertenece a solo un inmueble
 Interesado.belongsTo(Inmueble, { foreignKey: 'id_inmueble', as: 'inmueble' });
 
-
 // Un DetalleInmueble tiene varias fotos
-DetalleInmueble.hasMany(Foto, { foreignKey: 'id_detalle', as: 'fotos' });
+DetalleInmueble.hasMany(Foto, { foreignKey: 'id_detalle_inmueble', as: 'fotos' });
 
 //Una foto pertenece a un detalle
-Foto.belongsTo(DetalleInmueble, { foreignKey: 'id_detalle', as: 'detalle' });
+Foto.belongsTo(DetalleInmueble, { foreignKey: 'id_detalle_inmueble', as: 'detalle' });
 
 // Un DetalleInmueble tiene varios videos
-DetalleInmueble.hasMany(Video, { foreignKey: 'id_detalle', as: 'videos' });
+DetalleInmueble.hasMany(Video, { foreignKey: 'id_detalle_inmueble', as: 'videos' });
 
 //Un video pertenece a un detalle
-Video.belongsTo(DetalleInmueble, { foreignKey: 'id_detalle', as: 'detalle' });
+Video.belongsTo(DetalleInmueble, { foreignKey: 'id_detalle_inmueble', as: 'detalle' });
 
 
+/* Relaciones de la vista de filtro*/
+  VistaInmueblesPublicados.belongsTo(Ciudad, {
+      foreignKey: 'cod_ciudad',
+      as: 'ciudad', // Alias para la relación
+  });
+
+  VistaInmueblesPublicados.belongsTo(Inmueble, {
+    foreignKey: 'id_inmueble',
+    as: 'inmueble', // Alias para la relación
+});

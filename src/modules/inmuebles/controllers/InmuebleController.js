@@ -1,6 +1,7 @@
 //Manejar las solicitudes HTTP. Llama al servicio correspondiente.
 
 const inmuebleService = require('../services/InmuebleService'); //Importar el servicio 
+const filtroInmueble = require('../services/FiltrosInmuebleService');
 
 // Insertar un inmueble
 const insertInmueble = async (req, res) => {
@@ -37,7 +38,54 @@ const agregarZona = async (req, res) => {
     }
 };
 
+//Traer inmuebles publicados
+const getInmueblesPublicados = async (req, res) => {
+    try {
+        console.log(req.query);
+        msg = await filtroInmueble.getPublicados(req.query);
+        if(!msg.error){
+            res.status(201).json(msg); //Se retorna un mensaje
+        }else{
+            return res.status(500).json({ error: 'Error inesperado: ' + msg.message });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error del servidor: ' + err.message });
+    }
+};
+
+
+//Traer inmuebles publicados
+const getInmueblesUsuario = async (req, res) => {
+    try {
+        msg = await filtroInmueble.getInmueblesUsuario(req.query);
+        console.log(msg.error);
+        if(!msg.error){
+            res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
+        }else{
+            return res.status(500).json({ error: 'Error inesperado: ' + msg.message });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error del servidor: ' + err.message });
+    }
+};
+
+//Traer inmuebles con un codigo
+const getInmueblesCodigo = async (req, res) => {
+    try {
+        msg = await filtroInmueble.getInmueblesCodigo(req.query);
+        if(!msg.error){
+            res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
+        }else{
+            return res.status(500).json({ error: 'Error inesperado: ' + msg.message });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error del servidor: ' + err.message });
+    }
+};
 module.exports = {
     insertInmueble,
-    agregarZona
+    agregarZona,
+    getInmueblesPublicados,
+    getInmueblesUsuario,
+    getInmueblesCodigo
 }; 

@@ -2,7 +2,7 @@
 Tambien se encarga de interactuar con otros servicios*/
 const Inmueble = require("../entities/Inmueble");
 const TipoInmueble = require("../entities/TipoInmueble");
-const Zona = require("../entities/Zona");
+const seq = require("../../../conf/database");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 
 
@@ -55,10 +55,16 @@ const agregarZona = async (datos) => {
         return msg;
 
     } catch (error) {
-        console.log(error.name);
-        return manejarErrorSequelize(error, "inmueble-insert");
+        return manejarErrorSequelize(error, null);
     }
 }
+
+module.exports = {
+    insertarInmueble,
+    agregarZona
+}
+
+
 
 //Manejar los errores
 function manejarErrorSequelize(error, def) {
@@ -73,12 +79,8 @@ function manejarErrorSequelize(error, def) {
         case "SequelizeValidationError":
             return { error: true, type: 'VALIDATION_ERROR', message: error.message };
         case "SequelizeForeignKeyConstraintError":
-            return { error: true, type: 'VALIDATION_ERROR', message: "Error en la inserción. Error de relaciones: "+error.message };
+            return { error: true, type: 'VALIDATION_ERROR', message: "Error en la inserción. Error de relaciones: " + error.message };
         default:
             return { error: true, type: 'UNKNOWN', message: error.message };
     }
-}
-module.exports = {
-    insertarInmueble,
-    agregarZona
 }
