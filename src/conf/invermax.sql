@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-10-2024 a las 04:13:48
+-- Tiempo de generación: 29-10-2024 a las 00:02:43
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -1214,8 +1214,16 @@ CREATE TABLE `customers` (
   `telefono_fijo` varchar(30) DEFAULT NULL,
   `codigo_customer` varchar(30) DEFAULT NULL COMMENT 'Codigo unico de una inmobiliaria/tipo de customer. No es requerido',
   `perfil` varchar(25) NOT NULL COMMENT 'Tipo de customer. Pueden ser constructora,inmobiliaria,agente inmobiliario,propietario',
+  `numero_comercial` varchar(25) DEFAULT NULL,
   `id_usuario` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene a los usuarios tipo inmobiliaria';
+
+--
+-- Volcado de datos para la tabla `customers`
+--
+
+INSERT INTO `customers` (`id_customer`, `nombre_customer`, `logo_customer`, `correo_notificaciones`, `telefono_notificaciones`, `telefono_fijo`, `codigo_customer`, `perfil`, `numero_comercial`, `id_usuario`) VALUES
+(1, 'test', NULL, 'test@notify', '12123123', '23234234', '400004', 'constructora', '34343434', 1);
 
 -- --------------------------------------------------------
 
@@ -1280,10 +1288,39 @@ CREATE TABLE `detalles_inmuebles` (
   `iframe_recorrido` varchar(255) NOT NULL COMMENT 'Solo se guarda la URL del iframe del recorrido virtual',
   `cantidad_habitaciones` int(11) NOT NULL,
   `cantidad_baños` int(11) NOT NULL,
-  `parqueadero` varchar(25) NOT NULL COMMENT 'Posibles valores: ''Sí, carros'',''Sí, moto'',''No'',''''',
+  `parqueadero` varchar(25) NOT NULL COMMENT 'Posibles valores: ''Sí, carros'',''Sí, moto'',''No''',
+  `amoblado` tinyint(1) NOT NULL COMMENT '0 indica que no es amoblado, 1 indica que sí',
   `id_inmueble` int(11) NOT NULL,
   `id_proyecto` int(11) DEFAULT NULL COMMENT 'Referencia al proyecto. si es null es porque no pertenece a un proyecto'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene detalles de los inmuebles y separar proyectos';
+
+--
+-- Volcado de datos para la tabla `detalles_inmuebles`
+--
+
+INSERT INTO `detalles_inmuebles` (`id_detalle`, `valor_inmueble`, `area`, `iframe_recorrido`, `cantidad_habitaciones`, `cantidad_baños`, `parqueadero`, `amoblado`, `id_inmueble`, `id_proyecto`) VALUES
+(1, 300000.00, 150, 'hhttpads', 0, 2, '', 0, 59, NULL),
+(2, 300000.00, 150, 'hhttpads', 4, 2, 'no', 0, 61, NULL),
+(3, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 64, NULL),
+(4, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 64, NULL),
+(5, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 65, NULL),
+(6, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 65, NULL),
+(7, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 66, NULL),
+(8, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 66, NULL),
+(9, 300000.00, 150, 'hhttpads', 4, 3, 'si, motos', 0, 67, NULL),
+(10, 200000.00, 155, 'hadasdads', 5, 2, 'no', 0, 67, NULL),
+(11, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 69, NULL),
+(12, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 69, NULL),
+(13, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 71, NULL),
+(14, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 71, NULL),
+(15, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 72, NULL),
+(16, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 72, NULL),
+(17, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 75, 1),
+(18, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 75, 1),
+(19, 6550000.00, 50, 'hhttpads', 5, 3, 'no', 0, 80, NULL),
+(20, 6550000.00, 50, 'hhttpads', 7, 5, 'no', 1, 81, NULL),
+(21, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 1, 84, 3),
+(22, 20000.00, 155, 'hadasdads', 5, 1, 'no', 0, 84, 3);
 
 -- --------------------------------------------------------
 
@@ -1298,6 +1335,29 @@ CREATE TABLE `fotos` (
   `id_blog` int(11) DEFAULT NULL COMMENT 'id del blog al que pertenece la foto'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `fotos`
+--
+
+INSERT INTO `fotos` (`id_foto`, `url_foto`, `id_detalle_inmueble`, `id_blog`) VALUES
+(1, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\1-1729899132348-315022223.png', 1, NULL),
+(2, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\3-1729899269189-538742224.png', 3, NULL),
+(3, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\3-1729899333156-854477510.png', 3, NULL),
+(4, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\3-1729899390320-359172367.png', 3, NULL),
+(5, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\14-1729899598484-715423672.png', 14, NULL),
+(6, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\14-1729899761315-980483264.mp4', 14, NULL),
+(7, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\14-1729900300813-10157886.png', 14, NULL),
+(8, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\14-1729900710870-491428834.png', 14, NULL),
+(9, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\5-1729900731850-620540656.png', 5, NULL),
+(10, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\5-1729903983017-192270287.mp4', 5, NULL),
+(11, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\8-1729906903562-451773453.mp4', 8, NULL),
+(12, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\3-1729907121946-499388610.png', 3, NULL),
+(13, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\17-1729991482704-969006685.png', 17, NULL),
+(14, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\5-1730081291507-380941199.png', 5, NULL),
+(15, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\10-1730083454303-57458893.png', 10, NULL),
+(16, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\12-1730156144496-285083416.png', 12, NULL),
+(17, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\fotos\\13-1730156164178-893880629.png', 13, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -1311,14 +1371,69 @@ CREATE TABLE `inmuebles` (
   `estado_inmueble` varchar(25) NOT NULL COMMENT 'Estos pueden ser Nuevo o Usado',
   `modalidad` varchar(15) NOT NULL COMMENT 'La modalidad del inmueble. Pueden ser compra o arriendo',
   `titulo_inmueble` varchar(100) NOT NULL,
-  `estrato` tinyint(3) UNSIGNED NOT NULL,
-  `administracion_incluida` tinyint(1) NOT NULL COMMENT 'Valor de false indica que no está incluida',
+  `estrato` tinyint(1) UNSIGNED NOT NULL,
+  `administracion_incluida` tinyint(1) NOT NULL COMMENT 'Valor de 0\r\nindica que no está incluida',
   `tipo_vivienda` varchar(25) NOT NULL COMMENT 'Puede ser VIS o NO VIS',
-  `frame_maps` varchar(255) NOT NULL,
+  `iframe_maps` varchar(255) NOT NULL,
+  `estado_publicacion` varchar(25) NOT NULL COMMENT 'Puede estar en ''borrador'' o ''publicado''',
+  `fecha_publicacion` datetime DEFAULT NULL COMMENT 'Fecha de publicacion, es null cuando no está publicado el inmueble',
   `id_customer` int(11) NOT NULL,
   `cod_ciudad` int(11) NOT NULL,
   `id_tipo_inmueble` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `inmuebles`
+--
+
+INSERT INTO `inmuebles` (`id_inmueble`, `codigo_inmueble`, `descripcion`, `estado_inmueble`, `modalidad`, `titulo_inmueble`, `estrato`, `administracion_incluida`, `tipo_vivienda`, `iframe_maps`, `estado_publicacion`, `fecha_publicacion`, `id_customer`, `cod_ciudad`, `id_tipo_inmueble`) VALUES
+(21, '2045242', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 3),
+(31, '2045243', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(33, '2045245', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(35, '20452455', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(37, '2045211155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(39, '2045213155', 'U', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(40, '2035213155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(41, '203523155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 43, 2),
+(43, '202523155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(44, '232223155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-10-26 20:37:27', 1, 43, 2),
+(45, '2313023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(48, '2213023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(49, '22123023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(50, '22233023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(51, '222323423155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(54, '231003303155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(55, '229', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(56, '129', 'Una descripcion creativa', 'usado', 'compra', 'pruebaasdsd', 5, 1, 'VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 3, 2),
+(59, '122', 'Una descripcion creativa', 'usado', 'compra', 'pruebaasdsd', 5, 1, 'VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 3, 2),
+(61, '102', 'Una descripcion creativa', 'usado', 'compra', 'pruebaasdsd', 5, 1, 'VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 3, 2),
+(64, '4845242', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(65, '48445242', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(66, '482445242', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(67, '4824425242', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-10-26 20:32:05', 1, 43, 2),
+(69, '48224425242', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 43, 2),
+(71, '484425242', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 43, 2),
+(72, '48446625242', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 43, 2),
+(75, '484466252242', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 43, 5),
+(80, '10001', 'Una descripcion creativa', 'nuevo', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 43, 4),
+(81, '130001', 'Una descripcion creativa', 'nuevo', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 23, 4),
+(84, '4899966252242', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5);
+
+--
+-- Disparadores `inmuebles`
+--
+DELIMITER $$
+CREATE TRIGGER `actualizar_fecha_publicacion` BEFORE UPDATE ON `inmuebles` FOR EACH ROW BEGIN
+    -- Si el nuevo estado es 'borrador', establecer la fecha de publicación como NULL
+    IF NEW.estado_publicacion = 'borrador' THEN
+        SET NEW.fecha_publicacion = NULL;
+    -- Si el nuevo estado es 'publicado', establecer la fecha de publicación a la fecha y hora actuales
+    ELSEIF NEW.estado_publicacion = 'publicado' THEN
+        SET NEW.fecha_publicacion = NOW();
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -1365,6 +1480,13 @@ CREATE TABLE `interesados` (
   `id_inmueble` int(11) NOT NULL COMMENT 'Inmueble al cual está interesado el usuario'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `interesados`
+--
+
+INSERT INTO `interesados` (`id_interesado`, `nombre`, `telefono`, `correo`, `ubicacion`, `subsidio`, `estado_civil`, `id_inmueble`) VALUES
+(1, 'Raul Alvarez', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41);
+
 -- --------------------------------------------------------
 
 --
@@ -1390,6 +1512,14 @@ CREATE TABLE `proyectos` (
   `id_inmueble` int(11) NOT NULL COMMENT 'Referencia al inmueble para acceder a sus datos'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene datos particulares de los proyectos';
 
+--
+-- Volcado de datos para la tabla `proyectos`
+--
+
+INSERT INTO `proyectos` (`id_proyecto`, `fecha_entrega`, `id_inmueble`) VALUES
+(1, '2025-12-06', 75),
+(3, '2025-12-06', 84);
+
 -- --------------------------------------------------------
 
 --
@@ -1407,19 +1537,19 @@ CREATE TABLE `suscripciones` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `tipo_inmueble`
+-- Estructura de tabla para la tabla `tipos_inmueble`
 --
 
-CREATE TABLE `tipo_inmueble` (
+CREATE TABLE `tipos_inmueble` (
   `id_tipo_inmueble` int(11) NOT NULL,
   `tipo_inmueble` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `tipo_inmueble`
+-- Volcado de datos para la tabla `tipos_inmueble`
 --
 
-INSERT INTO `tipo_inmueble` (`id_tipo_inmueble`, `tipo_inmueble`) VALUES
+INSERT INTO `tipos_inmueble` (`id_tipo_inmueble`, `tipo_inmueble`) VALUES
 (1, 'apartamento'),
 (2, 'apartaestudio'),
 (3, 'casa'),
@@ -1435,8 +1565,15 @@ INSERT INTO `tipo_inmueble` (`id_tipo_inmueble`, `tipo_inmueble`) VALUES
 CREATE TABLE `usuarios` (
   `id_usuario` int(11) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `tipo_usuario` enum('usuario','customer','admin','') NOT NULL
+  `tipo_usuario` varchar(25) NOT NULL COMMENT 'Estos pueden ser\r\n''usuario'',''customer'',''admin'''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`id_usuario`, `email`, `tipo_usuario`) VALUES
+(1, 'test@gmail.com', '');
 
 -- --------------------------------------------------------
 
@@ -1450,6 +1587,56 @@ CREATE TABLE `videos` (
   `id_detalle_inmueble` int(11) DEFAULT NULL,
   `id_blog` int(11) DEFAULT NULL COMMENT 'Id del blog al que pertenece la imagen'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `videos`
+--
+
+INSERT INTO `videos` (`id_video`, `url_video`, `id_detalle_inmueble`, `id_blog`) VALUES
+(1, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\8-1729907075363-259743987.mp4', 8, NULL),
+(2, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\4-1729907252259-301830563.mp4', 4, NULL),
+(3, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\10-1729912027259-414529724.mp4', 10, NULL),
+(4, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\12-1729987642777-915951748.mp4', 12, NULL),
+(5, 'C:\\Users\\ADMIN\\Videos\\Invermax-temp\\uploads\\inmuebles\\videos\\12-1730081268580-353717211.mp4', 12, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura Stand-in para la vista `vista_inmuebles_filtros`
+-- (Véase abajo para la vista actual)
+--
+CREATE TABLE `vista_inmuebles_filtros` (
+`id_inmueble` int(11)
+,`estado_inmueble` varchar(25)
+,`modalidad` varchar(15)
+,`titulo_inmueble` varchar(100)
+,`tipo_inmueble` varchar(25)
+,`nombre_customer` varchar(50)
+,`nombre_ciudad` varchar(20)
+,`precio_minimo` decimal(12,2)
+,`precio_maximo` decimal(12,2)
+,`area_minima` int(11)
+,`habitaciones_minimas` int(11)
+,`baños_minimos` int(11)
+,`foto` int(11)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura Stand-in para la vista `vista_inmuebles_publicados`
+-- (Véase abajo para la vista actual)
+--
+CREATE TABLE `vista_inmuebles_publicados` (
+`id_inmueble` int(11)
+,`estado_inmueble` varchar(25)
+,`modalidad` varchar(15)
+,`titulo_inmueble` varchar(100)
+,`fecha_publicacion` datetime
+,`id_customer` int(11)
+,`cod_ciudad` int(11)
+,`id_tipo_inmueble` int(11)
+);
 
 -- --------------------------------------------------------
 
@@ -1486,6 +1673,36 @@ CREATE TABLE `zonas_inmuebles` (
   `id_inmueble` int(11) NOT NULL,
   `id_zona` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Intermedia entre los inmuebles y las zonas';
+
+--
+-- Volcado de datos para la tabla `zonas_inmuebles`
+--
+
+INSERT INTO `zonas_inmuebles` (`id_inmueble`, `id_zona`) VALUES
+(40, 1),
+(40, 3),
+(40, 4),
+(75, 1),
+(75, 3),
+(75, 5);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura para la vista `vista_inmuebles_filtros`
+--
+DROP TABLE IF EXISTS `vista_inmuebles_filtros`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_inmuebles_filtros`  AS SELECT `inmu`.`id_inmueble` AS `id_inmueble`, `inmu`.`estado_inmueble` AS `estado_inmueble`, `inmu`.`modalidad` AS `modalidad`, `inmu`.`titulo_inmueble` AS `titulo_inmueble`, `tipo`.`tipo_inmueble` AS `tipo_inmueble`, `custo`.`nombre_customer` AS `nombre_customer`, `ciudad`.`nombre_ciudad` AS `nombre_ciudad`, (select min(`det`.`valor_inmueble`) from `detalles_inmuebles` `det` where `det`.`id_inmueble` = `inmu`.`id_inmueble`) AS `precio_minimo`, (select max(`det`.`valor_inmueble`) from `detalles_inmuebles` `det` where `det`.`id_inmueble` = `inmu`.`id_inmueble`) AS `precio_maximo`, (select min(`det`.`area`) from `detalles_inmuebles` `det` where `det`.`id_inmueble` = `inmu`.`id_inmueble`) AS `area_minima`, (select min(`det`.`cantidad_habitaciones`) from `detalles_inmuebles` `det` where `det`.`id_inmueble` = `inmu`.`id_inmueble`) AS `habitaciones_minimas`, (select min(`det`.`cantidad_baños`) from `detalles_inmuebles` `det` where `det`.`id_inmueble` = `inmu`.`id_inmueble`) AS `baños_minimos`, (select `foto`.`id_foto` from (`fotos` `foto` join `detalles_inmuebles` `det` on(`foto`.`id_detalle_inmueble` = `det`.`id_detalle`)) where `det`.`id_inmueble` = `inmu`.`id_inmueble` order by `foto`.`id_foto` limit 1) AS `foto` FROM (((`inmuebles` `inmu` join `customers` `custo`) join `ciudades` `ciudad`) join `tipos_inmueble` `tipo`) WHERE `custo`.`id_customer` = `inmu`.`id_customer` AND `ciudad`.`cod_ciudad` = `inmu`.`cod_ciudad` AND `inmu`.`id_tipo_inmueble` = `tipo`.`id_tipo_inmueble` AND `inmu`.`estado_publicacion` = 'publicado' ORDER BY `inmu`.`fecha_publicacion` ASC ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura para la vista `vista_inmuebles_publicados`
+--
+DROP TABLE IF EXISTS `vista_inmuebles_publicados`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_inmuebles_publicados`  AS SELECT `inmuebles`.`id_inmueble` AS `id_inmueble`, `inmuebles`.`estado_inmueble` AS `estado_inmueble`, `inmuebles`.`modalidad` AS `modalidad`, `inmuebles`.`titulo_inmueble` AS `titulo_inmueble`, `inmuebles`.`fecha_publicacion` AS `fecha_publicacion`, `inmuebles`.`id_customer` AS `id_customer`, `inmuebles`.`cod_ciudad` AS `cod_ciudad`, `inmuebles`.`id_tipo_inmueble` AS `id_tipo_inmueble` FROM `inmuebles` WHERE `inmuebles`.`estado_publicacion` = 'publicado' ORDER BY `inmuebles`.`fecha_publicacion` ASC ;
 
 --
 -- Índices para tablas volcadas
@@ -1605,9 +1822,9 @@ ALTER TABLE `suscripciones`
   ADD KEY `id_customer` (`id_customer`);
 
 --
--- Indices de la tabla `tipo_inmueble`
+-- Indices de la tabla `tipos_inmueble`
 --
-ALTER TABLE `tipo_inmueble`
+ALTER TABLE `tipos_inmueble`
   ADD PRIMARY KEY (`id_tipo_inmueble`);
 
 --
@@ -1663,7 +1880,7 @@ ALTER TABLE `ciudades`
 -- AUTO_INCREMENT de la tabla `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id_customer` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_customer` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `departamentos`
@@ -1675,19 +1892,19 @@ ALTER TABLE `departamentos`
 -- AUTO_INCREMENT de la tabla `detalles_inmuebles`
 --
 ALTER TABLE `detalles_inmuebles`
-  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `fotos`
 --
 ALTER TABLE `fotos`
-  MODIFY `id_foto` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_foto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `inmuebles`
 --
 ALTER TABLE `inmuebles`
-  MODIFY `id_inmueble` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_inmueble` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
 -- AUTO_INCREMENT de la tabla `inmuebles_destacados`
@@ -1705,7 +1922,7 @@ ALTER TABLE `inmuebles_en_ascenso`
 -- AUTO_INCREMENT de la tabla `interesados`
 --
 ALTER TABLE `interesados`
-  MODIFY `id_interesado` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_interesado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `planes`
@@ -1717,7 +1934,7 @@ ALTER TABLE `planes`
 -- AUTO_INCREMENT de la tabla `proyectos`
 --
 ALTER TABLE `proyectos`
-  MODIFY `id_proyecto` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_proyecto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `suscripciones`
@@ -1726,22 +1943,22 @@ ALTER TABLE `suscripciones`
   MODIFY `id_suscripcion` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `tipo_inmueble`
+-- AUTO_INCREMENT de la tabla `tipos_inmueble`
 --
-ALTER TABLE `tipo_inmueble`
+ALTER TABLE `tipos_inmueble`
   MODIFY `id_tipo_inmueble` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `videos`
 --
 ALTER TABLE `videos`
-  MODIFY `id_video` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_video` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `zonas`
@@ -1798,7 +2015,7 @@ ALTER TABLE `fotos`
 ALTER TABLE `inmuebles`
   ADD CONSTRAINT `inmuebles_ibfk_1` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id_customer`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `inmuebles_ibfk_2` FOREIGN KEY (`cod_ciudad`) REFERENCES `ciudades` (`cod_ciudad`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `inmuebles_ibfk_3` FOREIGN KEY (`id_tipo_inmueble`) REFERENCES `tipo_inmueble` (`id_tipo_inmueble`);
+  ADD CONSTRAINT `inmuebles_ibfk_3` FOREIGN KEY (`id_tipo_inmueble`) REFERENCES `tipos_inmueble` (`id_tipo_inmueble`);
 
 --
 -- Filtros para la tabla `inmuebles_destacados`
@@ -1824,7 +2041,7 @@ ALTER TABLE `interesados`
 -- Filtros para la tabla `proyectos`
 --
 ALTER TABLE `proyectos`
-  ADD CONSTRAINT `proyectos_ibfk_1` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`);
+  ADD CONSTRAINT `proyectos_ibfk_1` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `suscripciones`
