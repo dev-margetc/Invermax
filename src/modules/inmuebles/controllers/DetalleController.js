@@ -7,7 +7,8 @@ const fs = require('fs'); // Para manejar la eliminación de archivos
 const insertMultimedia = async (req, res) => {
     const rutaFoto = req.file.path; // Ruta del archivo subido
     try {
-        const { idDetalle, tipoArchivo } = req.body;
+        const {tipoArchivo } = req.body;
+        const {idDetalle} = req.params;
         msg = await detalleService.insertarMultimediaDetalle(idDetalle, rutaFoto, tipoArchivo);  
         return res.status(200).json({ message: msg }); // Asegúrate de enviar una respuesta aquí
     } catch (err) {

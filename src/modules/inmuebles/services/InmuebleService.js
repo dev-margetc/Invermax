@@ -2,8 +2,9 @@
 Tambien se encarga de interactuar con otros servicios*/
 const Inmueble = require("../entities/Inmueble");
 const TipoInmueble = require("../entities/TipoInmueble");
-const seq = require("../../../conf/database");
+const sequelize = require("../../../conf/database");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
+const DetalleService = require("./DetalleService");
 
 
 const insertarInmueble = async (datosInmueble) => {
@@ -58,10 +59,35 @@ const agregarZona = async (datos) => {
         return manejarErrorSequelize(error, null);
     }
 }
+//Actualizar inmueble con detalles
+const actualizarInmuebleDetalles = async (datos, params) => {
+    const {inmueble} = datos;
+    const {idInmueble} = params
+    const listaDetalles = inmueble.detalles;
+
+    // crear transaccion
+    const transaction = await sequelize.transaction(); // Iniciar la transacción
+    try {
+        // actualizar el producto
+        await inmuebleRepository.actualizarInmueble(inmueble,idInmueble, transaction);
+        
+        // Actualizar detalles
+        await DetalleService.actualizarDetallesInmueble(listaDetalles,idInmueble,transaction);
+
+        await transaction.commit();
+        return "Actualizado";
+    } catch(error){
+        console.log(error);
+        await transaction.rollback();
+        return manejarErrorSequelize(error, "update");  
+    }
+}
+
 
 module.exports = {
     insertarInmueble,
-    agregarZona
+    agregarZona,
+    actualizarInmuebleDetalles
 }
 
 
@@ -69,7 +95,7 @@ module.exports = {
 //Manejar los errores
 function manejarErrorSequelize(error, def) {
     msgVal = "Error de clave unica";
-    if (def == "inmueble-insert") {
+    if (def == "inmueble-insert"|| def == "update") {
         msgVal = "Ya existe ese código de inmueble en el sistema";
     }
 

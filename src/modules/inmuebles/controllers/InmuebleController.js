@@ -26,7 +26,9 @@ const insertInmueble = async (req, res) => {
 // Insertar un inmueble
 const agregarZona = async (req, res) => {
     try {
-        const datos = req.body; //Datos del cuerpo de la solicitud
+        console.log(req.params);
+        const datos = req.body; //Datos del cuerpo de la solicitud (zonas)
+        datos.idInmueble = req.params.idInmueble;
         msg = await inmuebleService.agregarZona(datos);
         if(!msg.error){
             res.status(201).json(msg); //Se retorna un mensaje
@@ -57,7 +59,7 @@ const getInmueblesPublicados = async (req, res) => {
 //Traer inmuebles publicados
 const getInmueblesUsuario = async (req, res) => {
     try {
-        msg = await filtroInmueble.getInmueblesUsuario(req.query);
+        msg = await filtroInmueble.getInmueblesUsuario(req.params);
         console.log(msg.error);
         if(!msg.error){
             res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
@@ -72,7 +74,7 @@ const getInmueblesUsuario = async (req, res) => {
 //Traer inmuebles con un codigo
 const getInmueblesCodigo = async (req, res) => {
     try {
-        msg = await filtroInmueble.getInmueblesCodigo(req.query);
+        msg = await filtroInmueble.getInmueblesCodigo(req.params);
         if(!msg.error){
             res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
         }else{
@@ -82,10 +84,26 @@ const getInmueblesCodigo = async (req, res) => {
         res.status(500).json({ error: 'Error del servidor: ' + err.message });
     }
 };
+
+//Editar un inmueble con detalles
+const actualizarInmuebleDetalles = async (req, res) => {
+    try {
+        msg = await inmuebleService.actualizarInmuebleDetalles(req.body, req.params);
+        if(!msg.error){
+            res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
+        }else{
+            return res.status(500).json({ error: 'Error inesperado: ' + msg.message });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error del servidor: ' + err.message });
+    }
+}
+
 module.exports = {
     insertInmueble,
     agregarZona,
     getInmueblesPublicados,
     getInmueblesUsuario,
-    getInmueblesCodigo
+    getInmueblesCodigo,
+    actualizarInmuebleDetalles
 }; 

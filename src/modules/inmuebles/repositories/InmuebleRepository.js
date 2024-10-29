@@ -7,8 +7,6 @@ const Proyecto = require("../entities/Proyecto");
 const VistaPublicados = require("../entities/VistaInmueblesPublicados");
 const Ciudad = require("../entities/Ciudad");
 const TipoInmueble = require("../entities/TipoInmueble");
-const Foto = require("../entities/Foto");
-const ZonaInmueble = require("../entities/ZonasInmuebles");
 const Zona = require("../entities/Zona");
 
 //Crea un inmueble con sus detalles y proyecto si es el caso
@@ -163,10 +161,22 @@ const getInmueblesCodigo = async (codigo) => {
 
   return inmuebles;
 }
+
+// Actualizar inmueble
+const actualizarInmueble = async(datos, idInmueble, transaccion) =>{
+   try{
+    await Inmueble.update(datos, {where:{idInmueble}, transaccion});
+
+  }catch(error){
+   throw error; // Lanzar error para que sea capturado en el controlador
+  }
+  return "editando "+datos;
+}
 module.exports = {
   insertarInmuebleDetalles,
   asociarZona,
   getPublicados,
   getInmueblesUsuario,
-  getInmueblesCodigo
+  getInmueblesCodigo,
+  actualizarInmueble
 }

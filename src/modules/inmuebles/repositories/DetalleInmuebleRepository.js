@@ -48,6 +48,16 @@ const insertarVideo = async (idDetalle, rutaVideo)=>{
     }
 }
 
+// Actualizar detalle
+const actualizarDetalle = async(datos, idDetalle, idInmueble, transaccion) =>{
+    try{
+     await DetalleInmueble.update(datos, { where: { idDetalle: idDetalle, idInmueble: idInmueble}, transaccion });
+     return "Detalle actualizado"
+   }catch(error){
+   throw error;
+   }
+ }
+
 module.exports = {
-    insertDetalle, insertarFoto, insertarVideo
+    insertDetalle, insertarFoto, insertarVideo, actualizarDetalle
 }
