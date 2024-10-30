@@ -2,6 +2,7 @@
 
 const inmuebleService = require('../services/InmuebleService'); //Importar el servicio 
 const filtroInmueble = require('../services/FiltrosInmuebleService');
+const zonasInmueblesService = require('../services/ZonasInmueblesService');
 
 // Insertar un inmueble
 const insertInmueble = async (req, res) => {
@@ -29,7 +30,7 @@ const agregarZona = async (req, res) => {
         console.log(req.params);
         const datos = req.body; //Datos del cuerpo de la solicitud (zonas)
         datos.idInmueble = req.params.idInmueble;
-        msg = await inmuebleService.agregarZona(datos);
+        msg = await zonasInmueblesService.agregarZona(datos);
         if(!msg.error){
             res.status(201).json(msg); //Se retorna un mensaje
         }else{

@@ -5,6 +5,7 @@ const TipoInmueble = require("../entities/TipoInmueble");
 const sequelize = require("../../../conf/database");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
+const zonaInmuebleService = require("./ZonasInmueblesService");
 
 
 const insertarInmueble = async (datosInmueble) => {
@@ -37,56 +38,41 @@ const insertarInmueble = async (datosInmueble) => {
         return manejarErrorSequelize(error, "inmueble-insert");
     }
 }
-
-//Agregar zona
-const agregarZona = async (datos) => {
-    try {
-        //idZona puede ser una lista de id de zonas
-        const { idZona, idInmueble } = datos;
-
-        // Buscar por ID el inmueble
-        const inmueble = await Inmueble.findByPk(idInmueble);
-
-        if (!inmueble) {
-            throw new Error("Inmueble no encontrado");
-        }
-
-        /*Si es valido se inserta en la intermedia definida en asociaciones*/
-        msg = await inmuebleRepository.asociarZona(inmueble, idZona);
-        return msg;
-
-    } catch (error) {
-        return manejarErrorSequelize(error, null);
-    }
-}
 //Actualizar inmueble con detalles
 const actualizarInmuebleDetalles = async (datos, params) => {
-    const {inmueble} = datos;
-    const {idInmueble} = params
+    const { inmueble } = datos;
+    const { idInmueble } = params
     const listaDetalles = inmueble.detalles;
+    const zonas = inmueble.zonas;
 
     // crear transaccion
     const transaction = await sequelize.transaction(); // Iniciar la transacción
     try {
-        // actualizar el producto
-        await inmuebleRepository.actualizarInmueble(inmueble,idInmueble, transaction);
-        
-        // Actualizar detalles
-        await DetalleService.actualizarDetallesInmueble(listaDetalles,idInmueble,transaction);
+        // actualizar el inmueble
+        await inmuebleRepository.actualizarInmueble(inmueble, idInmueble, transaction);
+
+        // Si hay zonas se actualizan
+        if (zonas) {
+            await zonaInmuebleService.actualizarZonasInmuebles(zonas, idInmueble, transaction);
+        }
+
+        // Actualizar detalles si hay
+        if (listaDetalles) {
+            await DetalleService.actualizarDetallesInmueble(listaDetalles, idInmueble, transaction);
+        }
 
         await transaction.commit();
         return "Actualizado";
-    } catch(error){
+    } catch (error) {
         console.log(error);
         await transaction.rollback();
-        return manejarErrorSequelize(error, "update");  
+        return manejarErrorSequelize(error, "update");
     }
 }
 
 
 module.exports = {
     insertarInmueble,
-    agregarZona,
     actualizarInmuebleDetalles
 }
 
@@ -95,7 +81,7 @@ module.exports = {
 //Manejar los errores
 function manejarErrorSequelize(error, def) {
     msgVal = "Error de clave unica";
-    if (def == "inmueble-insert"|| def == "update") {
+    if (def == "inmueble-insert" || def == "update") {
         msgVal = "Ya existe ese código de inmueble en el sistema";
     }
 

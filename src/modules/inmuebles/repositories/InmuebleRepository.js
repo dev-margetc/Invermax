@@ -57,15 +57,6 @@ const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
   }
 };
 
-// Asociar un inmueble con una o mas zonas
-const asociarZona = async (inmueble, zona) => {
-  try {
-    await inmueble.addZonas(zona);
-    return "Inmueble relacionado con las zonas correctamente"
-  } catch (error) {
-    throw error;
-  }
-}
 
 // Traer los inmuebles con el estado de publicado (incluyendo proyectos)
 const getPublicados = async () => {
@@ -174,7 +165,6 @@ const actualizarInmueble = async(datos, idInmueble, transaccion) =>{
 }
 module.exports = {
   insertarInmuebleDetalles,
-  asociarZona,
   getPublicados,
   getInmueblesUsuario,
   getInmueblesCodigo,
