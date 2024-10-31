@@ -39,5 +39,19 @@ router.get('/codigo/:codigo', inmuebleController.getInmueblesCodigo);
 // Ruta para actualizar un inmueble y detalles (incluye proyectos -- )
 router.put('/:idInmueble', inmuebleController.actualizarInmuebleDetalles);
 
+// Ruta para eliminar un inmueble del todo
+router.delete('/:idInmueble', inmuebleController.eliminarInmueble);
+
+
+// Ruta para eliminar un detalle solamente (aplica solo para proyectos)
+router.delete('/detalles/:idDetalle',detalleInmuebleController.eliminarDetalle); //No enviar el archivo de primero
+
+
+// Ruta para eliminar una foto de un detalle. Apunta a la misma ruta de eliminar el video, cambia el tipo
+router.delete('/detalles/:idDetalle/multimedia/fotos/:idFoto',detalleInmuebleController.eliminarMultimediaDetalle); 
+
+// Ruta para eliminar un video
+router.delete('/detalles/:idDetalle/multimedia/videos/:idVideo',detalleInmuebleController.eliminarMultimediaDetalle); 
+
 
 module.exports = router;

@@ -5,7 +5,6 @@ const interesadoService = require('../services/InteresadoService');
 // Insertar un interesado
 const registrarInteresado = async (req, res) => {
     try {
-        console.log(req.body);
         const datos = req.body; //Datos del cuerpo de la solicitud
         msg = await interesadoService.registrarInteresado(datos.idInmueble, datos.interesado);
         if(!msg.error){

@@ -123,13 +123,13 @@ const getPublicados = async () => {
 // Traer los inmuebles de un usuario
 const getInmueblesUsuario = async (idUsuario) => {
   const inmuebles = Inmueble.findAll({
-    attributes:[
+    attributes: [
       ["id_inmueble", "id"], // Para renombrar se coloca a la izquierda el nombre que está en la BD
       "codigoInmueble",
       "tituloInmueble",
       "estadoPublicacionInmueble"
     ],
-    where:{
+    where: {
       idCustomer: idUsuario
     }
   });
@@ -142,10 +142,10 @@ const getInmueblesCodigo = async (codigo) => {
 
   // Solamente trae el id si encuentra un inmueble con ese codigo
   const inmuebles = Inmueble.findAll({
-    attributes:[
+    attributes: [
       ["id_inmueble", "id"], // Para renombrar se coloca a la izquierda el nombre que está en la BD
     ],
-    where:{
+    where: {
       codigoInmueble: codigo
     }
   });
@@ -154,19 +154,30 @@ const getInmueblesCodigo = async (codigo) => {
 }
 
 // Actualizar inmueble
-const actualizarInmueble = async(datos, idInmueble, transaccion) =>{
-   try{
-    await Inmueble.update(datos, {where:{idInmueble}, transaccion});
+const actualizarInmueble = async (datos, idInmueble, transaccion) => {
+  try {
+    await Inmueble.update(datos, { where: { idInmueble }, transaccion });
 
-  }catch(error){
-   throw error; // Lanzar error para que sea capturado en el controlador
+  } catch (error) {
+    throw error; // Lanzar error para que sea capturado en el controlador
   }
-  return "editando "+datos;
+  return "editando " + datos;
+}
+
+// Borrar inmueble
+const borrarInmueble = async (idInmueble) => {
+  try {
+    await Inmueble.destroy({ where: { idInmueble } });
+    return "Inmueble borrado";
+  } catch (error) {
+    throw error; // Lanzar error para que sea capturado en el controlador
+  }
 }
 module.exports = {
   insertarInmuebleDetalles,
   getPublicados,
   getInmueblesUsuario,
   getInmueblesCodigo,
-  actualizarInmueble
+  actualizarInmueble,
+  borrarInmueble
 }

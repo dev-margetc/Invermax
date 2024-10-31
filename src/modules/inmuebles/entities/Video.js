@@ -9,7 +9,7 @@ const Video = sequelize.define('Video', {
     autoIncrement: true, // Declara que es autoincremental
     field: 'id_video'
   },
-  urlFoto: {
+  urlVideo: {
     type: DataTypes.STRING,
     allowNull: false,
     field: 'url_video'

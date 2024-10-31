@@ -2,14 +2,13 @@
 
 const multer = require('multer');
 const path = require('path');
-const express = require("express");
 
 
 // Función que determina la carpeta de destino
 const setDestination = (tipoModulo, tipoArchivo) => {
     // Define la carpeta base según el tipo de módulo
     let ruta = process.env.UPLOADS_PATH;
-    let baseFolder = ruta + `/uploads/${tipoModulo}`; // e.g., 'uploads/blogs' o 'uploads/inmuebles'
+    let baseFolder = ruta + `/${tipoModulo}`; // e.g., 'uploads/blogs' o 'uploads/inmuebles'
 
     // Agrega subcarpetas según el tipo de archivo
     if (tipoArchivo === 'foto') {
@@ -55,10 +54,10 @@ const storage = multer.diskStorage({
         cb(null, destination);
     },
     filename: (req, file, cb) => {
-        const productId = req.body.idDetalle; // Obtiene el ID del detalleInmueble
+        const {idDetalle} = req.params; // Obtiene el ID del detalleInmueble
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); // Sufijo único para asegurar que no se repita el nombre en la BD
         const ext = path.extname(file.originalname); // Extensión del archivo
-        cb(null, `${productId}-${uniqueSuffix}${ext}`); // Nombre del archivo único
+        cb(null, `${idDetalle}-${uniqueSuffix}${ext}`); // Nombre del archivo único
     }
 });
 

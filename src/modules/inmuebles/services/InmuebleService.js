@@ -13,9 +13,9 @@ const insertarInmueble = async (datosInmueble) => {
 
         //Verifica que un proyecto que no es nuevo tampoco sea proyecto 
 
-        const { idTipoInmueble, estadoInmueble } = datosInmueble.inmueble;
+        const { idTipoInmueble, estadoInmueble, modalidadInmueble, administracion } = datosInmueble.inmueble;
 
-        // Buscar el tipo de producto por ID
+        // Buscar el tipo de inmueble por ID
         const tipoInmueble = await TipoInmueble.findByPk(idTipoInmueble);
 
         if (!tipoInmueble) {
@@ -24,7 +24,13 @@ const insertarInmueble = async (datosInmueble) => {
 
         // Verificar si el tipo es "proyecto" y es valido
         if (tipoInmueble.tipoInmueble === 'proyecto' && estadoInmueble !== 'nuevo') {
-            throw new Error("Los productos de tipo 'proyecto' deben ser nuevos.");
+            throw new Error("Los inmuebles de tipo 'proyecto' deben ser nuevos.");
+        }
+
+        // Verificar si es arriendo entonces el campo de administracion no puede ser null
+        if (modalidadInmueble === 'arriendo' && (!administracion)) {
+            throw new Error("Los inmuebles en modalidad de arriendo deben especificar si incluyen o no la administracion.");
+
         }
 
         // Extraer los campos y modificar los que se necesiten. Tambien se agrega lo que no viene en el front
@@ -48,9 +54,15 @@ const actualizarInmuebleDetalles = async (datos, params) => {
     // crear transaccion
     const transaction = await sequelize.transaction(); // Iniciar la transacción
     try {
+        
+        //Si hay un nuevo tipo y este es arriendo se valida que arriendo no sea null
+        if(inmueble.modalidadInmueble== "arriendo" && !inmueble.administracion){
+            throw new Error("La modalidad de arriendo requiere que se especifique si la administración está incluida");     
+        }
+        
         // actualizar el inmueble
         await inmuebleRepository.actualizarInmueble(inmueble, idInmueble, transaction);
-
+      
         // Si hay zonas se actualizan
         if (zonas) {
             await zonaInmuebleService.actualizarZonasInmuebles(zonas, idInmueble, transaction);
@@ -70,10 +82,57 @@ const actualizarInmuebleDetalles = async (datos, params) => {
     }
 }
 
+const eliminarInmueble = async (params) => {
+    const { idInmueble } = params;
+
+    try {
+        //  Traer detalles (para sus ID)
+        const detalles = await DetalleService.obtenerDetallesPorInmueble(idInmueble);
+
+        // Extraer los IDs de los detalles
+        const idsDetalles = detalles.map(detalle => detalle.dataValues.idDetalle);
+
+        // Obtener fotos para cada idDetalle de forma concurrente
+        const fotosPorDetalle = await Promise.all(
+            idsDetalles.map(idDetalle => DetalleService.getFotoDetalle(idDetalle))
+        );
+
+        // Obtener videos para cada idDetalle de forma concurrente
+        const videosPorDetalle = await Promise.all(
+            idsDetalles.map(idDetalle => DetalleService.getVideoDetalle(idDetalle))
+        );
+
+        // Extraer las URLs de las fotos encontradas
+        const urlsFoto = fotosPorDetalle.flatMap(fotos => fotos.map(foto => foto.urlFoto));
+
+        // URL fotos por video
+        const urlsVideo = videosPorDetalle.flatMap(videos => videos.map(video => video.urlVideo));
+
+        // Borrar inmueble, proyectos, detalles y fotos por cascade
+        await inmuebleRepository.borrarInmueble(idInmueble);
+
+        // Borrar archivos de fotos de detalles
+
+        await Promise.all(
+            urlsFoto.map(url => DetalleService.deleteMultimedia("fotos", url))
+        );
+
+        // Borrar archivos de videos de detalles
+        await Promise.all(
+            urlsVideo.map(url => DetalleService.deleteMultimedia("videos", url))
+        );
+        return "Inmueble borrado correctamente. ";
+    } catch (error) {
+        return manejarErrorSequelize(error, null);
+    }
+
+}
+
 
 module.exports = {
     insertarInmueble,
-    actualizarInmuebleDetalles
+    actualizarInmuebleDetalles,
+    eliminarInmueble
 }
 
 

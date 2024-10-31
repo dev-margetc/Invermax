@@ -69,7 +69,7 @@ const Inmueble = sequelize.define('Inmueble', {
     },
     administracion: { //Administración incluida: 0- No, 1-si
         type: DataTypes.TINYINT(1),
-        allowNull: false,
+        allowNull: true,
         validate: {
             isIn: {
                 args: [[0, 1]],  // Valores permitidos
