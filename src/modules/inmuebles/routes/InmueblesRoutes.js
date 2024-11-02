@@ -7,14 +7,35 @@ const ciudadController = require("../controllers/CiudadController");
 const inmuebleController = require("../controllers/InmuebleController");
 const detalleInmuebleController = require("../controllers/DetalleController");
 const interesadoController = require("../controllers/InteresadoController");
+const zonasController = require("../controllers/ZonasController");
 
 
-
-// ruta para insertar un inmueble (ruta )
-router.post('/', inmuebleController.insertInmueble);
 
 // Definir una ruta para obtener todos los departamentos con sus ciudades
 router.get('/departamentos/ciudades', ciudadController.getDepartamentosConCiudades);
+
+/* Ruta para traer inmuebles publicados con el filtro avanzado, incluye: 
+    categoria, modalidad, ciudad, monto maximo, habitaciones, baños, parqueadero, amoblado y zonas
+*/
+router.get('/publicados', inmuebleController.getInmueblesPublicados);
+
+// Ruta para traer inmuebles de un usuario
+router.get('/usuario/:idUsuario', inmuebleController.getInmueblesUsuario);
+
+// Ruta para traer todos los interesados de un inmueble
+router.get('/:idInmueble/interesados', inmuebleController.getInteresadosInmueble);
+
+// Ruta para traer todas las zonas
+router.get('/zonas', zonasController.getAllZonas);
+
+
+// Ruta para traer todos los tipos de inmueble
+
+// Ruta para traer inmuebles dependiendo de un codigo
+router.get('/codigo/:codigo', inmuebleController.getInmueblesCodigo);
+
+// ruta para insertar un inmueble (ruta )
+router.post('/', inmuebleController.insertInmueble);
 
 // ruta para insertar una foto/video para un detalle inmueble
 router.post('/detalles/:idDetalle/multimedia', upload.single('archivo'),detalleInmuebleController.insertMultimedia); //No enviar el archivo de primero
@@ -25,16 +46,7 @@ router.post('/:idInmueble/zonas', inmuebleController.agregarZona);
 // Ruta para insertar un interesado
 router.post('/interesados', interesadoController.registrarInteresado);
 
-/* Ruta para traer inmuebles publicados con el filtro avanzado, incluye: 
-    categoria, modalidad, ciudad, monto maximo, habitaciones, baños, parqueadero, amoblado y zonas
-*/
-router.get('/publicados', inmuebleController.getInmueblesPublicados);
 
-// Ruta para traer inmuebles de un usuario
-router.get('/usuario/:idUsuario', inmuebleController.getInmueblesUsuario);
-
-// Ruta para traer inmuebles dependiendo de un codigo
-router.get('/codigo/:codigo', inmuebleController.getInmueblesCodigo);
 
 // Ruta para actualizar un inmueble y detalles (incluye proyectos -- )
 router.put('/:idInmueble', inmuebleController.actualizarInmuebleDetalles);

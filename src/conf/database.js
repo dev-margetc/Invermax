@@ -18,6 +18,7 @@ const sequelize = new Sequelize(
             // Opciones globales
             freezeTableName: true, // Esto desactiva la pluralización
         },
+        timezone: '-05:00',
     }
 );
 

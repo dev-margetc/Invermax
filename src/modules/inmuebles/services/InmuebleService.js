@@ -1,11 +1,11 @@
 /*Se aplica la lógica de negocio a los datos traidos por el repositorio. 
 Tambien se encarga de interactuar con otros servicios*/
-const Inmueble = require("../entities/Inmueble");
 const TipoInmueble = require("../entities/TipoInmueble");
 const sequelize = require("../../../conf/database");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
 const zonaInmuebleService = require("./ZonasInmueblesService");
+const InteresadoRepo = require("../repositories/InteresadoRepository");
 
 
 const insertarInmueble = async (datosInmueble) => {
@@ -43,6 +43,18 @@ const insertarInmueble = async (datosInmueble) => {
     } catch (error) {
         return manejarErrorSequelize(error, "inmueble-insert");
     }
+}
+
+// Traer los interesados de un inmueble
+const traerInteresados= async (datos) =>{
+    const {idInmueble} = datos;
+
+    if(idInmueble){
+        return InteresadoRepo.getInteresadosInmueble(idInmueble);
+    }else{
+        return { error: true, message: "Inmueble no colocado" };
+    }
+
 }
 //Actualizar inmueble con detalles
 const actualizarInmuebleDetalles = async (datos, params) => {
@@ -132,7 +144,8 @@ const eliminarInmueble = async (params) => {
 module.exports = {
     insertarInmueble,
     actualizarInmuebleDetalles,
-    eliminarInmueble
+    eliminarInmueble,
+    traerInteresados
 }
 
 

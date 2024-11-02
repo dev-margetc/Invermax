@@ -21,6 +21,16 @@ const insertarInteresado = async (datosInteresado, codInmueble) => {
   }
 };
 
+// Trae los interesados de un inmueble
+const getInteresadosInmueble = async (inmueble) => {
+  const interesados = await Interesado.findAll({
+    where: {idInmueble:inmueble}
+  } 
+  );
+  return (interesados);
+};
+
 module.exports = {
-  insertarInteresado
+  insertarInteresado,
+  getInteresadosInmueble
 }

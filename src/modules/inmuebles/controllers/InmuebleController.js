@@ -85,6 +85,22 @@ const getInmueblesCodigo = async (req, res) => {
     }
 };
 
+// Traer los interesados de un inmueble
+const getInteresadosInmueble = async (req, res) => {
+
+    try {
+        interesados = await inmuebleService.traerInteresados(req.params);
+        if(!interesados.error){
+            res.status(201).json(interesados); //Se retorna un mensaje si se encuentra un error
+        }else{
+            return res.status(500).json({ error: 'Error inesperado: ' + msg.message });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error del servidor: ' + err.message });
+    }
+};
+
+
 //Editar un inmueble con detalles
 const actualizarInmuebleDetalles = async (req, res) => {
     try {
@@ -118,6 +134,7 @@ module.exports = {
     getInmueblesPublicados,
     getInmueblesUsuario,
     getInmueblesCodigo,
+    getInteresadosInmueble,
     actualizarInmuebleDetalles,
     eliminarInmueble
 }; 
