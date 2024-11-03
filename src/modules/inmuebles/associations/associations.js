@@ -60,11 +60,11 @@ Inmueble.hasOne(Proyecto, {
 Proyecto.belongsTo(Inmueble, { foreignKey: 'id_proyecto', as: 'inmueble' });
 
 // Un inmueble tiene varios interesados
-Inmueble.hasMany(Interesado, { foreignKey: 'id_inmueble', as: 'interesados' });
+Inmueble.hasMany(Interesado, { foreignKey: 'idInmueble', as: 'interesados' });
 
 
 // Un interesado pertenece a solo un inmueble
-Interesado.belongsTo(Inmueble, { foreignKey: 'id_inmueble', as: 'inmueble' });
+Interesado.belongsTo(Inmueble, { foreignKey: 'idInmueble', as: 'inmueble' });
 
 // Un DetalleInmueble tiene varias fotos
 DetalleInmueble.hasMany(Foto, { foreignKey: 'id_detalle_inmueble', as: 'fotos' });

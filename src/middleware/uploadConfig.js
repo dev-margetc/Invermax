@@ -30,17 +30,17 @@ const fileFilter = (req, file, cb) => {
     // Verifica si el archivo es una imagen o un video
     if (file.mimetype.startsWith('image/')) {
         if (file.size > maxImageSize) {
-            return cb(new Error(`El tamaño de la imagen excede el límite de ${maxImageSize / (1024 * 1024)} MB`), false);
+            return cb(new multer.MulterError(`El tamaño de la imagen excede el límite de ${maxImageSize / (1024 * 1024)} MB`), false);
         }
         cb(null, true); // Permite el archivo si es una imagen y cumple con el tamaño
 
     } else if (file.mimetype.startsWith('video/')) {
         if (file.size > maxVideoSize) {
-            return cb(new Error(`El tamaño del video excede el límite de ${maxVideoSize / (1024 * 1024)} MB`), false);
+            return cb(new multer.MulterError(`El tamaño del video excede el límite de ${maxVideoSize / (1024 * 1024)} MB`), false);
         }
         cb(null, true); // Permite el archivo si es un video
     } else {
-        cb(new Error('Solo se permiten imágenes o videos'), false); // Rechaza el archivo
+        cb(new multer.MulterError('Solo se permiten imágenes o videos'), false); // Rechaza el archivo
     }
 };
 
@@ -50,6 +50,9 @@ const storage = multer.diskStorage({
         const tipoModulo = req.body.tipoModulo;
         const tipoArchivo = req.body.tipoArchivo;
 
+        if (!tipoModulo || !tipoArchivo) {
+            return cb(new multer.MulterError('Falta tipo de módulo o tipo de archivo en la solicitud.'), false);
+        }
         const destination = setDestination(tipoModulo, tipoArchivo);
         cb(null, destination);
     },

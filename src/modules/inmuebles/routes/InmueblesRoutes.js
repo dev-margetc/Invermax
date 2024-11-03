@@ -8,6 +8,8 @@ const inmuebleController = require("../controllers/InmuebleController");
 const detalleInmuebleController = require("../controllers/DetalleController");
 const interesadoController = require("../controllers/InteresadoController");
 const zonasController = require("../controllers/ZonasController");
+const globalErrorHandler = require("../../../middleware/globalErrorHandler");
+
 
 
 
@@ -65,5 +67,8 @@ router.delete('/detalles/:idDetalle/multimedia/fotos/:idFoto',detalleInmuebleCon
 // Ruta para eliminar un video
 router.delete('/detalles/:idDetalle/multimedia/videos/:idVideo',detalleInmuebleController.eliminarMultimediaDetalle); 
 
+
+// Manejador de errores global
+router.use(globalErrorHandler);
 
 module.exports = router;

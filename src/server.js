@@ -35,6 +35,11 @@ app.get('/', (req, res) => {
 app.use('/inmuebles', inmueblesRoutes);
 
 
+// Manejo de rutas no encontradas (404)
+app.use((req, res, next) => {
+    res.status(404).json({ error: {message: "Recurso no encontrado" }});
+});
+
 
 // Escuchar peticiones en el puerto solicitado
 app.listen(PORT, () => {

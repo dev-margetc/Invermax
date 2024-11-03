@@ -73,10 +73,9 @@ const getPublicados = async (datos) => {
 
             return true;
         });
-
         return resultadoFiltrado;
     } catch (error) {
-        return { error: true, message: error.message};
+       throw error;
     }
 }
 

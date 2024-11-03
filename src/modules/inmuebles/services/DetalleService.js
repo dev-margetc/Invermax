@@ -1,5 +1,6 @@
 /*Se aplica la lógica de negocio a los datos traidos por el repositorio. 
 Tambien se encarga de interactuar con otros servicios*/
+const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const DetalleInmueble = require("../entities/DetalleInmueble");
 const detalleRepo = require("../repositories/DetalleInmuebleRepository");
 const sequelize = require("../../../conf/database");
@@ -8,11 +9,18 @@ const fs = require('fs');
 const insertarMultimediaDetalle = async (detalleId, rutaFoto, tipoArchivo) => {
     try {
 
+        if(!rutaFoto){
+            throw new ErrorNegocio("Ruta no encontrada");
+        }
+
+        if(!tipoArchivo){
+            throw new ErrorNegocio("Tipo de archivo no especificado");
+        }
         // Verificar que exista el id del detalle
         const detalle = await DetalleInmueble.findByPk(detalleId);
 
         if (!detalle) {
-            throw new Error("Detalle no encontrado");
+            throw new ErrorNegocio("Detalle no encontrado");
         }
 
         /*Si es valido se crea la foto o video*/
@@ -22,7 +30,7 @@ const insertarMultimediaDetalle = async (detalleId, rutaFoto, tipoArchivo) => {
         } else if (tipoArchivo === 'video') {
             msg = await detalleRepo.insertarVideo(detalleId, rutaFoto);
         } else {
-            throw new Error("Tipo de archivo no especificado");
+            throw new ErrorNegocio("Tipo de archivo no especificado");
         }
         return msg;
 
@@ -166,14 +174,14 @@ const deleteDetalle = async (idDetalle) => {
         const detalle = await DetalleInmueble.findByPk(idDetalle);
 
         if (!detalle) {
-            return "No hay tipo con ese ID";
+            throw new ErrorNegocio("No existe un detalle con el ID proporcionado");
         }
 
         const listaDetalles = await obtenerDetallesPorInmueble(detalle.idInmueble);
 
         // Si el inmueble solo tiene ese detalle no se borra (se debe modificar o eliminar el inmueble)
         if (listaDetalles.length <= 1) {
-            return "Un inmueble no puede quedarse sin tipos. Modifique el actual o elimine el inmueble.";
+            throw new ErrorNegocio("Un inmueble no puede quedarse sin tipos. Modifique el actual o elimine el inmueble.");
         } else {
 
             // Obtener fotos para idDetalle
@@ -195,7 +203,6 @@ const deleteDetalle = async (idDetalle) => {
             await Promise.all(
                 urlsFoto.map(url => deleteMultimediaServidor("fotos", url, "inmuebles"))
             );
-            console.log(urlsVideo);
             // Borrar archivos de videos de detalles
             await Promise.all(
                 urlsVideo.map(url => deleteMultimediaServidor("videos", url, "inmuebles"))

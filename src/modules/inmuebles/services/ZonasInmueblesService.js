@@ -1,5 +1,6 @@
 /*Se aplica la lógica de negocio a los datos traidos por el repositorio. 
 Tambien se encarga de interactuar con otros servicios*/
+const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const Inmueble = require("../entities/Inmueble");
 const ZonaInmuebles = require("../entities/ZonasInmuebles");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
@@ -16,7 +17,7 @@ const agregarZona = async (datos) => {
         const inmueble = await Inmueble.findByPk(idInmueble);
 
         if (!inmueble) {
-            throw new Error("Inmueble no encontrado");
+            throw new ErrorNegocio("Inmueble no encontrado");
         }
 
         /*Si es valido se inserta en la intermedia definida en asociaciones*/
@@ -24,7 +25,7 @@ const agregarZona = async (datos) => {
         return msg;
 
     } catch (error) {
-        return error.message;
+        throw error;
     }
 }
 

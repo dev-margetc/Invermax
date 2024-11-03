@@ -1,21 +1,29 @@
 //Manejar las solicitudes HTTP. Llama al servicio correspondiente. Este maneja las solicitudes GET
-
+const errorHandler = require('../../../utils/ErrorHandler');
 const detalleService = require('../services/DetalleService'); //Importar el servicio 
 const fs = require('fs'); // Para manejar la eliminación de archivos
 
 // Asignar una foto/video a un detalle
 const insertMultimedia = async (req, res) => {
-    const rutaFoto = req.file.path; // Ruta del archivo subido
-    const nombreFoto = req.file.filename;
+    let rutaFoto = null;
+    let nombreFoto = null;
+    // Verifica si se subió un archivo
+    if (req.file) {
+        rutaFoto = req.file.path; // Ruta del archivo subido
+        nombreFoto = req.file.filename;
+    } else {
+        return res.status(400).json({error:{ message: "No se subió ningún archivo." }});
+    }
+
     try {
-        const {tipoArchivo } = req.body;
-        const {idDetalle} = req.params;
-        msg = await detalleService.insertarMultimediaDetalle(idDetalle, nombreFoto, tipoArchivo);  
+        const { tipoArchivo } = req.body;
+        const { idDetalle } = req.params;
+
+        msg = await detalleService.insertarMultimediaDetalle(idDetalle, nombreFoto, tipoArchivo);
         return res.status(200).json({ message: msg }); // Asegúrate de enviar una respuesta aquí
     } catch (err) {
-
         // Elimina el archivo subido si hubo un error en la inserción
-       if (fs.existsSync(rutaFoto)) {
+        if (rutaFoto && fs.existsSync(rutaFoto)) {
             fs.unlink(rutaFoto, (err) => {
                 if (err) {
                     console.error('Error al eliminar el archivo:', err);
@@ -24,22 +32,18 @@ const insertMultimedia = async (req, res) => {
         }
 
         //Enviar el mensaje de error
-        res.status(500).json({ error: 'Error del servidor: ' + err.message });
+        errorHandler.handleControllerError(res, err, "inmuebles");
     }
 };
 
 // Eliminar un detalle
 const eliminarDetalle = async (req, res) => {
     try {
-        const {idDetalle} = req.params;
+        const { idDetalle } = req.params;
         msg = await detalleService.deleteDetalle(idDetalle);
-        if(!msg.error){
-            res.status(201).json(msg); //Se retorna un mensaje
-        }else{
-            return res.status(500).json({ error: 'Error inesperado: ' + msg.message });
-        }
+        res.status(201).json(msg); //Se retorna un mensaje
     } catch (err) {
-        res.status(500).json({ error: 'Error del servidor: ' + err.message });
+        errorHandler.handleControllerError(res, err, "inmuebles");
     }
 };
 
@@ -56,15 +60,12 @@ const eliminarMultimediaDetalle = async (req, res) => {
         // Toma el id de foto o video
         const id = idFoto || idVideo;
 
-        msg = await detalleService.deleteMultimediaBD(id, tipo, idDetalle)
+        msg = await detalleService.deleteMultimediaBD(id, tipo, idDetalle);
 
-        if(!msg.error){
-            res.status(201).json(msg); //Se retorna un mensaje
-        }else{
-            return res.status(500).json({ error: 'Error inesperado: ' + msg.message });
-        }
+        res.status(201).json(msg); //Se retorna un mensaje
+
     } catch (err) {
-        res.status(500).json({ error: 'Error del servidor: ' + err.message });
+        errorHandler.handleControllerError(res, err, "inmuebles");
     }
 };
 
@@ -72,6 +73,6 @@ const eliminarMultimediaDetalle = async (req, res) => {
 module.exports = {
     insertMultimedia,
     eliminarDetalle,
-    eliminarMultimediaDetalle   
-}; 
+    eliminarMultimediaDetalle
+};
 

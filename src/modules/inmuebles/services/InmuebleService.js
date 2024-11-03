@@ -1,5 +1,6 @@
 /*Se aplica la lógica de negocio a los datos traidos por el repositorio. 
 Tambien se encarga de interactuar con otros servicios*/
+const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const TipoInmueble = require("../entities/TipoInmueble");
 const sequelize = require("../../../conf/database");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
@@ -19,17 +20,17 @@ const insertarInmueble = async (datosInmueble) => {
         const tipoInmueble = await TipoInmueble.findByPk(idTipoInmueble);
 
         if (!tipoInmueble) {
-            throw new Error("Tipo de producto no encontrado");
+           throw new ErrorNegocio("Tipo de inmueble no encontrado");
         }
 
         // Verificar si el tipo es "proyecto" y es valido
         if (tipoInmueble.tipoInmueble === 'proyecto' && estadoInmueble !== 'nuevo') {
-            throw new Error("Los inmuebles de tipo 'proyecto' deben ser nuevos.");
+            throw new ErrorNegocio("Los inmuebles de tipo 'proyecto' deben ser nuevos.");
         }
 
         // Verificar si es arriendo entonces el campo de administracion no puede ser null
         if (modalidadInmueble === 'arriendo' && (!administracion)) {
-            throw new Error("Los inmuebles en modalidad de arriendo deben especificar si incluyen o no la administracion.");
+            throw new ErrorNegocio("Los inmuebles en modalidad de arriendo deben especificar si incluyen o no la administracion.");
 
         }
 
@@ -41,7 +42,7 @@ const insertarInmueble = async (datosInmueble) => {
         return msg;
 
     } catch (error) {
-        return manejarErrorSequelize(error, "inmueble-insert");
+        throw error;
     }
 }
 
@@ -69,7 +70,7 @@ const actualizarInmuebleDetalles = async (datos, params) => {
         
         //Si hay un nuevo tipo y este es arriendo se valida que arriendo no sea null
         if(inmueble.modalidadInmueble== "arriendo" && !inmueble.administracion){
-            throw new Error("La modalidad de arriendo requiere que se especifique si la administración está incluida");     
+            throw new ErrorNegocio("La modalidad de arriendo requiere que se especifique si la administración está incluida");     
         }
         
         // actualizar el inmueble
@@ -88,9 +89,8 @@ const actualizarInmuebleDetalles = async (datos, params) => {
         await transaction.commit();
         return "Actualizado";
     } catch (error) {
-        console.log(error);
         await transaction.rollback();
-        return manejarErrorSequelize(error, "update");
+throw error
     }
 }
 
@@ -135,7 +135,7 @@ const eliminarInmueble = async (params) => {
         );
         return "Inmueble borrado correctamente. ";
     } catch (error) {
-        return manejarErrorSequelize(error, null);
+       throw error;
     }
 
 }
@@ -146,25 +146,4 @@ module.exports = {
     actualizarInmuebleDetalles,
     eliminarInmueble,
     traerInteresados
-}
-
-
-
-//Manejar los errores
-function manejarErrorSequelize(error, def) {
-    msgVal = "Error de clave unica";
-    if (def == "inmueble-insert" || def == "update") {
-        msgVal = "Ya existe ese código de inmueble en el sistema";
-    }
-
-    switch (error.name) {
-        case "SequelizeUniqueConstraintError":
-            return { error: true, type: 'VALIDATION_ERROR', message: msgVal };
-        case "SequelizeValidationError":
-            return { error: true, type: 'VALIDATION_ERROR', message: error.message };
-        case "SequelizeForeignKeyConstraintError":
-            return { error: true, type: 'VALIDATION_ERROR', message: "Error en la inserción. Error de relaciones: " + error.message };
-        default:
-            return { error: true, type: 'UNKNOWN', message: error.message };
-    }
 }
