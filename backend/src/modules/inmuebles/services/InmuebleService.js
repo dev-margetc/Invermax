@@ -53,10 +53,22 @@ const traerInteresados= async (datos) =>{
     if(idInmueble){
         return InteresadoRepo.getInteresadosInmueble(idInmueble);
     }else{
-        return { error: true, message: "Inmueble no colocado" };
+        throw new ErrorNegocio("Inmueble no colocado");
     }
 
 }
+
+// Traer los tipos de inmueble
+const getAllTipos= async () =>{
+    try{
+        const tipos = TipoInmueble.findAll();
+        return tipos;
+    }catch(error){
+        throw error;
+    }
+}
+
+
 //Actualizar inmueble con detalles
 const actualizarInmuebleDetalles = async (datos, params) => {
     const { inmueble } = datos;
@@ -144,6 +156,7 @@ const eliminarInmueble = async (params) => {
 module.exports = {
     insertarInmueble,
     actualizarInmuebleDetalles,
+    getAllTipos,
     eliminarInmueble,
     traerInteresados
 }

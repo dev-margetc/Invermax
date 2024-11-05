@@ -4,6 +4,7 @@ const Inmueble = require("../entities/Inmueble");
 const TipoInmueble = require("../entities/TipoInmueble");
 const seq = require("../../../conf/database");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
+const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 
 
 
@@ -115,6 +116,23 @@ const getInmueblesCodigo = async (datos) => {
     }
 
 }
+
+// Traer inmuebles usando el ID de la BD
+const getInmuebleByID = async (datos) => {
+    const {idInmueble} = datos;
+try{
+    if(idInmueble){
+        return inmuebleRepository.getInmuebleByID(idInmueble);
+    }else{
+        throw new ErrorNegocio("ID inmueble no colocado");
+    }
+}catch(error){
+    throw error;
+}
+    
+
+}
 module.exports = {
-    getPublicados, getInmueblesUsuario, getInmueblesCodigo
+    getPublicados, getInmueblesUsuario, getInmueblesCodigo,
+    getInmuebleByID
 }

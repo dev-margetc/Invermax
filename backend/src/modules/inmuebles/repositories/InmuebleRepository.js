@@ -142,9 +142,16 @@ const getInmueblesCodigo = async (codigo) => {
 
   // Solamente trae el id si encuentra un inmueble con ese codigo
   const inmuebles = Inmueble.findAll({
-    attributes: [
-      ["id_inmueble", "id"], // Para renombrar se coloca a la izquierda el nombre que está en la BD
-    ],
+    include: [ // Incluir detalles por medio de inmueble
+      // Incluir zonas
+      {
+        model: Zona,
+        as: "zonas"
+      },
+      {
+        model: DetalleInmueble,
+        as: "detalles"
+      }],
     where: {
       codigoInmueble: codigo
     }
@@ -152,6 +159,32 @@ const getInmueblesCodigo = async (codigo) => {
 
   return inmuebles;
 }
+
+// Traer los inmuebles y detalles con el ID
+const getInmuebleByID = async (id) => {
+
+  // Solamente trae el id si encuentra un inmueble con ese codigo
+  const inmuebles = Inmueble.findAll({
+    include: [ // Incluir detalles por medio de inmueble
+      // Incluir zonas
+      {
+        model: Zona,
+        as: "zonas"
+      },
+      // Incluir detalles
+      {
+        model: DetalleInmueble,
+        as: "detalles"
+      }
+    ],
+    where: {
+      idInmueble: id
+    }
+  });
+
+  return inmuebles;
+}
+
 
 // Actualizar inmueble
 const actualizarInmueble = async (datos, idInmueble, transaccion) => {
@@ -176,6 +209,7 @@ const borrarInmueble = async (idInmueble) => {
 module.exports = {
   insertarInmuebleDetalles,
   getPublicados,
+  getInmuebleByID,
   getInmueblesUsuario,
   getInmueblesCodigo,
   actualizarInmueble,

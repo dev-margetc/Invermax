@@ -32,11 +32,15 @@ router.get('/zonas', zonasController.getAllZonas);
 
 
 // Ruta para traer todos los tipos de inmueble
+router.get('/tipos', inmuebleController.getAllTipos);
 
 // Ruta para traer inmuebles dependiendo de un codigo
 router.get('/codigo/:codigo', inmuebleController.getInmueblesCodigo);
 
-// ruta para insertar un inmueble (ruta )
+// Ruta para traer inmuebles dependiendo de su ID en la BD
+router.get('/:idInmueble', inmuebleController.getInmuebleByID);
+
+// ruta para insertar un inmueble (ruta tipo post)
 router.post('/', inmuebleController.insertInmueble);
 
 // ruta para insertar una foto/video para un detalle inmueble

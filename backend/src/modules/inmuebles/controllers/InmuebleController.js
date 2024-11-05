@@ -35,6 +35,27 @@ const getInmueblesPublicados = async (req, res) => {
     }
 };
 
+//Traer todas los tipos de inmueble
+const getAllTipos = async (req, res) => {
+    try {
+        msg = await inmuebleService.getAllTipos();
+        res.status(201).json(msg); //Se retorna un mensaje
+    } catch (err) {
+        errorHandler.handleControllerError(res,err,"inmuebles");
+    }
+};
+
+//Traer todas los tipos de inmueble
+const getInmuebleByID = async (req, res) => {
+    try {
+        msg = await filtroInmueble.getInmuebleByID(req.params);
+        console.log("===");
+        res.status(201).json(msg); //Se retorna un mensaje
+    } catch (err) {
+        errorHandler.handleControllerError(res,err,"inmuebles");
+    }
+};
+
 
 //Traer inmuebles publicados
 const getInmueblesUsuario = async (req, res) => {
@@ -90,6 +111,8 @@ const eliminarInmueble = async (req, res) => {
 module.exports = {
     insertInmueble,
     agregarZona,
+    getAllTipos,
+    getInmuebleByID,
     getInmueblesPublicados,
     getInmueblesUsuario,
     getInmueblesCodigo,
