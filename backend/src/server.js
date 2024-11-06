@@ -1,7 +1,5 @@
 const express = require('express');
 const session = require("express-session");
-const passport = require('passport');
-const GoogleStrategy  = require("passport-google-oauth20");
 const multer  = require('multer');
 const upload = multer();
 require('dotenv').config();
@@ -24,23 +22,6 @@ const PORT = process.env.PORT || 3000;
 
 
 app.use(express.json());
-
-// Manejo de sesiones
-app.use(session({
-    secret: 'tu_secreto',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      secure: true,       // Asegúrate de usar HTTPS
-      httpOnly: true,     // Protege las cookies de XSS
-      sameSite: 'None',      // Permite que las cookies se compartan entre dominios diferentes
-      maxAge: 60 * 60 * 1000,  // Caducidad de la sesión (1 hora)
-    }
-  }));
-
-  // Autenticacion
-  app.use(passport.initialize());
-  app.use(passport.session());
 
 //Ruta por defecto    
 app.get('/', (req, res) => {
