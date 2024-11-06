@@ -113,6 +113,10 @@ const Inmueble = sequelize.define('Inmueble', {
     },
     idCustomer: {
         type: DataTypes.INTEGER, //Integra a la tabla de customers
+        references: {
+            model: 'customers',  // Nombre de la tabla asociada
+            key: 'id_customer' //Nombre de la clave primaria de la tabla asociada
+        },
         allowNull: false,
         field: 'id_customer'
     },

@@ -54,7 +54,7 @@ const Customer = sequelize.define('Customer', {
                 msg: `Tipo de customer no valido. Los tipos permitidos son: ${PERFILES.join(', ')}.`
             }
         },
-        field: 'tipo_usuario'
+        field: 'perfil'
     },
     numeroComercialCustomer: {
         type: DataTypes.STRING,
@@ -77,4 +77,4 @@ const Customer = sequelize.define('Customer', {
 })
 
 
-module.exports = Usuario;
+module.exports = Customer;

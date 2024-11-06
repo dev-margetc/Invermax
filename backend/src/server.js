@@ -9,9 +9,11 @@ const sequelize = require('./conf/database'); // Importar la conexión a la BD
 
 // Importar y ejecutar las asociaciones de los modelos
 require('../src/modules/inmuebles/associations/associations');
+require('../src/modules/usuarios/associations/associations');
 
 
 const inmueblesRoutes = require('./modules/inmuebles/routes/InmueblesRoutes'); // Importar las rutas de inmuebles
+const usuariosRoutes = require('./modules/usuarios/routes/UsuariosRoutes'); // Importar las rutas de usuarios
 
 
 //Configuración aplicacion
@@ -33,6 +35,10 @@ app.get('/', (req, res) => {
 
 // Usar las rutas del modulo de inmuebles
 app.use('/inmuebles', inmueblesRoutes);
+
+// Usar las rutas del modulo de usuarios
+app.use('/usuarios', usuariosRoutes);
+
 
 
 // Manejo de rutas no encontradas (404)

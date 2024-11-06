@@ -11,6 +11,7 @@ const DetalleInmueble = require('../entities/DetalleInmueble');
 const Foto = require('../entities/Foto');
 const Video = require('../entities/Video');
 const VistaInmueblesPublicados = require('../entities/VistaInmueblesPublicados');
+const Customer = require('../../usuarios/entities/Customer');
 
 // Un departamento tiene muchas ciudades
 Departamento.hasMany(Ciudad, { foreignKey: 'id_departamento', as: 'ciudades' }); //La fk es de ciudad
@@ -89,3 +90,10 @@ Video.belongsTo(DetalleInmueble, { foreignKey: 'id_detalle_inmueble', as: 'detal
     foreignKey: 'id_inmueble',
     as: 'inmueble', // Alias para la relación
 });
+
+/* Relaciones con el modulo de usuarios*/
+//Un inmueble pertenece a un customer
+Inmueble.belongsTo(Customer, { foreignKey: 'id_customer', as: 'customer' });
+
+// Un Customer puede tener varios inmuebles
+Customer.hasMany(Inmueble, { foreignKey: 'id_customer', as: 'inmuebles' });
