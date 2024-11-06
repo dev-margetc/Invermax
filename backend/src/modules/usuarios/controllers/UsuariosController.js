@@ -14,7 +14,23 @@ const getAllUsuarios = async (req, res) => {
     }
 };
 
+/* Metodos para guardar datos */
+
+// Metodo para registrar customer junto con usuario
+const crearCustomerUsuarios = async(req, res)=>{
+    try {
+        const {usuario, customer} = req.body;
+        console.log(customer);
+        const msg = await UsuarioService.insertUsuarioCustomer(usuario,customer);
+        res.status(200).json(msg); //Se retorna un mensaje
+    } catch (err) {
+        console.log(err);
+        errorHandler.handleControllerError(res, err, "usuarios");
+    }
+}
+
 
 module.exports = {
-    getAllUsuarios
+    getAllUsuarios,
+    crearCustomerUsuarios
 };

@@ -36,6 +36,11 @@ const handleSequelizeErrors = (error, modulo) => {
         if (error.errors[0].type === 'notNull Violation') {
             return mensajesModulo.notNullViolation?.[campo] || `El campo ${campo} es obligatorio.`;
         }
+
+        //Error de validación de datos. Este mensaje lo proporciona sequelize
+        if (error.errors[0].type === 'Validation error') {
+            return error.errors[0].message;
+        }
     }
 
     // Error de relaciones entre llaves
@@ -64,7 +69,8 @@ const handleControllerError = (res, error, moduleName) => {
     }
 
     const mensajeError = handleSequelizeErrors(error, moduleName);
-
+    console.log(mensajeError);
+    console.log(error.name);
     if (error.name === 'SequelizeValidationError') {
         return res.status(422).json({ error: {message: mensajeError} }); // 422 para errores de validación
     }

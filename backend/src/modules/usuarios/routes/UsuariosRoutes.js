@@ -32,6 +32,7 @@ router.get('/customers/basic', customerController.getAllCustomersBasic);
 /* Rutas Post */
 
 // Registrar un customer junto con su usuario
+router.post('/customers', userController.crearCustomerUsuarios);
 
 
 // Registrar un usuario unicamente (para tipo admin o user)

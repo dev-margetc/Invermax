@@ -189,6 +189,8 @@ const getInmuebleByID = async (id) => {
 // Actualizar inmueble
 const actualizarInmueble = async (datos, idInmueble, transaccion) => {
   try {
+    transaccion = await sequelize.transaction(); // Iniciar la transacción
+
     await Inmueble.update(datos, { where: { idInmueble }, transaccion });
 
   } catch (error) {

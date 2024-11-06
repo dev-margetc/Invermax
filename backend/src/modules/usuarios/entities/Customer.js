@@ -20,16 +20,16 @@ const Customer = sequelize.define('Customer', {
     },
     logoCustomer: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         field: 'logo_customer'
     },
-    correoNotificacionCustomer: {
+    correoNotiCustomer: { // Campo correo de notificaciones
         type: DataTypes.STRING,
         allowNull: false,
         field: 'correo_notificaciones'
     },
     
-    telefonoNotificacionCustomer: {
+    telefonoNotiCustomer: { // Campo correo de notificaciones
         type: DataTypes.STRING,
         allowNull: false,
         field: 'telefono_notificaciones'
@@ -41,7 +41,7 @@ const Customer = sequelize.define('Customer', {
     },
     codigoCustomer: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
         field: 'codigo_customer'
     },
@@ -51,12 +51,12 @@ const Customer = sequelize.define('Customer', {
         validate: {
             isIn: {
                 args: [PERFILES],
-                msg: `Tipo de customer no valido. Los tipos permitidos son: ${PERFILES.join(', ')}.`
+                msg: `Perfil de customer no valido. Los tipos permitidos son: ${PERFILES.join(', ')}.`
             }
         },
         field: 'perfil'
     },
-    numeroComercialCustomer: {
+    numComercialCustomer: {
         type: DataTypes.STRING,
         allowNull: true,
         field: 'numero_comercial'

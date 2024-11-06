@@ -3,7 +3,7 @@ const errorHandler = require('../../../utils/ErrorHandler');
 const UsuarioService = require('../services/UsuariosService');
 const CustomerService = require('../services/CustomerService');
 
-
+/* Metodos para traer datos */
 // Obtener todos los customers
 const getAllCustomers = async (req, res) => {
     try {
