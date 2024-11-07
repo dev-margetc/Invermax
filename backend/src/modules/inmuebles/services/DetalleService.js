@@ -1,5 +1,6 @@
 /*Se aplica la lógica de negocio a los datos traidos por el repositorio. 
 Tambien se encarga de interactuar con otros servicios*/
+const {deleteMultimediaServidor} = require("../../../middleware/uploadConfig");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const DetalleInmueble = require("../entities/DetalleInmueble");
 const detalleRepo = require("../repositories/DetalleInmuebleRepository");
@@ -135,35 +136,6 @@ const getInfoMultimedia = async (idMultimedia, tipo, idDetalle) => {
     }
 }
 
-// Eliminar multimedia del servidor. Tiene en cuenta si el nombre de la BD incluye la ruta
-const deleteMultimediaServidor = async (tipo, nombre, modulo) => {
-    try {
-        // Si tiene la ruta no se usará la ruta del servidor
-        let incluyeRuta = nombre.includes("C:");
-        let ruta = "-";
-        if (!incluyeRuta) {
-            ruta = process.env.UPLOADS_PATH + "/" + modulo + "/" + tipo + "/" + nombre;
-        } else {
-            ruta = nombre;
-        }
-        console.log(ruta);
-        if (fs.existsSync(ruta)) {
-            fs.unlink(ruta, (err) => {
-                if (err) {
-                    throw new Error("Error inesperado buscando ruta de multimedia");
-                } else {
-                    return "Multimedia eliminada";
-                }
-            });
-        } else {
-            throw new Error("Ruta de multimedia no encontrada");
-        }
-
-    } catch (error) {
-        console.error("Error borrando multimedia:", error);
-        throw error;
-    }
-}
 
 
 // Eliminar un detalle. Los registros de fotos y videos se borran por la relacion cascade
@@ -252,7 +224,6 @@ module.exports = {
     obtenerDetallesPorInmueble,
     getFotoDetalle,
     getVideoDetalle,
-    deleteMultimediaServidor,
     deleteMultimediaBD,
     deleteDetalle,
     getInfoMultimedia

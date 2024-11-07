@@ -20,16 +20,30 @@ const getAllCustomers = async (condiciones) => {
 */
 const insertarCustomer = async (datosCustomer, transaccion) => {
     try {
-        if(!transaccion){
+        if (!transaccion) {
             transaccion = await sequelize.transaction(); // Iniciar la transacción
         }
 
         const customer = await Customer.create({
             ...datosCustomer
-        },{transaction:transaccion});
-
-console.log(datosCustomer);
+        }, { transaction: transaccion });
         return customer;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Actualizar los datos de un customer
+const actualizarCustomer = async (datosCustomer, idCustomer, transaction = null) => {
+    try {
+        await Customer.update(datosCustomer, {
+            where: { idCustomer },
+            fields: ['nombreCustomer', 'logoCustomer', 'correoNotiCustomer', 'telefonoNotiCustomer',
+                'telefonoFijoCustomer', 'codigoCustomer', 'perfilCustomer', 'numComercialCustomer',
+                'estadoPublicacion'], // Campos permitidos para actualizar
+
+            transaction: transaction // Si no se pasa, será null y no se usará
+        });
     } catch (error) {
         throw error;
     }
@@ -37,5 +51,6 @@ console.log(datosCustomer);
 
 module.exports = {
     getAllCustomers,
-    insertarCustomer
+    insertarCustomer,
+    actualizarCustomer
 }

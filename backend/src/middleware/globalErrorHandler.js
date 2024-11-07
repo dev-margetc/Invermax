@@ -12,9 +12,11 @@ const globalErrorHandler = (err, req, res, next) => {
     if (err.name && err.errors) {
         return handleControllerError(res, err, null); // Se usarian los mensajes genericos
     }
+    console.log(err);
 
     // Mensaje genérico para otros errores
-    return res.status(500).json({error:{ message: 'Ocurrió un error inesperado. Inténtalo de nuevo más tarde.' }});
+    let msg = "Ocurrió un error inesperado."+err.errno+"-"+err.message+". \n Intentalo de nuevo más tarde";
+    return res.status(500).json({error:{ message: msg }});
 };
 
 module.exports = globalErrorHandler;

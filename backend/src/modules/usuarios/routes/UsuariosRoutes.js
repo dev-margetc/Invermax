@@ -1,7 +1,7 @@
 //Rutas para acceder a las consultas
 const express = require('express');
 const router = express.Router();
-const upload = require('../../../middleware/uploadConfig');
+const {upload} = require('../../../middleware/uploadConfig');
 
 const globalErrorHandler = require("../../../middleware/globalErrorHandler");
 
@@ -34,15 +34,13 @@ router.get('/customers/basic', customerController.getAllCustomersBasic);
 // Registrar un customer junto con su usuario
 router.post('/customers', userController.crearCustomerUsuarios);
 
-
-// Registrar un usuario unicamente (para tipo admin o user)
-
+// ruta para insertar una foto para el logo
+router.post('/customers/:idCustomer/logo', upload.single('archivo'),customerController.actualizarLogo); //No enviar el archivo de primero
 
 /* Rutas Put */
 
 // Actualizar un customer
-
-
+router.put('/customer/:idCustomer', customerController.actualizarCustomer);
 /* Rutas delete*/
 
 // Borrar un customer y usuario dado el ID del usuario 

@@ -105,6 +105,7 @@ const eliminarInmueble = async (req, res) => {
         msg = await inmuebleService.eliminarInmueble(req.params);
         res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
     } catch (err) {
+        console.log(err);
         errorHandler.handleControllerError(res,err,"inmuebles");
     }
 }

@@ -51,7 +51,10 @@ const insertarVideo = async (idDetalle, rutaVideo) => {
 // Actualizar detalle
 const actualizarDetalle = async (datos, idDetalle, idInmueble, transaccion) => {
     try {
-        await DetalleInmueble.update(datos, { where: { idDetalle: idDetalle, idInmueble: idInmueble }, transaccion });
+        await DetalleInmueble.update(datos, { where: { idDetalle: idDetalle, idInmueble: idInmueble }, 
+            fields: [ 'valorInmueble','area','frameRecorrido','cantidadHabitaciones',
+                      'cantidadBaños','parqueadero','amoblado'], // Campos permitidos para actualizar
+     transaccion });
         return "Detalle actualizado"
     } catch (error) {
         throw error;

@@ -191,7 +191,10 @@ const actualizarInmueble = async (datos, idInmueble, transaccion) => {
   try {
     transaccion = await sequelize.transaction(); // Iniciar la transacción
 
-    await Inmueble.update(datos, { where: { idInmueble }, transaccion });
+    await Inmueble.update(datos, { where: { idInmueble },
+      fields: [ 'codigoInmueble','estadoInmueble','modalidadInmueble','tituloInmueble','estrato','administracion',
+                'tipoVivienda','codigoCiudad','idTipoInmueble','frameMaps','descripcionInmueble','estadoPublicacion'], // Campos permitidos para actualizar
+      transaccion });
 
   } catch (error) {
     throw error; // Lanzar error para que sea capturado en el controlador

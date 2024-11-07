@@ -7,6 +7,7 @@ const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
 const zonaInmuebleService = require("./ZonasInmueblesService");
 const InteresadoRepo = require("../repositories/InteresadoRepository");
+const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
 
 
 const insertarInmueble = async (datosInmueble) => {
@@ -138,12 +139,12 @@ const eliminarInmueble = async (params) => {
         // Borrar archivos de fotos de detalles
 
         await Promise.all(
-            urlsFoto.map(url => DetalleService.deleteMultimedia("fotos", url))
+            urlsFoto.map(url => deleteMultimediaServidor("fotos", url,"inmuebles"))
         );
 
         // Borrar archivos de videos de detalles
         await Promise.all(
-            urlsVideo.map(url => DetalleService.deleteMultimedia("videos", url))
+            urlsVideo.map(url => deleteMultimediaServidor("videos", url,"inmuebles"))
         );
         return "Inmueble borrado correctamente. ";
     } catch (error) {
