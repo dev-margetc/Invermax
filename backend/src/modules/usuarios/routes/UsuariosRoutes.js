@@ -21,13 +21,16 @@ router.get('/', userController.getAllUsuarios);
 router.get('/customers', customerController.getAllCustomers);
 
 /*  Traer todos los nombres de customers   
-    -En los parametros puede incluirse el tipo especifico, si está vacio los traerá todos
+    -En los parametros puede incluirse :
+      -el tipo especifico, el id de usuario o el id de customer
+    si está vacio los traerá todos
 */
 router.get('/customers/basic', customerController.getAllCustomersBasic);
 
-// Traer información de un customer dado el id de un usuario
-
-// Traer información de un customer dado su ID
+// Traer información de un customer dado el id de un usuario Ruta para que se use como parametro el id del usuario
+router.get('/:idUsuario/customer', customerController.getCustomerByID);
+// Traer información de un customer dado su ID. Ruta para que se use como parametro el id
+router.get('/customers/:idCustomer', customerController.getCustomerByID);
 
 /* Rutas Post */
 
@@ -43,8 +46,8 @@ router.post('/customers/:idCustomer/logo', upload.single('archivo'),customerCont
 router.put('/customer/:idCustomer', customerController.actualizarCustomer);
 /* Rutas delete*/
 
-// Borrar un customer y usuario dado el ID del usuario 
-
+// Borrar un usuario y customer dado el ID del usuario y del customer
+router.delete('/:idUsuario/customer/:idCustomer', userController.borrarUsuarioCustomer)
 
 // Manejador de errores global
 router.use(globalErrorHandler);

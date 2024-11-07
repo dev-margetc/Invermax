@@ -5,6 +5,10 @@ const ErrorNegocio = require("../../../utils/errores/ErrorNegocio")
 
 const UsuariosRepo = require("../repositories/UsuariosRepository");
 const CustomerRepo = require("../repositories/CustomerRepository");
+const InmuebleService = require("../../inmuebles/services/InmuebleService");
+const FiltrosInmuebleService = require("../../inmuebles/services/FiltrosInmuebleService");
+const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
+const Customer = require("../entities/Customer");
 
 /* Metodos de consulta*/
 const getAllUsuarios= async ()=>{ 
@@ -45,8 +49,54 @@ const insertUsuarioCustomer= async (datosUsuario, datosCustomer)=>{
     }
 }
 
+/* Metodos de delete*/
+// Borrar un usuario y un customer correspondiente
+const deleteUsuarioCustomer= async (idUsuario, idCustomer)=>{ 
+    const transaction = await sequelize.transaction(); // Iniciar la transacción
+
+    try{
+        if(!idUsuario||!idCustomer){
+            throw new ErrorNegocio("Hacen falta datos para borrar");
+        }
+
+    // Verificar que el customer si esté vinculado al usuario
+    const customer = await Customer.findByPk(idCustomer);
+
+    if(!customer || customer.idUsuario != idUsuario){
+        throw new ErrorNegocio("El customer ingresado no coincide con el id del usuario");
+    }
+    console.log("Filtrar");
+
+    // Obtener los inmuebles (El servicio de filtros tiene esta logica)
+    let dato ={};
+    dato.idCustomer = idCustomer;
+    dato.urlLogo = customer.logoCustomer;
+    const inmuebles = await FiltrosInmuebleService.getInmueblesUsuario(dato);
+
+    // Borrar los inmuebles (el servicio de inmuebles ya tiene esta logica)
+    await Promise.all(
+        inmuebles.map((inmueble) => InmuebleService.eliminarInmueble({ idInmueble: inmueble.dataValues.id }))
+    );
+    console.log("borrar");
+    
+    // borrar el usuario. El customer e inmuebles se borran por cascada
+    await UsuariosRepo.borrarUsuario(idUsuario);
+
+
+    // Borrar fotos del logo del customer
+    deleteMultimediaServidor("fotos", dato.urlLogo, "customers");
+    transaction.commit();
+    return "Usuario customer borrado";
+
+    }catch(error){
+        console.log(error);
+        transaction.rollback();
+        throw error;
+    }
+}
 
 module.exports = {
     getAllUsuarios,
-    insertUsuarioCustomer
+    insertUsuarioCustomer,
+    deleteUsuarioCustomer
 }

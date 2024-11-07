@@ -69,8 +69,6 @@ const handleControllerError = (res, error, moduleName) => {
     }
 
     const mensajeError = handleSequelizeErrors(error, moduleName);
-    console.log(mensajeError);
-    console.log(error.name);
     if (error.name === 'SequelizeValidationError') {
         return res.status(422).json({ error: {message: mensajeError} }); // 422 para errores de validación
     }

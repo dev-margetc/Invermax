@@ -29,8 +29,23 @@ const crearCustomerUsuarios = async(req, res)=>{
     }
 }
 
+/* Metodos para borrar*/
+// Borra el usuario y su customer asociado (tambien borra los inmuebles del customer)
+const borrarUsuarioCustomer= async (req,res)=>{
+    try{
+        const {idUsuario, idCustomer} = req.params;
+        console.log(req.params);
+        const msg = await UsuarioService.deleteUsuarioCustomer(idUsuario,idCustomer);
+        res.status(200).json(msg); //Se retorna un mensaje
+    }catch(err){
+        console.log(err);
+        errorHandler.handleControllerError(res,err,"usuarios");
+    }
+}
+
 
 module.exports = {
     getAllUsuarios,
-    crearCustomerUsuarios
+    crearCustomerUsuarios,
+    borrarUsuarioCustomer
 };

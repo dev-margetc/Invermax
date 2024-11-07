@@ -21,8 +21,8 @@ router.get('/departamentos/ciudades', ciudadController.getDepartamentosConCiudad
 */
 router.get('/publicados', inmuebleController.getInmueblesPublicados);
 
-// Ruta para traer inmuebles de un usuario
-router.get('/usuario/:idUsuario', inmuebleController.getInmueblesUsuario);
+// Ruta para traer inmuebles de un customer
+router.get('/customer/:idCustomer', inmuebleController.getInmueblesUsuario);
 
 // Ruta para traer todos los interesados de un inmueble
 router.get('/:idInmueble/interesados', inmuebleController.getInteresadosInmueble);

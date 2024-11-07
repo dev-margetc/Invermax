@@ -7,14 +7,23 @@ const {deleteMultimediaServidor} = require("../../../middleware/uploadConfig");
 const Customer = require("../entities/Customer");
 const CustomerRepo = require("../repositories/CustomerRepository");
 const DetalleService = require("../../inmuebles/services/DetalleService");
+const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 
 // Traer todos los customers. Valida si hay condiciones qué aplicar en la consulta
 const getAllCustomers = async (datos) => {
-    const { perfilCustomer } = datos;
+    const { perfilCustomer, idUsuario, idCustomer } = datos;
 
     const condiciones = {};
     if (perfilCustomer) {
         condiciones.perfilCustomer = perfilCustomer;
+    }
+    
+    if (idUsuario) {
+        condiciones.idUsuario = idUsuario;
+    }
+    
+    if (idCustomer) {
+        condiciones.idCustomer = idCustomer;
     }
     const customers = await CustomerRepo.getAllCustomers(condiciones);
     return customers;
@@ -50,9 +59,10 @@ const actualizarCustomer = async (datos, params) => {
 
 // Actualizar un logo
 const actualizarLogo = async (idCustomer, nombreArchivo, tipoArchivo) => {
-    try{
-        const transaction = await sequelize.transaction(); // Iniciar la transacción
+    const transaction = await sequelize.transaction(); // Iniciar la transacción
 
+    try{
+       
         if (!nombreArchivo || !tipoArchivo) {
             throw new ErrorNegocio("Ruta no encontrada o tipo de archivo no correcto");
         }

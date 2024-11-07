@@ -96,12 +96,12 @@ const tieneZonas = (zonasInmueble, zonas) => {
 
 // Traer inmuebles de un usuario
 const getInmueblesUsuario = async (datos) => {
-    const {idUsuario} = datos;
+    const {idCustomer} = datos;
 
-    if(idUsuario){
-        return inmuebleRepository.getInmueblesUsuario(idUsuario);
+    if(idCustomer){
+        return inmuebleRepository.getInmueblesUsuario(idCustomer);
     }else{
-        return { error: true, message: "usuario no colocado" };
+        throw new ErrorNegocio("Customer no colocado");
     }
 }
 

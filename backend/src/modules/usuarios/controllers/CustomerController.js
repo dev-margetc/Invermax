@@ -4,6 +4,7 @@ const UsuarioService = require('../services/UsuariosService');
 const CustomerService = require('../services/CustomerService');
 const {deleteMultimediaServidor} = require('../../../middleware/uploadConfig');
 const fs = require('fs');
+const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 
 /* Metodos para traer datos */
 // Obtener todos los customers
@@ -22,6 +23,26 @@ const getAllCustomersBasic = async (req, res) => {
     try {
         const customers = await CustomerService.getAllCustomersBasic(req.query);
         res.status(200).json(customers); //Se retornan los usuarios
+    } catch (err) {
+        console.log(err);
+        errorHandler.handleControllerError(res, err, "usuarios");
+    }
+};
+
+// Traer un customer dado su idUsuario o idCustomer
+const getCustomerByID = async (req, res) => {
+    try {
+        const {idCustomer, idUsuario} = req.params;
+        let dato = {};
+        if(idCustomer){
+            dato.idCustomer = idCustomer;
+        }else if(idUsuario){
+            dato.idUsuario = idUsuario; 
+        }else{
+            throw new ErrorNegocio("Parametro no colocado");
+        }
+        const customer = await CustomerService.getAllCustomers(dato);
+        res.status(200).json(customer); //Se retornan los usuarios
     } catch (err) {
         console.log(err);
         errorHandler.handleControllerError(res, err, "usuarios");
@@ -61,7 +82,7 @@ const actualizarLogo = async (req, res) => {
         if (rutaFoto) {
             await deleteMultimediaServidor("fotos",nombreFoto,"customers");
         }
-
+        
         //Enviar el mensaje de error
         errorHandler.handleControllerError(res, err, "usuarios");
     }
@@ -69,6 +90,7 @@ const actualizarLogo = async (req, res) => {
 module.exports = {
     getAllCustomers,
     getAllCustomersBasic,
+    getCustomerByID,
     actualizarCustomer,
     actualizarLogo
 }

@@ -26,7 +26,17 @@ const insertarUsuario = async (datosUsuario, transaccion) => {
     }
 }
 
+const borrarUsuario = async (idUsuario) => {
+    try {
+      await Usuario.destroy({ where: { idUsuario: idUsuario } });
+      return "Usuario borrado";
+    } catch (error) {
+      throw error; // Lanzar error para que sea capturado en el controlador
+    }
+  }
+
 module.exports = {
     getAllUsuarios,
-    insertarUsuario
+    insertarUsuario,
+    borrarUsuario
 }
