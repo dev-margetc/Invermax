@@ -5,6 +5,10 @@ const sequelize = require('../../../conf/database');
 //Tipos de customer permitidos
 const PERFILES = ['constructora', 'inmobiliaria', 'agente inmobiliario', 'propietario'];
 
+
+//Estados de customer permitidos
+const ESTADOS = ['activo', 'inactivo'];
+
 const Customer = sequelize.define('Customer', {
     idCustomer: {
         type: DataTypes.INTEGER,
@@ -60,6 +64,18 @@ const Customer = sequelize.define('Customer', {
         type: DataTypes.STRING,
         allowNull: true,
         field: 'numero_comercial'
+    },
+    estadoCustomer: {
+        type: DataTypes.STRING,
+        defaultValue: 'inactivo', // Valor por defecto
+        allowNull: false,
+        validate: {
+            isIn: {
+                args: [ESTADOS],
+                msg: `Estado de customer no valido. Los tipos permitidos son: ${ESTADOS.join(', ')}.`
+            }
+        },
+        field: 'estado_customer'
     },
     idUsuario: {
         type: DataTypes.INTEGER,

@@ -40,7 +40,7 @@ const actualizarCustomer = async (datosCustomer, idCustomer, transaction = null)
             where: { idCustomer },
             fields: ['nombreCustomer', 'logoCustomer', 'correoNotiCustomer', 'telefonoNotiCustomer',
                 'telefonoFijoCustomer', 'codigoCustomer', 'perfilCustomer', 'numComercialCustomer',
-                'estadoPublicacion'], // Campos permitidos para actualizar
+                'estadoCustomer'], // Campos permitidos para actualizar
 
             transaction: transaction // Si no se pasa, será null y no se usará
         });

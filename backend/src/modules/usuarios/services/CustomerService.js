@@ -3,6 +3,7 @@ Tambien se encarga de interactuar con otros servicios*/
 
 const sequelize = require("../../../conf/database");
 const {deleteMultimediaServidor} = require("../../../middleware/uploadConfig");
+const {filtrarCampos}  = require("../../../utils/utils");
 
 const Customer = require("../entities/Customer");
 const CustomerRepo = require("../repositories/CustomerRepository");
@@ -52,8 +53,18 @@ const getAllCustomersBasic = async (datos) => {
 // Actualizar un customer
 const actualizarCustomer = async (datos, params) => {
     const { customer } = datos;
-    const { idCustomer } = params
-    await CustomerRepo.actualizarCustomer(customer, idCustomer);
+    const { idCustomer } = params;
+
+    // Dependiendo del tipo de usuario se pueden cambiar ciertas cosas (GOOGLEAUTH REQUERIDO)
+    const campos = ["nombreCustomer", "correoNotiCustomer", "telefonoNotiCustomer", "telefonoFijoCustomer",
+                    "codigoCustomer", "perfilCustomer", "numComercialCustomer", "estadoCustomer"];
+
+    // Para el admin ademas de estos campos se agrega el de estado
+
+    // Extraer los datos respectivos
+    const customerData = filtrarCampos(customer,campos);
+
+    await CustomerRepo.actualizarCustomer(customerData, idCustomer);
     return "Datos actualizados";
 }
 
@@ -84,6 +95,7 @@ const actualizarLogo = async (idCustomer, nombreArchivo, tipoArchivo) => {
                 await deleteMultimediaServidor("fotos", fotoVieja, "customers");
             }
 
+            // Se usa el metodo de actualizacion del repositorio
             await CustomerRepo.actualizarCustomer(newData, idCustomer, transaction);
             transaction.commit();
             msg = "Logo actualizado";

@@ -193,7 +193,7 @@ const actualizarInmueble = async (datos, idInmueble, transaccion) => {
 
     await Inmueble.update(datos, { where: { idInmueble },
       fields: [ 'codigoInmueble','estadoInmueble','modalidadInmueble','tituloInmueble','estrato','administracion',
-                'tipoVivienda','codigoCiudad','idTipoInmueble','frameMaps','descripcionInmueble','estadoPublicacion'], // Campos permitidos para actualizar
+                'tipoVivienda','codigoCiudad','idTipoInmueble','frameMaps','descripcionInmueble','estadoPublicacionInmueble'], // Campos permitidos para actualizar
       transaccion });
 
   } catch (error) {

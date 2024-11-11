@@ -29,24 +29,24 @@ router.get('/customers/basic', customerController.getAllCustomersBasic);
 
 // Traer información de un customer dado el id de un usuario Ruta para que se use como parametro el id del usuario
 router.get('/:idUsuario/customer', customerController.getCustomerByID);
-// Traer información de un customer dado su ID. Ruta para que se use como parametro el id
+// Traer información de un customer dado su ID. Ruta para que se use como parametro el id 
 router.get('/customers/:idCustomer', customerController.getCustomerByID);
 
 /* Rutas Post */
 
-// Registrar un customer junto con su usuario
+// Registrar un customer junto con su usuario (GOOGLEAUTH REQUERIDO)
 router.post('/customers', userController.crearCustomerUsuarios);
 
-// ruta para insertar una foto para el logo
+// ruta para insertar una foto para el logo. Solo puede usarlo el customer iniciado y el admin (GOOGLEAUTH REQUERIDO)
 router.post('/customers/:idCustomer/logo', upload.single('archivo'),customerController.actualizarLogo); //No enviar el archivo de primero
 
 /* Rutas Put */
 
-// Actualizar un customer
+// Actualizar un customer. Solo puede usarlo el customer iniciado y el admin (GOOGLEAUTH REQUERIDO)
 router.put('/customer/:idCustomer', customerController.actualizarCustomer);
 /* Rutas delete*/
 
-// Borrar un usuario y customer dado el ID del usuario y del customer
+// Borrar un usuario y customer dado el ID del usuario y del customer. Solo lo puede usar el admin  (GOOGLEAUTH REQUERIDO)
 router.delete('/:idUsuario/customer/:idCustomer', userController.borrarUsuarioCustomer)
 
 // Manejador de errores global

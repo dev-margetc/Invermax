@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 31-10-2024 a las 18:53:35
+-- Tiempo de generación: 11-11-2024 a las 22:52:39
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -1215,6 +1215,7 @@ CREATE TABLE `customers` (
   `codigo_customer` varchar(30) DEFAULT NULL COMMENT 'Codigo unico de una inmobiliaria/tipo de customer. No es requerido',
   `perfil` varchar(25) NOT NULL COMMENT 'Tipo de customer. Pueden ser constructora,inmobiliaria,agente inmobiliario,propietario',
   `numero_comercial` varchar(25) DEFAULT NULL,
+  `estado_customer` varchar(25) NOT NULL DEFAULT 'inactivo' COMMENT 'Estados posibles: "activo", "inactivo"',
   `id_usuario` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene a los usuarios tipo inmobiliaria';
 
@@ -1222,8 +1223,31 @@ CREATE TABLE `customers` (
 -- Volcado de datos para la tabla `customers`
 --
 
-INSERT INTO `customers` (`id_customer`, `nombre_customer`, `logo_customer`, `correo_notificaciones`, `telefono_notificaciones`, `telefono_fijo`, `codigo_customer`, `perfil`, `numero_comercial`, `id_usuario`) VALUES
-(1, 'test', NULL, 'test@notify', '12123123', '23234234', '400004', 'constructora', '34343434', 1);
+INSERT INTO `customers` (`id_customer`, `nombre_customer`, `logo_customer`, `correo_notificaciones`, `telefono_notificaciones`, `telefono_fijo`, `codigo_customer`, `perfil`, `numero_comercial`, `estado_customer`, `id_usuario`) VALUES
+(1, 'test', 'customer-1-1730955641328-99772360.png', 'test@notify', '12123123', '23234234', '400004', 'constructora', '34343434', 'activo', 1),
+(2, '', NULL, '', '', NULL, NULL, '', NULL, 'activo', 2),
+(3, 'nuevo customer', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, 'inmobiliaria', NULL, 'inactivo', 18),
+(4, 'Propietario pato', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, 'propietario', '63421232', 'inactivo', 19),
+(5, 'actualizado', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', '4040040404', 'inmobiliaria', '63421232', '0', 18),
+(8, 'inmobiliaria prueba', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, 'inmobiliaria', '63421232', '0', 23),
+(9, 'inmobiliaria ácp', NULL, 'notif@hotmail.com', '4458458 ext 511', '56566554', NULL, 'inmobiliaria', '6343221232', 'inactivo', 25),
+(10, 'Propietario pato', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, 'propietario', '63421232', 'inactivo', 26);
+
+--
+-- Disparadores `customers`
+--
+DELIMITER $$
+CREATE TRIGGER `desactivar_inmuebles` AFTER UPDATE ON `customers` FOR EACH ROW BEGIN
+    -- Verificar que el estado del customer haya cambiado a 'inactivo'
+    IF NEW.estado_customer = 'inactivo' AND OLD.estado_customer != 'inactivo' THEN
+        -- Actualizar los inmuebles relacionados de ese customer a 'borrador'
+        UPDATE inmuebles
+        SET estado_publicacion = 'borrador'
+        WHERE id_customer = NEW.id_customer;
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -1302,7 +1326,6 @@ INSERT INTO `detalles_inmuebles` (`id_detalle`, `valor_inmueble`, `area`, `ifram
 (2, 300000.00, 150, 'hhttpads', 4, 2, 'no', 0, 61, NULL),
 (7, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 66, NULL),
 (8, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 66, NULL),
-(11, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 69, NULL),
 (12, 200000.00, 155, 'hadasdads', 5, 1, 'no', 0, 69, NULL),
 (13, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 71, NULL),
 (15, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 0, 72, NULL),
@@ -1312,11 +1335,31 @@ INSERT INTO `detalles_inmuebles` (`id_detalle`, `valor_inmueble`, `area`, `ifram
 (21, 300000.00, 150, 'hhttpads', 4, 2, 'si, motos', 1, 84, 3),
 (22, 20000.00, 155, 'hadasdads', 5, 1, 'no', 0, 84, 3),
 (23, 6550000.00, 50, 'hhttpads', 7, 5, 'no', 1, 86, NULL),
-(25, 20030000.00, 155, 'hadasdads', 3, 1, 'no', 1, 87, 4),
 (26, 3050000.00, 30, 'fram-editado2', 7, 5, 'no', 1, 88, NULL),
 (27, 2030000.00, 200, 'hadasdads', 5, 1, 'si, motos', 1, 88, NULL),
 (28, 2030000.00, 200, 'hadasdads', 5, 1, 'si, motos', 1, 88, NULL),
-(32, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 89, 5);
+(32, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 89, 5),
+(33, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 91, 6),
+(35, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 91, 6),
+(36, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 91, 6),
+(37, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 106, NULL),
+(38, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 141, 7),
+(39, 20030000.00, 155, 'hadasdads', 3, 1, 'no', 1, 141, 7),
+(40, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 141, 7),
+(41, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 141, 7),
+(42, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 144, NULL),
+(43, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 146, 8),
+(44, 20030000.00, 155, 'hadasdads', 3, 1, 'no', 1, 146, 8),
+(45, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 146, 8),
+(46, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 146, 8),
+(48, 20030000.00, 155, 'hadasdads', 3, 1, 'no', 1, 148, 9),
+(49, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 148, 9),
+(50, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 148, 9),
+(52, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 152, NULL),
+(53, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 154, NULL),
+(57, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 160, NULL),
+(58, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 162, NULL),
+(59, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 164, NULL);
 
 -- --------------------------------------------------------
 
@@ -1386,12 +1429,12 @@ INSERT INTO `inmuebles` (`id_inmueble`, `codigo_inmueble`, `descripcion`, `estad
 (41, '203523155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 43, 2),
 (43, '202523155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
 (44, '232223155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-10-26 20:37:27', 1, 43, 2),
-(45, '120201', 'Nova descripcion', 'usado', 'compra', 'cambio-titulo', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
-(48, '2213023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(45, '120201', 'Nova descripcion', 'usado', 'compra', 'cambio-titulo', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-11-02 01:44:09', 1, 43, 2),
+(48, '2213023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-11-02 01:47:20', 1, 43, 2),
 (49, '22123023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
-(50, '22233023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
-(51, '222323423155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
-(54, '231003303155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
+(50, '22233023155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-11-01 20:51:30', 1, 43, 2),
+(51, '222323423155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-11-01 21:02:29', 1, 43, 2),
+(54, '231003303155', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-11-03 17:36:42', 1, 43, 2),
 (55, '229', 'Una descripcion creativa', 'usado', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 2),
 (56, '129', 'Una descripcion creativa', 'usado', 'compra', 'pruebaasdsd', 5, 1, 'VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 3, 2),
 (61, '102', 'Una descripcion creativa', 'usado', 'compra', 'pruebaasdsd', 5, 1, 'VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 3, 2),
@@ -1404,9 +1447,19 @@ INSERT INTO `inmuebles` (`id_inmueble`, `codigo_inmueble`, `descripcion`, `estad
 (81, '130001', 'Una descripcion creativa', 'nuevo', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', NULL, 1, 23, 4),
 (84, '4899966252242', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5),
 (86, '13031', 'Una descripcion creativa', 'nuevo', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 23, 4),
-(87, '120001', 'Nova descripcion', 'nuevo', 'compra', 'cambio-titulo', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5),
 (88, '120002', 'Una descripcion creativa', 'nuevo', 'arriendo', 'cambio-titulo', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 23, 4),
-(89, '999999', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5);
+(89, '999999', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5),
+(91, '99433499', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5),
+(106, '23449941', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 23, 3),
+(141, '994332499', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5),
+(144, '23449921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 23, 3),
+(146, '99433899', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5),
+(148, '9943899', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 43, 5),
+(152, '234429921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 23, 3),
+(154, '234422921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 1, 23, 3),
+(160, '2134422921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 8, 23, 3),
+(162, '2323921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 4, 23, 3),
+(164, '232233921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 10, 23, 3);
 
 --
 -- Disparadores `inmuebles`
@@ -1478,7 +1531,13 @@ INSERT INTO `interesados` (`id_interesado`, `nombre`, `telefono`, `correo`, `ubi
 (2, 'Raul Alvarez', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41),
 (6, 'Raul Alvarez', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 75),
 (7, 'Kevin', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 40),
-(8, 'Cam cif', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41);
+(8, 'Cam cif', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41),
+(9, 'Cam cif', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41),
+(12, 'Cam cif', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41),
+(13, 'Cam cif', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41),
+(14, 'Cam cif', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41),
+(15, 'Cam cif', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41),
+(16, 'Cam cif', '494992939', 'hola@gmail.com', 'rural', 0, 'viudo', 41);
 
 -- --------------------------------------------------------
 
@@ -1512,8 +1571,11 @@ CREATE TABLE `proyectos` (
 INSERT INTO `proyectos` (`id_proyecto`, `fecha_entrega`, `id_inmueble`) VALUES
 (1, '2025-12-06', 75),
 (3, '2025-12-06', 84),
-(4, '2025-12-06', 87),
-(5, '2025-12-06', 89);
+(5, '2025-12-06', 89),
+(6, '2027-11-05', 91),
+(7, '2027-11-05', 141),
+(8, '2027-11-05', 146),
+(9, '2027-11-05', 148);
 
 -- --------------------------------------------------------
 
@@ -1568,7 +1630,14 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `email`, `tipo_usuario`) VALUES
-(1, 'test@gmail.com', '');
+(1, 'test@gmail.com', 'customer'),
+(2, 'correo@gmail.com', 'customer'),
+(18, 'correo@gmail.com', 'customer'),
+(19, 'correo@gmail.com', 'customer'),
+(20, 'correo_test@gmail.com', 'customer'),
+(23, 'correo_test@gmail.com', 'customer'),
+(25, 'corret@gmail.com', 'customer'),
+(26, 'correo_test@gmail.com', 'customer');
 
 -- --------------------------------------------------------
 
@@ -1588,9 +1657,10 @@ CREATE TABLE `videos` (
 --
 
 INSERT INTO `videos` (`id_video`, `url_video`, `id_detalle_inmueble`, `id_blog`) VALUES
-(19, '32-1730396139223-772385828.mp4', 32, NULL),
 (21, '32-1730396141005-939855727.mp4', 32, NULL),
-(22, '32-1730396141912-513050915.mp4', 32, NULL);
+(22, '32-1730396141912-513050915.mp4', 32, NULL),
+(23, '32-1730672251776-565073422.mp4', 32, NULL),
+(24, '32-1730676337191-998007189.mp4', 32, NULL);
 
 -- --------------------------------------------------------
 
@@ -1683,10 +1753,7 @@ INSERT INTO `zonas_inmuebles` (`id_inmueble`, `id_zona`) VALUES
 (75, 1),
 (75, 2),
 (75, 3),
-(75, 5),
-(87, 1),
-(87, 3),
-(87, 4);
+(75, 5);
 
 -- --------------------------------------------------------
 
@@ -1882,7 +1949,7 @@ ALTER TABLE `ciudades`
 -- AUTO_INCREMENT de la tabla `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id_customer` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_customer` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `departamentos`
@@ -1894,19 +1961,19 @@ ALTER TABLE `departamentos`
 -- AUTO_INCREMENT de la tabla `detalles_inmuebles`
 --
 ALTER TABLE `detalles_inmuebles`
-  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT de la tabla `fotos`
 --
 ALTER TABLE `fotos`
-  MODIFY `id_foto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id_foto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de la tabla `inmuebles`
 --
 ALTER TABLE `inmuebles`
-  MODIFY `id_inmueble` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `id_inmueble` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=165;
 
 --
 -- AUTO_INCREMENT de la tabla `inmuebles_destacados`
@@ -1924,7 +1991,7 @@ ALTER TABLE `inmuebles_en_ascenso`
 -- AUTO_INCREMENT de la tabla `interesados`
 --
 ALTER TABLE `interesados`
-  MODIFY `id_interesado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_interesado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `planes`
@@ -1936,7 +2003,7 @@ ALTER TABLE `planes`
 -- AUTO_INCREMENT de la tabla `proyectos`
 --
 ALTER TABLE `proyectos`
-  MODIFY `id_proyecto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_proyecto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `suscripciones`
@@ -1954,13 +2021,13 @@ ALTER TABLE `tipos_inmueble`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `videos`
 --
 ALTER TABLE `videos`
-  MODIFY `id_video` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_video` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT de la tabla `zonas`
