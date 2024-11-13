@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require("cors");
 const multer  = require('multer');
 const upload = multer();
 require('dotenv').config();
@@ -22,6 +23,13 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Permitir solicitudes desde el frontend (http://localhost:3001)
+app.use(cors({
+    origin: "http://localhost:3001", // Reemplazar con el origen del frontend
+    methods: ["GET", "POST", "PUT", "DELETE"], // Métodos HTTP permitidos
+    credentials: true, // enviar cookies o autenticación
+}));
+
 //Ruta por defecto    
 app.get('/', (req, res) => {
     res.send('Servidor funcionando correctamente');
@@ -32,7 +40,6 @@ app.use('/inmuebles', inmueblesRoutes);
 
 // Usar las rutas del modulo de usuarios
 app.use('/usuarios', usuariosRoutes);
-
 
 
 // Manejo de rutas no encontradas (404)

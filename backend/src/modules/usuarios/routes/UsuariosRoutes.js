@@ -3,6 +3,9 @@ const express = require('express');
 const router = express.Router();
 const {upload} = require('../../../middleware/uploadConfig');
 
+const { protegerRuta } = require('../../../middleware/authMiddleware'); // middleware autenticacion
+
+
 const globalErrorHandler = require("../../../middleware/globalErrorHandler");
 
 const userController = require("../controllers/UsuariosController");
@@ -18,7 +21,7 @@ router.get('/', userController.getAllUsuarios);
     -En los parametros puede incluirse el tipo especifico, si está vacio los traerá todos
     - Esta ruta trae toda la información de customers, debería estar protegida
 */
-router.get('/customers', customerController.getAllCustomers);
+router.get('/customers',protegerRuta, customerController.getAllCustomers);
 
 /*  Traer todos los nombres de customers   
     -En los parametros puede incluirse :
@@ -33,6 +36,10 @@ router.get('/:idUsuario/customer', customerController.getCustomerByID);
 router.get('/customers/:idCustomer', customerController.getCustomerByID);
 
 /* Rutas Post */
+
+//Ruta para autenticar al usuario usando el idToken de firebase
+router.post('/auth/google', userController.autenticarUsuario);
+
 
 // Registrar un customer junto con su usuario (GOOGLEAUTH REQUERIDO)
 router.post('/customers', userController.crearCustomerUsuarios);
