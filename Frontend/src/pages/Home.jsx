@@ -1,20 +1,28 @@
-// src/pages/Home.js
+
 import React from 'react';
 import Banner from '../components/Banner'; 
 import CarouselDestacados from '../components/CarouselDestacados'; 
 import CarouselAltaDemanda from '../components/CarouselAltaDemanda'; 
-
 import Footer from '../components/Footer'; 
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  return (
-    <div >
-      <Banner />
-      <section className='fondo-p'>
-      <CarouselDestacados />
-      <CarouselAltaDemanda />
-      </section>
+  const navigate = useNavigate();
 
+  const handleSearch = (formData) => {
+    // Navega a la página de Filter y pasa los datos del formulario
+    navigate('/filter', { state: { formData } });
+  };
+
+  return (
+    <div>
+      <Banner onSearch={handleSearch} />
+      <section className='fondo-p'>
+        <CarouselDestacados />
+        <CarouselAltaDemanda />
+      </section>
+      {/* Resto del contenido de la página */}
+      {/* Sección de Aliados */}
       <section className='allies-section-1'></section>
 
       {/* Sección de Aliados */}
@@ -73,12 +81,7 @@ const Home = () => {
         </button>
     </div>
 </section>
-
-
-
-
-
-
+      {/* Sección de Blog */}
       {/* Sección de Blog */}
       <section className="container my-5">
         <h1 className="text-center mb-4 raya"><strong>BLOG</strong></h1>

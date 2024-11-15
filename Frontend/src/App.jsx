@@ -10,6 +10,8 @@ import Home from './pages/Home';
 import Navbar from './components/NavBar';
 import Footer from './components/Footer';
 import Filter from './pages/Filter';
+import Plantilla from './pages/Plantilla';
+
 
 
 
@@ -28,10 +30,13 @@ function App() {
         <Route path="/" element={<Home />} />    
         {/* Agrega más rutas aquí si tienes otros componentes de página */}
         <Route path="/filter" element={<Filter />} /> 
+        <Route path="/plantilla" element={<Plantilla />} /> 
       </Routes>
 
      {/* Footer */}
+  
       <Footer />
+      
 
     </Router>
   );

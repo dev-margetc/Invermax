@@ -135,20 +135,25 @@
   margin: 0%;
 }
 
-/* Botón activo */
-/* .actives-bottons {
-  background-color: rgba(255, 255, 255, 0.8); 
-  color: black;
-} */
+/* Estilo para el botón inactivo (fondo gris oscuro) */
+.btn-inactive-b {
+  background: rgba(255, 255, 255, 0.3); /* Fondo gris oscuro para el botón no seleccionado */
+  color: #383838; /* Color del texto en el botón inactivo */
+  border-radius: 8px 8px 8px 8px;
+}
 
-/* Botón inactivo */
-.boton-ciudad .btn:not(.actives-bottons), .boton-codigo .btn:not(.actives-bottons) {
-  background-color: rgba(255, 255, 255, 0.596); /* Fondo oscuro translúcido para el botón inactivo */
-  color: rgb(32, 30, 30);
+/* Estilo para el botón activo (fondo blanco) */
+.btn-active-b {
+  background: rgba(0, 0, 0, 0.034);
+  backdrop-filter: blur(5px);
+  color: #f5f3f3; /* Color del texto en el botón activo */
+  border-radius: 8px 8px 8px 8px;
+  
+ 
 }
 
 /* Estilos de los inputs y selects */
-.custom-select,
+.custom-select-bp,
 .input-t,
 .input-c {
   background: rgba(0, 0, 0, 0.3);
@@ -160,7 +165,7 @@
   width: 100%;
 }
 
-.custom-select:focus,
+.custom-select-bp:focus,
 .input-t:focus,
 .input-c:focus {
   
@@ -196,6 +201,339 @@
   justify-content: center;
   text-align: center;
 }
+
+/* Estilos para el mensaje de error */
+.error-message {
+  color: #ff4d4d; /* Rojo claro para el texto de error */
+  background-color: #ffe6e6; /* Fondo rojo suave */
+  border: 1px solid #ff4d4d; /* Borde rojo */
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  margin: 15px auto;
+  max-width: 80%; /* Ajusta el ancho máximo para centrarlo */
+}
+
+
+
+
+/* ------------------------------------------------------------------------- */
+/* Estilos del Banner - Filter --------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* BannerFilter Component Styles */
+/* Estilo para las opciones de select al pasar el mouse */
+@media (max-width: 1099px) {
+  /* Aquí defines los estilos que quieres aplicar en modo "mobile" */
+  .banner-filter {
+    height: 500px;
+    padding: 10px;
+  }
+
+  .col-md-3 {
+    width: 100%; /* Forzar las columnas a ocupar el ancho completo */
+  }
+
+  /* Otros ajustes de estilo que desees hacer en modo "mobile" */
+}
+
+
+.banner-filter {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: rgb(26, 24, 24);
+  text-align: center;
+  width: 100%;
+}
+
+.more-filters {
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px;
+  cursor: pointer;
+  color: black;
+}
+
+.more-filters .arrow {
+  margin-left: 5px;
+  font-size: 16px; /* Tamaño de la flecha */
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+
+
+.ejemplo {
+  background: url(/public/img/edificios-filtro.png)  center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 94.7px;/* or specify a height, like 500px, based on your layout */
+}
+
+
+@media (max-width: 768px) {
+  .banner-filter {
+    height: 500px;
+  }
+
+  .ejemplo{
+    padding: 10px 40px;
+  }
+
+}
+
+/* Overlay for dark layer on top of the image */
+.banner-filter-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url(/public/img/edificios-filtro.png)  center center;
+
+}
+
+/* Banner content */
+.banner-filter-content {
+  width: 100%;
+  margin: 0; /* Opcional: elimina el margen del contenedor padre */
+  padding: 0px 10px;
+  
+  
+}
+
+.banner-filter-content h1 {
+  color: black;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+/* Search container styling */
+.banner-filter-card {
+  background: #ffffff; /* Fondo blanco */
+  padding: 0px 50px 20px 50px;
+  width: 100%; /* Ancho completo */
+  margin: 0 auto; /* Centrar la tarjeta horizontalmente */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+  border-radius: 0px 0px 8px 8px; /* Bordes redondeados */
+  position: relative; /* Permitir posicionamiento relativo */
+  z-index: 1000; /* Alto valor para que esté sobre otros elementos */
+}
+
+
+/* Contenedor de los botones */
+.button-container {
+  display: flex; /* Usar Flexbox para distribuir los botones en línea */
+  width: 100%; /* Ocupa todo el ancho disponible */
+  box-shadow: 0px -2px 6px rgba(0, 0, 0, 0.1), 2px 0px 6px rgba(0, 0, 0, 0.1), -2px 0px 6px rgba(0, 0, 0, 0.1); /* Sombra suave en la parte superior y laterales */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+
+
+/* Estilo base para los botones de filtro */
+.city-btn,
+.code-btn {
+  flex: 1; /* Los botones ocupan espacio equitativo */
+  font-weight: bold;
+  padding: 10px 20px;
+  font-size: 1rem;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Estilo para el botón inactivo (fondo gris oscuro) */
+.btn-inactive {
+  background-color: #E6E6E6; /* Fondo gris oscuro para el botón no seleccionado */
+  color: #383838; /* Color del texto en el botón inactivo */
+  border-radius: 8px 8px 8px 8px;
+}
+
+/* Estilo para el botón activo (fondo blanco) */
+.btn-active {
+  background-color: #ffffff; /* Fondo blanco para el botón seleccionado */
+  color: #000000; /* Color del texto en el botón activo */
+ 
+ 
+}
+
+
+
+/* Inputs and selects styling */
+.banner-filter-select,
+.banner-filter-input-text,
+.banner-filter-input-code {
+  background: #ffffff;
+  backdrop-filter: blur(5px);
+  color: rgb(58, 58, 58);
+  border: 1px solid rgb(82, 82, 82);
+  border-radius: 5px;
+  padding: 6px 8px;
+  width: 100%;
+}
+
+.banner-filter-select:focus,
+.banner-filter-input-text:focus,
+.banner-filter-input-code:focus {
+  color: #080808;
+  border-color: #353636;
+  outline: none; /* Elimina el borde azul */
+  box-shadow: none; /* Elimina el efecto de sombra de Bootstrap */
+}
+
+
+/* Search button styling */
+.banner-filter-btn-dark {
+  background-color: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-weight: bold;
+  padding: 8px 20px;
+  width: 100%;
+}
+
+.banner-filter-btn-dark img {
+  margin-right: 8px;
+}
+
+/* Label styling */
+.banner-filter-text-white {
+  color: rgb(37, 37, 37);
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.banner-filter-center {
+  justify-content: center;
+  text-align: center;
+}
+
+
+.banner-filter-content {
+  position: relative;
+  transition: all 0.3s ease;
+  color: white; /* Color inicial */
+}
+
+.banner-filter-content.expanded {
+  position: absolute;
+  top: 20px; /* Ajusta este valor según el espacio necesario */
+  left: 0;
+  width: 100%;
+  background-color: white;
+  color: black; /* Cambia el texto a negro en modo expandido */
+  z-index: 10; /* Asegura que esté en una capa superior */
+  
+  margin-top: 75px; /* Ajusta este valor según el espacio necesario */
+}
+
+.more-filters {
+  cursor: pointer;
+}
+
+.additional-filters label,
+.additional-filters input,
+.additional-filters select {
+  color: black; /* Asegura que el texto de los campos adicionales sea negro */
+}
+
+.button-container button {
+  color: black; /* Asegura que los botones también tengan texto negro en el modo expandido */
+}
+
+
+/* amoblando */
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  background-color: #f0f5f5;
+  padding: 8px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  width: 80px;
+  justify-content: space-between;
+  position: relative;
+}
+
+.toggle-switch .option {
+  font-size: 14px;
+  color: #888;
+  font-weight: bold;
+}
+
+.toggle-switch .option.active {
+  color: black;
+}
+
+.toggle-switch .switch {
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  width: 32px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50px;
+  transition: all 0.3s;
+}
+
+.toggle-switch.on .switch {
+  left: 42px;
+  background-color: red;
+}
+
+.toggle-switch .switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+@media (max-width: 1099px) {
+  .banner-filter {
+    height: 500px;
+  }
+
+  .ejemplo {
+    padding: 10px 40px;
+  }
+
+  .banner-filter-content {
+    position: relative;
+    width: 100%;
+    padding: 10px;
+    color: white;
+    transition: all 0.3s ease;
+  }
+
+  .banner-filter-card {
+    padding: 20px;
+    width: 100%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 0px;
+  }
+
+  .more-filters {
+    font-size: 14px;
+  }
+
+  /* Cualquier otro estilo para "mobile" puedes incluirlo aquí */
+}
+
+
+
 
 
 
@@ -866,7 +1204,9 @@ font-size: 18px;
 .catalogo {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 30px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 /* Tarjeta de propiedad */
@@ -877,7 +1217,9 @@ font-size: 18px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   height: 500px; /* Aumentar la altura según sea necesario */
+  max-width: 300px;
   overflow: visible;
+  background-color:#FFFFFF;
   
 }
 
@@ -921,8 +1263,10 @@ font-size: 18px;
 /* Imagen de la propiedad */
 .property-img {
   width: 100%;
+  max-width: 300px;
   height: 200px;
   object-fit: cover;
+  border-radius: 10px 10px 0px 0px;
 }
 
 /* Insignia de "Destacado" */
@@ -968,12 +1312,32 @@ font-size: 18px;
   z-index: 1;
 }
 
-/* Insignia de "Nuevo" o "Alta demanda" */
+/* en carruseles */
 .badge-nuevo {
   text-align: center;
   position: absolute;
   top: 11px;
   left: 230px;
+  right: 0;
+  background-color:#0EB69A;
+  color: #fff;
+  padding: 2px 5px;
+  font-weight: bold;
+  border-radius: 5px;
+  z-index: 1;
+  transform: rotate(45deg);
+  width: 30%;
+  border-radius: 40px 0px 40px 0px;
+  
+  
+}
+
+/* en catalogo */
+.badge-nuevo-catalogo {
+  text-align: center;
+  position: absolute;
+  top: 4px;
+  left: 200px;
   right: 0;
   background-color:#0EB69A;
   color: #fff;
@@ -1071,14 +1435,11 @@ font-size: 18px;
   z-index: 1; /* Asegura que esté en frente de otros elementos */
 }
 
-
-
-
 .pagination {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 20px 0;
+  margin: 40px 0;
 }
 
 .pagination-button {
@@ -1095,16 +1456,23 @@ font-size: 18px;
   padding: 5px 10px;
   margin: 0 5px;
   cursor: pointer;
-  color: red; /* Color del texto */
-  transition: background-color 0.3s;
+  color: rgb(27, 26, 26); /* Color del texto */
+  transition: background-color 0.3s, color 0.3s;
+  background-color: #e9e9e9; /* Fondo gris para botones inactivos */
 }
-
-
 
 .page-number:hover {
-  /* Efecto al pasar el ratón */
   text-decoration: underline; /* Subraya el número al pasar el ratón */
 }
+
+/* Estilo para el botón de página seleccionado */
+.page-number.active {
+  background-color: rgb(247, 245, 245); /* Fondo rojo para el botón activo */
+  color: red; /* Texto blanco para mejor contraste */
+  border: solid 1px rgb(196, 196, 196);
+}
+
+
 
 .property-details {
   display: flex;
@@ -1145,7 +1513,16 @@ font-size: 18px;
   }
 
   .property-card {
-    height: auto; /* Permite que la tarjeta ajuste su altura */
+    .property-card {
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      height: 500px; /* Aumentar la altura según sea necesario */
+      overflow: visible;
+      
+    }
   }
 }
 
@@ -1157,6 +1534,69 @@ font-size: 18px;
   .property-img {
     height: 150px; /* Ajustar la altura de la imagen para pantallas pequeñas */
   }
+
+  .catalogo-container {
+    margin: 60px;
+  }
+
+  .property-card{
+    margin: 0px 40px;
+  }
+}
+
+
+/* EJEMPLO DE INTERRUPTOR */
+.switch-container {
+  background-color: rgb(236, 234, 234);
+  padding: 8px 5px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 130px;
+ 
+}
+
+.label {
+  font-size: 14px;
+  color: #ccc;
+  transition: color 0.3s ease;
+}
+
+.label.active {
+  color: black;
+}
+
+.toggle-switch {
+  width: 50px;
+  height: 24px;
+  background-color: red;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-switch.no {
+  background-color: red;
+}
+
+.toggle-switch.yes {
+  background-color: red;
+}
+
+.toggle-circle {
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.toggle-switch.yes .toggle-circle {
+  transform: translateX(26px);
 }
 
 

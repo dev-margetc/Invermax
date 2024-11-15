@@ -172,8 +172,8 @@ const CarouselDestacados = () => {
         ))}
       </div>
       <div className="carousel-controls">
-        <button className="carousel-button" onClick={prevSlide}><img src="/img/icons/frame27.svg" alt="" /></button>
-        <button className="carousel-button" onClick={nextSlide}><img src="/img/icons/frame26.svg" alt="" /></button>
+        <button className="carousel-button" onClick={prevSlide}><img src="/img/icons/frame27.svg" alt="fecla" /></button>
+        <button className="carousel-button" onClick={nextSlide}><img src="/img/icons/frame26.svg" alt="flecha" /></button>
       </div>
     </div>
   );
