@@ -4,10 +4,28 @@ const Customer = require("../entities/Customer");
 const sequelize = require("../../../conf/database");
 
 
+// Trae todos los usuarios
 const getAllUsuarios = async () => {
     const users = await Usuario.findAll({});
     return users;
 
+}
+
+// Traer un usuario dependiendo del UID o correo
+const getUsuarioUIDEmail = async (uid=null, email=null) =>{
+    const whereCondition = {};
+
+    if (uid) {
+        whereCondition.uidFirebase = uid;
+    }
+    if (email) {
+        whereCondition.email = email;
+    }
+    const users = await Usuario.findOne({
+        where:whereCondition
+    });
+
+    return users;
 }
 
 
@@ -37,6 +55,7 @@ const borrarUsuario = async (idUsuario) => {
 
 module.exports = {
     getAllUsuarios,
+    getUsuarioUIDEmail,
     insertarUsuario,
     borrarUsuario
 }

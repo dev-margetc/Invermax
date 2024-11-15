@@ -1,10 +1,9 @@
 //Manejar las solicitudes HTTP. Llama al servicio correspondiente. Este maneja las solicitudes GET
 const errorHandler = require('../../../utils/ErrorHandler');
-const UsuarioService = require('../services/UsuariosService');
 const CustomerService = require('../services/CustomerService');
-const {deleteMultimediaServidor} = require('../../../middleware/uploadConfig');
-const fs = require('fs');
+const { deleteMultimediaServidor } = require('../../../middleware/uploadConfig');
 const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
+const { traerToken } = require('../../../conf/firebaseAuth');
 
 /* Metodos para traer datos */
 // Obtener todos los customers
@@ -32,17 +31,27 @@ const getAllCustomersBasic = async (req, res) => {
 // Traer un customer dado su idUsuario o idCustomer
 const getCustomerByID = async (req, res) => {
     try {
-        const {idCustomer, idUsuario} = req.params;
+        const token = await traerToken(req);
+        const { idCustomer, idUsuario } = req.params;
         let dato = {};
-        if(idCustomer){
+        if (idCustomer) {
             dato.idCustomer = idCustomer;
-        }else if(idUsuario){
-            dato.idUsuario = idUsuario; 
-        }else{
+        } else if (idUsuario) {
+            dato.idUsuario = idUsuario;
+        } else {
             throw new ErrorNegocio("Parametro no colocado");
         }
+
+        // Traer el customer
         const customer = await CustomerService.getAllCustomers(dato);
-        res.status(200).json(customer); //Se retornan los usuarios
+
+        // Si el usuario es admin se permite el ver los datos 
+        if (token.tipoUsuario == 'admin' || token.idUsuario == customer[0].dataValues.idUsuario) {
+            res.status(200).json(customer); //Se retornan los usuarios
+        } else {
+            throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el solicitado.")
+        }
+
     } catch (err) {
         console.log(err);
         errorHandler.handleControllerError(res, err, "usuarios");
@@ -52,8 +61,15 @@ const getCustomerByID = async (req, res) => {
 // Actualizar un customer
 const actualizarCustomer = async (req, res) => {
     try {
-        const msg = await CustomerService.actualizarCustomer(req.body, req.params);
-        res.status(200).json(msg); //Se retornan el mensaje
+        const token = await traerToken(req);
+        const { idCustomer } = req.body;
+        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+            const msg = await CustomerService.actualizarCustomer(req.body, req.params);
+            res.status(200).json(msg); //Se retornan el mensaje
+        } else {
+            throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el solicitado.");
+        }
+
     } catch (err) {
         errorHandler.handleControllerError(res, err, "usuarios");
     }
@@ -61,6 +77,7 @@ const actualizarCustomer = async (req, res) => {
 
 // Guardar la foto del logo
 const actualizarLogo = async (req, res) => {
+    const token = await traerToken(req);
     let rutaFoto = null;
     let nombreFoto = null;
     let tipoArchivo = null;
@@ -75,14 +92,20 @@ const actualizarLogo = async (req, res) => {
     try {
         const { idCustomer } = req.params;
 
-        msg = await CustomerService.actualizarLogo(idCustomer, nombreFoto, tipoArchivo);
-        return res.status(200).json({ message: msg });
+        // Verificar que el customer que se intenta actualizar sea el que inicio sesion
+        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+            msg = await CustomerService.actualizarLogo(idCustomer, nombreFoto, tipoArchivo);
+            return res.status(200).json({ message: msg });
+        } else {
+            throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el solicitado.");
+        }
+
     } catch (err) {
         // Elimina el archivo subido si hubo un error en la inserción
         if (rutaFoto) {
-            await deleteMultimediaServidor("fotos",nombreFoto,"customers");
+            await deleteMultimediaServidor("fotos", nombreFoto, "customers");
         }
-        
+
         //Enviar el mensaje de error
         errorHandler.handleControllerError(res, err, "usuarios");
     }

@@ -2,8 +2,8 @@
 Tambien se encarga de interactuar con otros servicios*/
 
 const sequelize = require("../../../conf/database");
-const {deleteMultimediaServidor} = require("../../../middleware/uploadConfig");
-const {filtrarCampos}  = require("../../../utils/utils");
+const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
+const { filtrarCampos } = require("../../../utils/utils");
 
 const Customer = require("../entities/Customer");
 const CustomerRepo = require("../repositories/CustomerRepository");
@@ -18,16 +18,25 @@ const getAllCustomers = async (datos) => {
     if (perfilCustomer) {
         condiciones.perfilCustomer = perfilCustomer;
     }
-    
+
     if (idUsuario) {
         condiciones.idUsuario = idUsuario;
     }
-    
+
     if (idCustomer) {
         condiciones.idCustomer = idCustomer;
     }
     const customers = await CustomerRepo.getAllCustomers(condiciones);
     return customers;
+}
+
+// Verificar que el id de un usuario coincida con el de un customer
+const coincideIdUsuario = async (idUsuario, idCustomer) => {
+    // Obtener el customer
+    let dato = {};
+    dato.idCustomer = idCustomer; 
+    const customer = getAllCustomers(dato); // Traer customer
+    return (customer[0].dataValues.idUsuario==idUsuario); // Validar si es el mismo que el del parametro
 }
 
 // Traer todos los customers pero limita a nombre, logo y tipo. 
@@ -57,12 +66,12 @@ const actualizarCustomer = async (datos, params) => {
 
     // Dependiendo del tipo de usuario se pueden cambiar ciertas cosas (GOOGLEAUTH REQUERIDO)
     const campos = ["nombreCustomer", "correoNotiCustomer", "telefonoNotiCustomer", "telefonoFijoCustomer",
-                    "codigoCustomer", "perfilCustomer", "numComercialCustomer", "estadoCustomer"];
+        "codigoCustomer", "perfilCustomer", "numComercialCustomer", "estadoCustomer"];
 
     // Para el admin ademas de estos campos se agrega el de estado
 
     // Extraer los datos respectivos
-    const customerData = filtrarCampos(customer,campos);
+    const customerData = filtrarCampos(customer, campos);
 
     await CustomerRepo.actualizarCustomer(customerData, idCustomer);
     return "Datos actualizados";
@@ -72,24 +81,24 @@ const actualizarCustomer = async (datos, params) => {
 const actualizarLogo = async (idCustomer, nombreArchivo, tipoArchivo) => {
     const transaction = await sequelize.transaction(); // Iniciar la transacción
 
-    try{
-       
+    try {
+
         if (!nombreArchivo || !tipoArchivo) {
             throw new ErrorNegocio("Ruta no encontrada o tipo de archivo no correcto");
         }
-    
+
         // Verificar que exista el id del customer
         const customer = await Customer.findByPk(idCustomer);
-    
+
         if (!customer) {
             throw new ErrorNegocio("Customer no encontrado");
         }
-    
+
         /*Si es valido se actualiza el customer con el nuevo nombre de archivo*/
         msg = "";
         if (tipoArchivo === 'foto') {
             let fotoVieja = customer.logoCustomer;
-            let newData = {logoCustomer: nombreArchivo};
+            let newData = { logoCustomer: nombreArchivo };
             // Borrar la foto vieja. Se usa el metodo del servicio de detalles que ya lo incluye
             if (fotoVieja) {
                 await deleteMultimediaServidor("fotos", fotoVieja, "customers");
@@ -102,10 +111,10 @@ const actualizarLogo = async (idCustomer, nombreArchivo, tipoArchivo) => {
         } else {
             throw new ErrorNegocio("Tipo de archivo no especificado");
         }
-    
+
         return msg;
-    }catch(err){
-        console.log(err);   
+    } catch (err) {
+        console.log(err);
         transaction.rollback();
         throw err;
     }
@@ -114,5 +123,6 @@ module.exports = {
     getAllCustomers,
     getAllCustomersBasic,
     actualizarCustomer,
-    actualizarLogo
+    actualizarLogo,
+    coincideIdUsuario
 }

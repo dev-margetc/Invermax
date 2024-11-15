@@ -5,6 +5,7 @@ const TipoInmueble = require("../entities/TipoInmueble");
 const seq = require("../../../conf/database");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
+const DetalleInmueble = require("../entities/DetalleInmueble");
 
 
 
@@ -49,41 +50,41 @@ const getPublicados = async (datos) => {
 
 
             // El filtro tiene habitaciones minimas, por lo que se quita un inmueble si tiene menos
-                if (habitacionesMinimas && inmuebleData.cantidadMinHabitaciones < Number(habitacionesMinimas)) return false;//Quitar ;
+            if (habitacionesMinimas && inmuebleData.cantidadMinHabitaciones < Number(habitacionesMinimas)) return false;//Quitar ;
 
             // Se quita si la cantidad de baños del detalle es menor a la del filtro de baños minimos
             if (bañosMinimos && inmuebleData.cantidadMinBaños < bañosMinimos) return false;
 
 
             if (parqueadero) {
-                if(!verificarCoincidencia(inmuebleData.detalles,'parqueadero',(parqueadero))) return false;
+                if (!verificarCoincidencia(inmuebleData.detalles, 'parqueadero', (parqueadero))) return false;
             }
 
             // Se quita si amoblado no coincide
             // Se quita si el parqueadero de ningun detalle coincide
 
             if (amoblado) {
-                if(!verificarCoincidencia(inmuebleData.detalles,'amoblado',(amoblado))) return false;
+                if (!verificarCoincidencia(inmuebleData.detalles, 'amoblado', (amoblado))) return false;
             }
 
 
             // Verificar zonas
             if (zonas) {
-               if (!tieneZonas(inmuebleData.zonas, zonas))return false;
+                if (!tieneZonas(inmuebleData.zonas, zonas)) return false;
             }
 
             return true;
         });
         return resultadoFiltrado;
     } catch (error) {
-       throw error;
+        throw error;
     }
 }
 
 // Función auxiliar para saber si hay coincidencias en detalles de un campo especifico
 const verificarCoincidencia = (detalles, campo, valor) => {
-   let coincidencia = detalles.length > 0 && detalles.some(detalle => detalle[campo] == valor);
-   return coincidencia;
+    let coincidencia = detalles.length > 0 && detalles.some(detalle => detalle[campo] == valor);
+    return coincidencia;
 };
 
 // Función auxiliar para verificar zonas
@@ -96,22 +97,22 @@ const tieneZonas = (zonasInmueble, zonas) => {
 
 // Traer inmuebles de un usuario
 const getInmueblesUsuario = async (datos) => {
-    const {idCustomer} = datos;
+    const { idCustomer } = datos;
 
-    if(idCustomer){
+    if (idCustomer) {
         return inmuebleRepository.getInmueblesUsuario(idCustomer);
-    }else{
+    } else {
         throw new ErrorNegocio("Customer no colocado");
     }
 }
 
 // Traer inmuebles usando un codigo
 const getInmueblesCodigo = async (datos) => {
-    const {codigo} = datos;
+    const { codigo } = datos;
 
-    if(codigo){
+    if (codigo) {
         return inmuebleRepository.getInmueblesCodigo(codigo);
-    }else{
+    } else {
         return { error: true, message: "Codigo no colocado" };
     }
 
@@ -119,20 +120,40 @@ const getInmueblesCodigo = async (datos) => {
 
 // Traer inmuebles usando el ID de la BD
 const getInmuebleByID = async (datos) => {
-    const {idInmueble} = datos;
-try{
-    if(idInmueble){
-        return inmuebleRepository.getInmuebleByID(idInmueble);
-    }else{
-        throw new ErrorNegocio("ID inmueble no colocado");
+    const { idInmueble } = datos;
+    try {
+        if (idInmueble) {
+            return inmuebleRepository.getInmuebleByID(idInmueble);
+        } else {
+            throw new ErrorNegocio("ID inmueble no colocado");
+        }
+    } catch (error) {
+        throw error;
     }
-}catch(error){
-    throw error;
 }
-    
+
+// Traer el customer de un inmueble dado su detalle o idInmueble
+const traerCustomerInmueble = async (idUsuario, idDetalle = null, idInmueble = null) => {
+    try {
+        let inmueble;
+        if (idDetalle) {
+            const detalle = DetalleInmueble.findByPk(idDetalle);
+            inmueble = Inmueble.findByPk(detalle.idInmueble); 
+        } else if (idInmueble){
+            inmueble = Inmueble.findByPk(idInmueble); 
+        }
+
+        if(!inmueble){
+            throw new ErrorNegocio("Inmueble no encontrado");
+        }
+
+        return inmueble.idCustomer;
+    } catch (error) {
+        throw error;
+    }
 
 }
 module.exports = {
     getPublicados, getInmueblesUsuario, getInmueblesCodigo,
-    getInmuebleByID
+    getInmuebleByID, traerCustomerInmueble
 }

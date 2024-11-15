@@ -21,23 +21,38 @@ const getAllUsuarios = async (req, res) => {
 };
 
 const autenticarUsuario = async (req, res) => {
-    console.log(req.body);
     const { idToken } = req.body; // Recibe el idToken de Firebase desde el frontend
     try {
-        console.log(idToken);
         // Verifica el idToken con Firebase Admin
         const decodedToken = await admin.auth().verifyIdToken(idToken);
         const uid = decodedToken.uid;
+        const correo = decodedToken.email;
+
+        // Buscar el usuario por UID
+        let user = await UsuarioService.getUserByUID(uid);
+
+        if(!user){
+            // Si no se encuentra por UID se busca por correo
+            user = await UsuarioService.getUserByEmail(correo);
+            if(user){
+                // El correo estaría asociado a otro usuario
+                return res.status(400).json({
+                    message: "El correo ya está asociado a otra cuenta. Contacta soporte.",
+                });
+            } else {
+                // Crear un usuario nuevo si no existe ni el correo ni el UID
+                console.log("creando");
+            }
+
+        }
+        console.log(user.tipoUsuario);
 
         // Crear un JWT personalizado para la sesión del usuario
-        const jwtPayload = { uid, email: decodedToken.email };
+        const jwtPayload = { uid, email: correo, tipoUsuario: user.tipoUsuario, idUsuario: user.idUsuario };
         const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        // Si no existe en la BD se crea el usuario
 
         // Responde con el JWT generado
         res.json({ token: jwtToken });
-        console.log(decodedToken.email);
     } catch (error) {
         console.error(error);
         res.status(401).json({ error: 'No se puede verificar el token. Error' +error.message });

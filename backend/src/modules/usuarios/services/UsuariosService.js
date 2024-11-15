@@ -11,8 +11,28 @@ const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig")
 const Customer = require("../entities/Customer");
 
 /* Metodos de consulta*/
+
+//Obtener todos los usuarios
 const getAllUsuarios= async ()=>{ 
     const usuarios = await UsuariosRepo.getAllUsuarios();
+    return usuarios;
+}
+
+// Obtener un usuario con el UID (unique ID)
+const getUserByUID= async(uid)=>{
+    if(!uid){
+        throw new ErrorNegocio("ID firebase no existe");
+    }
+    const usuarios = await UsuariosRepo.getUsuarioUIDEmail(uid, null);
+    return usuarios;
+}
+
+// Obtener un usuario con el correo
+const getUserByEmail= async(email)=>{
+    if(!email){
+        throw new ErrorNegocio("Email no proporcionado");
+    }
+    const usuarios = await UsuariosRepo.getUsuarioUIDEmail(null,email);
     return usuarios;
 }
 
@@ -65,7 +85,6 @@ const deleteUsuarioCustomer= async (idUsuario, idCustomer)=>{
     if(!customer || customer.idUsuario != idUsuario){
         throw new ErrorNegocio("El customer ingresado no coincide con el id del usuario");
     }
-    console.log("Filtrar");
 
     // Obtener los inmuebles (El servicio de filtros tiene esta logica)
     let dato ={};
@@ -97,6 +116,8 @@ const deleteUsuarioCustomer= async (idUsuario, idCustomer)=>{
 
 module.exports = {
     getAllUsuarios,
+    getUserByUID,
+    getUserByEmail,
     insertUsuarioCustomer,
     deleteUsuarioCustomer
 }

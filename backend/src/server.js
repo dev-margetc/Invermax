@@ -14,7 +14,7 @@ require('../src/modules/usuarios/associations/associations');
 
 const inmueblesRoutes = require('./modules/inmuebles/routes/InmueblesRoutes'); // Importar las rutas de inmuebles
 const usuariosRoutes = require('./modules/usuarios/routes/UsuariosRoutes'); // Importar las rutas de usuarios
-
+const globalErrorHandler = require("./middleware/globalErrorHandler"); // Handler de errores
 
 //Configuración aplicacion
 const app = express();
@@ -41,6 +41,8 @@ app.use('/inmuebles', inmueblesRoutes);
 // Usar las rutas del modulo de usuarios
 app.use('/usuarios', usuariosRoutes);
 
+// Manejador de errores globales
+app.use(globalErrorHandler);
 
 // Manejo de rutas no encontradas (404)
 app.use((req, res, next) => {

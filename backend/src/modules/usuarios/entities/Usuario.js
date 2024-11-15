@@ -29,6 +29,12 @@ const Usuario = sequelize.define('Usuario', {
         },
         field: 'tipo_usuario'
     },
+    uidFirebase:{
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique:true,
+        field:'UID_firebase'
+    }
 
 }, {
     tableName: 'usuarios',

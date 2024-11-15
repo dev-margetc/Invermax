@@ -3,14 +3,13 @@ const express = require('express');
 const router = express.Router();
 const {upload} = require('../../../middleware/uploadConfig');
 
+const { protegerRuta } = require('../../../middleware/authMiddleware'); // middleware autenticacion
+
 const ciudadController = require("../controllers/CiudadController");
 const inmuebleController = require("../controllers/InmuebleController");
 const detalleInmuebleController = require("../controllers/DetalleController");
 const interesadoController = require("../controllers/InteresadoController");
 const zonasController = require("../controllers/ZonasController");
-const globalErrorHandler = require("../../../middleware/globalErrorHandler");
-
-
 
 
 // Definir una ruta para obtener todos los departamentos con sus ciudades
@@ -25,7 +24,7 @@ router.get('/publicados', inmuebleController.getInmueblesPublicados);
 router.get('/customer/:idCustomer', inmuebleController.getInmueblesUsuario);
 
 // Ruta para traer todos los interesados de un inmueble
-router.get('/:idInmueble/interesados', inmuebleController.getInteresadosInmueble);
+router.get('/:idInmueble/interesados',protegerRuta(['admin', 'customer']), inmuebleController.getInteresadosInmueble);
 
 // Ruta para traer todas las zonas
 router.get('/zonas', zonasController.getAllZonas);
@@ -41,13 +40,13 @@ router.get('/codigo/:codigo', inmuebleController.getInmueblesCodigo);
 router.get('/:idInmueble', inmuebleController.getInmuebleByID);
 
 // ruta para insertar un inmueble (ruta tipo post)
-router.post('/', inmuebleController.insertInmueble);
+router.post('/',protegerRuta(['admin', 'customer']), inmuebleController.insertInmueble);
 
 // ruta para insertar una foto/video para un detalle inmueble
-router.post('/detalles/:idDetalle/multimedia', upload.single('archivo'),detalleInmuebleController.insertMultimedia); //No enviar el archivo de primero
+router.post('/detalles/:idDetalle/multimedia',protegerRuta(['admin', 'customer']), upload.single('archivo'),detalleInmuebleController.insertMultimedia); //No enviar el archivo de primero
 
 // Ruta para asociar una zona a un inmueble
-router.post('/:idInmueble/zonas', inmuebleController.agregarZona);
+router.post('/:idInmueble/zonas',protegerRuta(['admin', 'customer']), inmuebleController.agregarZona);
 
 // Ruta para insertar un interesado
 router.post('/interesados', interesadoController.registrarInteresado);
@@ -55,24 +54,22 @@ router.post('/interesados', interesadoController.registrarInteresado);
 
 
 // Ruta para actualizar un inmueble y detalles (incluye proyectos -- )
-router.put('/:idInmueble', inmuebleController.actualizarInmuebleDetalles);
+router.put('/:idInmueble', protegerRuta(['admin', 'customer']),inmuebleController.actualizarInmuebleDetalles);
 
 // Ruta para eliminar un inmueble del todo
-router.delete('/:idInmueble', inmuebleController.eliminarInmueble);
+router.delete('/:idInmueble', protegerRuta(['admin', 'customer']), inmuebleController.eliminarInmueble);
 
 
 // Ruta para eliminar un detalle solamente (aplica solo para proyectos)
-router.delete('/detalles/:idDetalle',detalleInmuebleController.eliminarDetalle); //No enviar el archivo de primero
+router.delete('/detalles/:idDetalle',protegerRuta(['admin', 'customer']),detalleInmuebleController.eliminarDetalle); //No enviar el archivo de primero
 
 
 // Ruta para eliminar una foto de un detalle. Apunta a la misma ruta de eliminar el video, cambia el tipo
-router.delete('/detalles/:idDetalle/multimedia/fotos/:idFoto',detalleInmuebleController.eliminarMultimediaDetalle); 
+router.delete('/detalles/:idDetalle/multimedia/fotos/:idFoto',protegerRuta(['admin', 'customer']),detalleInmuebleController.eliminarMultimediaDetalle); 
 
 // Ruta para eliminar un video
-router.delete('/detalles/:idDetalle/multimedia/videos/:idVideo',detalleInmuebleController.eliminarMultimediaDetalle); 
+router.delete('/detalles/:idDetalle/multimedia/videos/:idVideo',protegerRuta(['admin', 'customer']),detalleInmuebleController.eliminarMultimediaDetalle); 
 
 
-// Manejador de errores global
-router.use(globalErrorHandler);
 
 module.exports = router;
