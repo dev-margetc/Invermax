@@ -119,7 +119,7 @@ const Banner = ({ onSearch }) => {
   </div>
                   <div className="col-md-3 d-flex align-items-end">
                     <button type="button" className="btn btn-dark w-100" onClick={handleSubmit}>
-                      <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" /> Buscar
+                      <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
                     </button>
                   </div>
                 </div>
@@ -134,7 +134,7 @@ const Banner = ({ onSearch }) => {
                   </div>
                   <div className="col-md-3 d-flex align-items-end">
                     <button type="button" className="btn btn-dark w-100" onClick={handleSubmit}>
-                      <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" /> Buscar
+                      <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
                     </button>
                   </div>
                 </div>

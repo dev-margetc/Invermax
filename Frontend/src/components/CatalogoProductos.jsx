@@ -1,29 +1,32 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import items from './Productos';
 
-
-const CatalogoProductos = () => {
-  
-  const itemsPerPage = 12; // 4 productos por fila y 3 filas
+const CatalogoProductos = ({ showOnlyFour = false }) => {
+  const itemsPerPage = showOnlyFour ? 4 : 12; // Mostrar solo 4 items si 'showOnlyFour' es true
   const [currentPage, setCurrentPage] = useState(0);
-  
+  const navigate = useNavigate(); // Inicializa el hook de navegación
+
   const totalPages = Math.ceil(items.length / itemsPerPage);
-  const paginatedItems = items.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+  const paginatedItems = showOnlyFour
+    ? items.slice(0, 4) // Solo 4 items
+    : items.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
   const renderPagination = () => {
+    if (showOnlyFour) return null; // No mostrar paginación si 'showOnlyFour' es true
     const pageButtons = [];
     for (let i = 0; i < totalPages; i++) {
       pageButtons.push(
         <button
           key={i}
-          className={`page-number ${currentPage === i ? 'active' : ''}`}
+          className={`page-number ${currentPage === i ? "active" : ""}`}
           onClick={() => setCurrentPage(i)}
         >
           {i + 1}
         </button>
       );
     }
-  
+
     return (
       <div className="pagination">
         <button
@@ -31,7 +34,7 @@ const CatalogoProductos = () => {
           disabled={currentPage === 0}
           onClick={() => setCurrentPage(currentPage - 1)}
         >
-          <i className="fas fa-chevron-left" style={{ color: 'black', fontSize: '14px' }}></i>
+          <i className="fas fa-chevron-left" style={{ color: "black", fontSize: "14px" }}></i>
         </button>
         {pageButtons}
         <button
@@ -39,97 +42,110 @@ const CatalogoProductos = () => {
           disabled={currentPage === totalPages - 1}
           onClick={() => setCurrentPage(currentPage + 1)}
         >
-          <i className="fas fa-chevron-right" style={{ color: 'black', fontSize: '14px' }}></i>
+          <i className="fas fa-chevron-right" style={{ color: "black", fontSize: "14px" }}></i>
         </button>
       </div>
     );
   };
-  
+
+  const handleNavigate = () => {
+    navigate('/plantilla'); // Navega a la ruta "/plantilla"
+  };
 
   return (
-    <div className="catalogo-container container">
-      {renderPagination()}
+    <div className={`catalogo-container container ${showOnlyFour ? "four-items-layout" : ""}`}>
+      {!showOnlyFour && renderPagination()} {/* No renderizar paginación si 'showOnlyFour' es true */}
       
       <div className="catalogo">
         {paginatedItems.map((item, index) => (
           <div className="property-card" key={index}>
-              {item.badge.toLowerCase() === "destacado" && (
-                <span className="badge-destacado">
-                  Destacado
-                  <span className='badge-destacado-start'><img src="/img/icons/Star1.svg" alt="" width="55px"/></span>
+            {item.badge.toLowerCase() === "destacado" && (
+              <span className="badge-destacado">
+                Destacado
+                <span className="badge-destacado-start">
+                  <img src="/img/icons/Star1.svg" alt="" width="55px" loading="lazy"/>
                 </span>
-              )}
-              {item.nuevo === true && (
-                <span className="badge-nuevo-catalogo" style={{overflow: "hidden"}}>Nuevo</span>
-              )}
-              {item.badge.toLowerCase() === "alta demanda" && (
-                <span className="badge-alta-demanda">
-                  <img src="img/icons/vectorFlechaRoja.svg" alt="" /> Alta Demanda
-                </span>
-              )}
+              </span>
+            )}
+            {item.nuevo === true && (
+              <span className="badge-nuevo-catalogo" style={{ overflow: "hidden" }}>
+                Nuevo
+              </span>
+            )}
+            {item.badge.toLowerCase() === "alta demanda" && (
+              <span className="badge-alta-demanda">
+                <img src="img/icons/vectorFlechaRoja.svg" alt="alta" loading="lazy"/> Alta Demanda
+              </span>
+            )}
 
+            <img className="property-img" src={item.imgSrc} alt={`Inmueble ${index + 1}`} loading="lazy" />
 
-   
-            <img className="property-img" src={item.imgSrc} alt={`Inmueble ${index + 1}`} />
-            
-            
             <div className="property-info">
-            {item.proyecto === true && (
-                  <span className='zona-proyecto'>Proyecto</span>
-                )}
+              {item.proyecto === true && <span className="zona-proyecto">Proyecto</span>}
 
-                <p>
-                  {item.info.split(" - ").map((line, index) => (
-                    <span key={index} className={index === 0 ? "info-title" : "info-detail-bold"}>
-                      {line}
-                      {index < item.info.split(" - ").length - 1 && <br />}
+              <p>
+                {item.info.split(" - ").map((line, index) => (
+                  <span
+                    key={index}
+                    className={index === 0 ? "info-title" : "info-detail-bold"}
+                  >
+                    {line}
+                    {index < item.info.split(" - ").length - 1 && <br />}
+                  </span>
+                ))}
+              </p>
+
+              <p className="price">
+                {item.price.split(" - ").map((line, index) => {
+                  const regex = /(\$[\d.,]+)/g;
+                  const parts = line.split(regex);
+                  return (
+                    <span key={index} className="price-part">
+                      {parts.map((part, i) =>
+                        regex.test(part) ? (
+                          <span key={i} className="price-green">
+                            {part}
+                          </span>
+                        ) : (
+                          <span key={i}>{part}</span>
+                        )
+                      )}
+                      {index < item.price.split(" - ").length - 1 && <br />}
                     </span>
-                  ))}
-                </p>
-
-                <p className="price">
-                  {item.price.split(" - ").map((line, index) => {
-                    // Expresión regular para detectar números y signos de dólar
-                    const regex = /(\$[\d.,]+)/g;
-                    const parts = line.split(regex);
-                    return (
-                      <span key={index} className="price-part">
-                        {parts.map((part, i) =>
-                          regex.test(part) ? (
-                            <span key={i} className="price-green">{part}</span>
-                          ) : (
-                            <span key={i}>{part}</span>
-                          )
-                        )}
-                        {index < item.price.split(" - ").length - 1 && <br />}
-                      </span>
-                    );
-                  })}
-                </p>
+                  );
+                })}
+              </p>
 
               <div className="property-details container">
                 <div className="detail-item">
-                  <span className="icon"><img src="/img/icons/fa-icon.svg" alt="#" /></span> {/* Usa un icono SVG o una imagen si prefieres */}
+                  <span className="icon">
+                    <img src="/img/icons/fa-icon.svg" alt="#" loading="lazy"/>
+                  </span>
                   <span className="value">{item.area}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="icon"><img src="/img/icons/fa-icon2.svg" alt="#" /></span> {/* Icono de cama */}
+                  <span className="icon">
+                    <img src="/img/icons/fa-icon2.svg" alt="#" loading="lazy"/>
+                  </span>
                   <span className="value">{item.rooms}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="icon"><img src="/img/icons/fa-icon3.svg" alt="#" /></span> {/* Icono de baño */}
+                  <span className="icon">
+                    <img src="/img/icons/fa-icon3.svg" alt="#" loading="lazy"/>
+                  </span>
                   <span className="value">{item.baths}</span>
                 </div>
               </div>
 
               <p>Nombre vendedor / Inmobiliaria</p>
-              
             </div>
-            <button className="btn-ver-inmueble">Ver inmueble</button>
+            <button className="btn-ver-inmueble" onClick={handleNavigate}>
+              Ver inmueble
+            </button>
           </div>
         ))}
       </div>
-      {renderPagination()}
+      {!showOnlyFour && renderPagination()}
     </div>
   );
 };

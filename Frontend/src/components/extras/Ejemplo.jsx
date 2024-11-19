@@ -70,7 +70,7 @@ const Ejemplo = ({ selectedOptions = [], setSelectedOptions, onSelectionChange }
               </div>
             ))}
         </div>
-        <span className="arrow"><img src="/img/icons/Frame6.svg" alt="comprar" /></span>
+        <span className="arrow"><img src="/img/icons/Frame6.svg" alt="comprar" loading="lazy"/></span>
       </div>
 
       {isDropdownOpen && (

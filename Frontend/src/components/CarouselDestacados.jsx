@@ -105,14 +105,14 @@ const CarouselDestacados = () => {
               {item.badge.toLowerCase() === "destacado" && (
                 <span className="badge-destacado">
                   Destacado
-                  <span className='badge-destacado-start'><img src="/img/icons/Star1.svg" alt="" width="55px"/></span>
+                  <span className='badge-destacado-start'><img src="/img/icons/Star1.svg" alt="" width="55px" loading="lazy" /></span>
                 </span>
               )}
               {item.nuevo === true && (
                 <span className="badge-nuevo" style={{overflow: "hidden"}}>Nuevo</span>
               )}
 
-              <img className="property-img" src={item.imgSrc} alt={`Inmueble ${index + 1}`} />
+              <img className="property-img" src={item.imgSrc} alt={`Inmueble ${index + 1}`} loading="lazy" />
               <div className="property-info">
                 {item.proyecto === true && (
                   <span className='zona-proyecto'>Proyecto</span>
@@ -151,15 +151,15 @@ const CarouselDestacados = () => {
 
                 <div className="property-details container">
                   <div className="detail-item">
-                    <span className="icon"><img src="/img/icons/fa-icon.svg" alt="#" /></span>
+                    <span className="icon"><img src="/img/icons/fa-icon.svg" alt="#" loading="lazy" /></span>
                     <span className="value">{item.area}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="icon"><img src="/img/icons/fa-icon2.svg" alt="#" /></span>
+                    <span className="icon"><img src="/img/icons/fa-icon2.svg" alt="#" loading="lazy" /></span>
                     <span className="value">{item.rooms}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="icon"><img src="/img/icons/fa-icon3.svg" alt="#" /></span>
+                    <span className="icon"><img src="/img/icons/fa-icon3.svg" alt="#" loading="lazy" /></span>
                     <span className="value">{item.baths}</span>
                   </div>
                 </div>
@@ -172,8 +172,8 @@ const CarouselDestacados = () => {
         ))}
       </div>
       <div className="carousel-controls">
-        <button className="carousel-button" onClick={prevSlide}><img src="/img/icons/frame27.svg" alt="fecla" /></button>
-        <button className="carousel-button" onClick={nextSlide}><img src="/img/icons/frame26.svg" alt="flecha" /></button>
+        <button className="carousel-button" onClick={prevSlide}><img src="/img/icons/frame27.svg" alt="fecla" loading="lazy"/></button>
+        <button className="carousel-button" onClick={nextSlide}><img src="/img/icons/frame26.svg" alt="flecha" loading="lazy"/></button>
       </div>
     </div>
   );

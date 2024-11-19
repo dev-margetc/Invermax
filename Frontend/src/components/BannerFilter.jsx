@@ -175,7 +175,7 @@ const BannerFilter = ({ initialData }) => {
                       </div>
                       <div className="col-md-3 d-flex align-items-end">
                         <button type="button" className="btn btn-dark w-100" onClick={handleApplyFilters}>
-                          <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" /> Buscar
+                          <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
                         </button>
                       </div>
                     </div>
@@ -187,7 +187,7 @@ const BannerFilter = ({ initialData }) => {
                       </div>
                       <div className="col-md-3 d-flex align-items-end">
                         <button type="button" className="btn btn-dark w-100" onClick={handleApplyFilters}>
-                          <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" /> Buscar
+                          <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
                         </button>
                       </div>
                     </div>
@@ -206,7 +206,7 @@ const BannerFilter = ({ initialData }) => {
                   <div className="filter-options d-flex justify-content-center mt-2 align-items-center">
                     <a className="text-dark me-2" style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={toggleMoreFilters}>
                       {selectedFilters.length > 0 ? (showMoreFilters ? 'Cerrar filtros' : 'Editar filtros') : (showMoreFilters ? 'Cerrar filtros' : 'Más filtros')}
-                      <span><img src="/img/icons/Frame6.svg" alt="comprar" /></span>
+                      <span><img src="/img/icons/Frame6.svg" alt="comprar" loading="lazy" /></span>
                     </a>
                     <span className="mx-2 text-muted">|</span>
                     <a className="text-danger" style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={handleClearFilters}>
@@ -221,7 +221,7 @@ const BannerFilter = ({ initialData }) => {
                   <a className="text-dark" style={{ cursor: 'pointer' }}>
                     {showMoreFilters ? 'Cerrar filtros' : 'Más filtros'}
                   </a>
-                  <span className="arrow"><img src="/img/icons/Frame6.svg" alt="toggle filtros" /></span>
+                  <span className="arrow"><img src="/img/icons/Frame6.svg" alt="toggle filtros" loading="lazy"/></span>
                   <hr />
                 </div>
               )}

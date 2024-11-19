@@ -26,12 +26,15 @@ function App() {
        <Navbar />
        
       {/* Rutas */}
+      <div className='fondo-principal'>
       <Routes>
         <Route path="/" element={<Home />} />    
         {/* Agrega más rutas aquí si tienes otros componentes de página */}
         <Route path="/filter" element={<Filter />} /> 
         <Route path="/plantilla" element={<Plantilla />} /> 
       </Routes>
+      </div>
+     
 
      {/* Footer */}
   
