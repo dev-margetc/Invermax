@@ -40,11 +40,8 @@ const agregarZona = async (req, res) => {
         const datos = req.body; //Datos del cuerpo de la solicitud (zonas)
         datos.idInmueble = req.params.idInmueble;
 
-        console.log(datos.idInmueble);
         // Traer dueño del inmueble
         const idCustomer = await filtroInmueble.traerCustomerInmueble(null, datos.idInmueble);
-        console.log(idCustomer);
-        console.log( await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer));
         // Validar que sea el dueño
         if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             let msg = await zonasInmueblesService.agregarZona(datos);
@@ -94,8 +91,17 @@ const getInmuebleByID = async (req, res) => {
 //Traer inmuebles publicados
 const getInmueblesUsuario = async (req, res) => {
     try {
-        msg = await filtroInmueble.getInmueblesUsuario(req.params);
-        res.status(201).json(msg);
+        const token = await traerToken(req);
+        // Verificar si el id de quien inicio sesion es el mismo del que se intenta acceder
+        let {idCustomer} = req.params;
+        let coincide = await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer);
+        if(token.tipoUsuario == "admin"|| coincide){
+            msg = await filtroInmueble.getInmueblesUsuario(req.params);
+            res.status(201).json(msg);
+        }else {
+            throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el solicitado.")
+        }
+       
     } catch (err) {
         errorHandler.handleControllerError(res, err, "inmuebles");
     }

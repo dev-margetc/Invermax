@@ -35,8 +35,10 @@ router.get('/customers/:idCustomer', protegerRuta(['admin', 'customer']), custom
 /* Rutas Post */
 
 //Ruta para autenticar al usuario usando el idToken de firebase
-router.post('/auth/google', userController.autenticarUsuario);
+router.post('/login', userController.autenticarUsuario);
 
+//Ruta para autenticar al usuario usando el idToken de firebase
+router.post('/logout', userController.cerrarSesion);
 
 // Registrar un customer junto con su usuario (GOOGLEAUTH REQUERIDO)
 router.post('/customers', protegerRuta(['admin']), userController.crearCustomerUsuarios);

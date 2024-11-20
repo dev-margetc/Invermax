@@ -20,20 +20,26 @@ const getPublicados = async (datos) => {
             parqueadero, // se usará un ==
             amoblado, // se usará un ==
             zonas,
+            idCustomer
         } = datos;
-
         // Construir el objeto de filtros
         // Por las multiples consultas a la BD en el metodo del repository el filtro se aplica aca
-        resultado = await inmuebleRepository.getPublicados();
-
+        resultado = await inmuebleRepository.getPublicados();   
         // filtrar la lista
         resultadoFiltrado = resultado.filter((dato) => {
             /* 
-                Los datos que trae directamente la vista se acceden por medio de 'dato.nombre_campo'
-                Los datos que se traen usando sequelize se acceden por medio de 'dato.inmueble.dataValues.campo'
-                -Si el campo de sequelize es otro modelo se debe agregar el modelo: 'dato.inmueble.dataValues.modelo.campo'
+                Dato es un registro de la vista VistaInmueblesPublicados
+                Los datos que trae directamente de la vista se acceden por medio de 'dato.nombre_campo'
+
+                Los datos que se incluyan por medio de un modelo sequelize se traen como 'dato.inmueble.dataValues.campo'
+                - Si el modelo incluido a su vez involucra otro modelo se llama asi: 'dato.inmueble.dataValues.modelo.campo'
             */
+
+            // Datos del modelo inmueble generado
             const inmuebleData = dato.inmueble.dataValues;
+
+            // Filtrar por idCustomer
+            if (idCustomer && dato.idCustomer != idCustomer) return false;
 
             // estado
             if (estadoInmueble && dato.estadoInmueble !== estadoInmueble) return false;
@@ -70,9 +76,9 @@ const getPublicados = async (datos) => {
             if (zonas) {
                 if (!tieneZonas(inmuebleData.zonas, zonas)) return false;
             }
-
             return true;
         });
+
         return resultadoFiltrado;
     } catch (error) {
         throw error;
@@ -144,7 +150,7 @@ const traerCustomerInmueble = async (idDetalle = null, idInmueble = null) => {
 
         if (!inmueble) {
             throw new ErrorNegocio("Inmueble no encontrado");
-        }   
+        }
         return inmueble.idCustomer;
     } catch (error) {
         throw error;
