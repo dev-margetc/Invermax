@@ -13,14 +13,14 @@ const Customer = require("../entities/Customer");
 /* Metodos de consulta*/
 
 //Obtener todos los usuarios
-const getAllUsuarios= async ()=>{ 
+const getAllUsuarios = async () => {
     const usuarios = await UsuariosRepo.getAllUsuarios();
     return usuarios;
 }
 
 // Obtener un usuario con el UID (unique ID)
-const getUserByUID= async(uid)=>{
-    if(!uid){
+const getUserByUID = async (uid) => {
+    if (!uid) {
         throw new ErrorNegocio("ID firebase no existe");
     }
     const usuarios = await UsuariosRepo.getUsuarioUIDEmail(uid, null);
@@ -28,41 +28,84 @@ const getUserByUID= async(uid)=>{
 }
 
 // Obtener un usuario con el correo
-const getUserByEmail= async(email)=>{
-    if(!email){
+const getUserByEmail = async (email) => {
+    if (!email) {
         throw new ErrorNegocio("Email no proporcionado");
     }
-    const usuarios = await UsuariosRepo.getUsuarioUIDEmail(null,email);
+    const usuarios = await UsuariosRepo.getUsuarioUIDEmail(null, email);
     return usuarios;
 }
 
 /* Metodos de insert*/
 // Insertar un usuario y un customer correspondiente
-const insertUsuarioCustomer= async (datosUsuario, datosCustomer)=>{ 
+const insertUsuarioCustomer = async (datosUsuario, datosCustomer) => {
     const transaction = await sequelize.transaction(); // Iniciar la transacción
 
-    try{
-        if(!datosUsuario||!datosCustomer){
+    try {
+        if (!datosUsuario || !datosCustomer) {
             throw new ErrorNegocio("Hacen falta datos");
         }
-    // Insertar el usuario
+        // Insertar el usuario
 
-    // Colocar el tipo como customer
-    datosUsuario.tipoUsuario = "customer";
+        // Colocar el tipo como customer
+        datosUsuario.tipoUsuario = "customer";
+        datosUsuario.estadoUsuario = "nuevo"; // Estado customer
 
-    usuario = await UsuariosRepo.insertarUsuario(datosUsuario, transaction);
+        usuario = await UsuariosRepo.insertarUsuario(datosUsuario, transaction);
 
-    // Insertar el customer
+        // Insertar el customer
 
-    // Colocar el id del usuario recien creado
+        // Colocar el id del usuario recien creado
 
-    datosCustomer.idUsuario = usuario.idUsuario;
-    customer = await CustomerRepo.insertarCustomer(datosCustomer, transaction);
+        datosCustomer.idUsuario = usuario.idUsuario;
+        customer = await CustomerRepo.insertarCustomer(datosCustomer, transaction);
 
-    transaction.commit();
-    return "Usuario customer registrado";
+        transaction.commit();
+        return "Usuario customer registrado";
 
-    }catch(error){
+    } catch (error) {
+        console.log(error);
+        transaction.rollback();
+        throw error;
+    }
+}
+
+// Insertar un usuario basico y un customer correspondiente
+const insertBasicUser = async (uid, correo) => {
+    const transaction = await sequelize.transaction(); // Iniciar la transacción
+    let datosUsuario = {};
+    let datosCustomer = {};
+    try {
+        if (!uid || !correo) {
+            throw new ErrorNegocio("Hacen falta datos");
+        }
+        // Insertar el usuario
+
+        // Colocar los datos de usuario
+        datosUsuario.tipoUsuario = "customer";
+        datosUsuario.emailUsuario = correo;
+        datosUsuario.uidFirebase = uid;
+
+        usuario = await UsuariosRepo.insertarUsuario(datosUsuario, transaction);
+
+        // Insertar el customer
+
+        // Colocar el id del usuario recien creado
+
+        datosCustomer.idUsuario = usuario.idUsuario;
+        datosCustomer.nombreCustomer = "NOMBRE CUSTOMER";
+        datosCustomer.correoNotiCustomer = correo;
+        datosCustomer.telefonoNotiCustomer = "NUMERO NOTIFICACION"
+        datosCustomer.telefonoFijoCustomer = "TELEFONO FIJO";
+        datosCustomer.perfilCustomer = "constructora";
+        datosCustomer.estadoCustomer = "nuevo";
+
+        customer = await CustomerRepo.insertarCustomer(datosCustomer, transaction);
+
+        transaction.commit();
+        return "Usuario customer registrado";
+
+    } catch (error) {
         console.log(error);
         transaction.rollback();
         throw error;
@@ -71,43 +114,43 @@ const insertUsuarioCustomer= async (datosUsuario, datosCustomer)=>{
 
 /* Metodos de delete*/
 // Borrar un usuario y un customer correspondiente
-const deleteUsuarioCustomer= async (idUsuario, idCustomer)=>{ 
+const deleteUsuarioCustomer = async (idUsuario, idCustomer) => {
     const transaction = await sequelize.transaction(); // Iniciar la transacción
 
-    try{
-        if(!idUsuario||!idCustomer){
+    try {
+        if (!idUsuario || !idCustomer) {
             throw new ErrorNegocio("Hacen falta datos para borrar");
         }
 
-    // Verificar que el customer si esté vinculado al usuario
-    const customer = await Customer.findByPk(idCustomer);
+        // Verificar que el customer si esté vinculado al usuario
+        const customer = await Customer.findByPk(idCustomer);
 
-    if(!customer || customer.idUsuario != idUsuario){
-        throw new ErrorNegocio("El customer ingresado no coincide con el id del usuario");
-    }
+        if (!customer || customer.idUsuario != idUsuario) {
+            throw new ErrorNegocio("El customer ingresado no coincide con el id del usuario");
+        }
 
-    // Obtener los inmuebles (El servicio de filtros tiene esta logica)
-    let dato ={};
-    dato.idCustomer = idCustomer;
-    dato.urlLogo = customer.logoCustomer;
-    const inmuebles = await FiltrosInmuebleService.getInmueblesUsuario(dato);
+        // Obtener los inmuebles (El servicio de filtros tiene esta logica)
+        let dato = {};
+        dato.idCustomer = idCustomer;
+        dato.urlLogo = customer.logoCustomer;
+        const inmuebles = await FiltrosInmuebleService.getInmueblesUsuario(dato);
 
-    // Borrar los inmuebles (el servicio de inmuebles ya tiene esta logica)
-    await Promise.all(
-        inmuebles.map((inmueble) => InmuebleService.eliminarInmueble({ idInmueble: inmueble.dataValues.id }))
-    );
-    console.log("borrar");
-    
-    // borrar el usuario. El customer e inmuebles se borran por cascada
-    await UsuariosRepo.borrarUsuario(idUsuario);
+        // Borrar los inmuebles (el servicio de inmuebles ya tiene esta logica)
+        await Promise.all(
+            inmuebles.map((inmueble) => InmuebleService.eliminarInmueble({ idInmueble: inmueble.dataValues.id }))
+        );
+        console.log("borrar");
+
+        // borrar el usuario. El customer e inmuebles se borran por cascada
+        await UsuariosRepo.borrarUsuario(idUsuario);
 
 
-    // Borrar fotos del logo del customer
-    deleteMultimediaServidor("fotos", dato.urlLogo, "customers");
-    transaction.commit();
-    return "Usuario customer borrado";
+        // Borrar fotos del logo del customer
+        deleteMultimediaServidor("fotos", dato.urlLogo, "customers");
+        transaction.commit();
+        return "Usuario customer borrado";
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
         transaction.rollback();
         throw error;
@@ -119,5 +162,6 @@ module.exports = {
     getUserByUID,
     getUserByEmail,
     insertUsuarioCustomer,
+    insertBasicUser,
     deleteUsuarioCustomer
 }

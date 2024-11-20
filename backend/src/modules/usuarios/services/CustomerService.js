@@ -34,9 +34,12 @@ const getAllCustomers = async (datos) => {
 const coincideIdUsuario = async (idUsuario, idCustomer) => {
     // Obtener el customer
     let dato = {};
-    dato.idCustomer = idCustomer; 
-    const customer = getAllCustomers(dato); // Traer customer
-    return (customer[0].dataValues.idUsuario==idUsuario); // Validar si es el mismo que el del parametro
+    dato.idCustomer = idCustomer;
+    const customer = await getAllCustomers(dato); // Traer customer
+    if(!customer || !customer[0]){
+        return false;
+    }
+    return (customer[0].dataValues.idUsuario == idUsuario); // Validar si es el mismo que el del parametro
 }
 
 // Traer todos los customers pero limita a nombre, logo y tipo. 
@@ -63,19 +66,53 @@ const getAllCustomersBasic = async (datos) => {
 const actualizarCustomer = async (datos, params) => {
     const { customer } = datos;
     const { idCustomer } = params;
+    const { tipoUsuario } = datos;
 
     // Dependiendo del tipo de usuario se pueden cambiar ciertas cosas (GOOGLEAUTH REQUERIDO)
     const campos = ["nombreCustomer", "correoNotiCustomer", "telefonoNotiCustomer", "telefonoFijoCustomer",
-        "codigoCustomer", "perfilCustomer", "numComercialCustomer", "estadoCustomer"];
+        "codigoCustomer", "perfilCustomer", "numComercialCustomer"];
 
     // Para el admin ademas de estos campos se agrega el de estado
+    if (tipoUsuario === "admin") {
+        campos.push("estadoCustomer");
+    }
+
 
     // Extraer los datos respectivos
     const customerData = filtrarCampos(customer, campos);
 
     await CustomerRepo.actualizarCustomer(customerData, idCustomer);
+
+    // Si no fue un admin se hace la actualizacion de estado segun suscripciones
+    if (tipoUsuario != "admin") {
+        // Hacer la modificación automatica segun suscripciones
+        let customerTemp = await Customer.findByPk(idCustomer);
+
+        modificarEstadoPago(customerTemp);
+    }
+
+
     return "Datos actualizados";
 }
+
+/* Modificar los estados de un usuario si tiene suscripciones activas*/
+const modificarEstadoPago = async (customer) => {
+    let estadoActual = customer.estadoCustomer; // Estado actual
+    let nuevoEstado = null;
+    let tieneSuscripcionActiva = false; // Validar con modulo de suscripciones
+    if (tieneSuscripcionActiva && (estadoActual == "inactivo" || estadoActual == "nuevo")) {
+        nuevoEstado = "activo";
+    } else if (!tieneSuscripcionActiva && (estadoActual == "activo" || estadoActual == "nuevo")) {
+        nuevoEstado = "inactivo";
+    }
+
+    if (nuevoEstado) {
+        let data = {};
+        data.estadoCustomer = nuevoEstado;
+        await CustomerRepo.actualizarCustomer(data, customer.idCustomer);
+    }
+
+};
 
 // Actualizar un logo
 const actualizarLogo = async (idCustomer, nombreArchivo, tipoArchivo) => {
@@ -114,7 +151,6 @@ const actualizarLogo = async (idCustomer, nombreArchivo, tipoArchivo) => {
 
         return msg;
     } catch (err) {
-        console.log(err);
         transaction.rollback();
         throw err;
     }

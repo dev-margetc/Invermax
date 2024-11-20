@@ -4,6 +4,8 @@ const detalleService = require('../services/DetalleService');
 const CustomerService = require('../../usuarios/services/CustomerService');
 const FiltrosInmuebleService = require('../services/FiltrosInmuebleService');
 const fs = require('fs'); // Para manejar la eliminación de archivos
+
+const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 const { deleteMultimediaServidor } = require('../../../middleware/uploadConfig');
 const { traerToken } = require('../../../conf/firebaseAuth');
 
@@ -26,9 +28,8 @@ const insertMultimedia = async (req, res) => {
         const { idDetalle } = req.params;
         /* Verificar que el customer dueño sea el mismo que inició sesion
           Si el usuario es admin se permite el ver los datos*/
-        const idCustomer = FiltrosInmuebleService.traerCustomerInmueble(token.idUsuario, idDetalle, null);
-        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
-
+        const idCustomer = await FiltrosInmuebleService.traerCustomerInmueble(idDetalle, null);
+        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             msg = await detalleService.insertarMultimediaDetalle(idDetalle, nombreFoto, tipoArchivo);
             return res.status(200).json({ message: msg }); // respuesta aquí
 
@@ -45,7 +46,6 @@ const insertMultimedia = async (req, res) => {
             }
             deleteMultimediaServidor(folder, nombreFoto, "inmuebles");
         }
-
         //Enviar el mensaje de error
         errorHandler.handleControllerError(res, err, "inmuebles");
     }
@@ -58,8 +58,8 @@ const eliminarDetalle = async (req, res) => {
         const { idDetalle } = req.params;
         /* Verificar que el customer dueño sea el mismo que inició sesion
           Si el usuario es admin se permite el ver los datos*/
-        const idCustomer = FiltrosInmuebleService.traerCustomerInmueble(token.idUsuario, idDetalle, null);
-        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+        const idCustomer = await FiltrosInmuebleService.traerCustomerInmueble(idDetalle, null);
+        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             msg = await detalleService.deleteDetalle(idDetalle);
             res.status(201).json(msg); //Se retorna un mensaje
         } else {
@@ -84,8 +84,8 @@ const eliminarMultimediaDetalle = async (req, res) => {
         const id = idFoto || idVideo;
         /* Verificar que el customer dueño sea el mismo que inició sesion
           Si el usuario es admin se permite el ver los datos*/
-        const idCustomer = FiltrosInmuebleService.traerCustomerInmueble(token.idUsuario, idDetalle, null);
-        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+        const idCustomer = await FiltrosInmuebleService.traerCustomerInmueble(idDetalle, null);
+        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             let msg = await detalleService.deleteMultimediaBD(id, tipo, idDetalle);
 
             res.status(201).json(msg); //Se retorna un mensaje

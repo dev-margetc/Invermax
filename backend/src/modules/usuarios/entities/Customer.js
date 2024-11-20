@@ -7,7 +7,7 @@ const PERFILES = ['constructora', 'inmobiliaria', 'agente inmobiliario', 'propie
 
 
 //Estados de customer permitidos
-const ESTADOS = ['activo', 'inactivo'];
+const ESTADOS = ['activo', 'inactivo', 'nuevo'];
 
 const Customer = sequelize.define('Customer', {
     idCustomer: {

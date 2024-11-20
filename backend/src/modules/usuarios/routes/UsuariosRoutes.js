@@ -12,13 +12,13 @@ const customerController = require("../controllers/CustomerController");
 
 //Traer todos los usuarios junto con sus customer. 
 
-router.get('/', userController.getAllUsuarios);
+router.get('/', protegerRuta(['admin']), userController.getAllUsuarios);
 
 /*  Traer todos los customers   
     -En los parametros puede incluirse el tipo especifico, si está vacio los traerá todos
     - Esta ruta trae toda la información de customers, debería estar protegida
 */
-router.get('/customers', protegerRuta(['admin', 'customer']), customerController.getAllCustomers);
+router.get('/customers', protegerRuta(['admin']), customerController.getAllCustomers);
 
 /*  Traer todos los nombres y logos de customers   
     -En los parametros puede incluirse :

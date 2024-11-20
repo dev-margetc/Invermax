@@ -3,6 +3,10 @@ Tambien se encarga de interactuar con otros servicios*/
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const TipoInmueble = require("../entities/TipoInmueble");
 const sequelize = require("../../../conf/database");
+
+const CustomerService = require("../../usuarios/services/CustomerService");
+const FiltrosInmuebleService = require("./FiltrosInmuebleService");
+
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
 const zonaInmuebleService = require("./ZonasInmueblesService");
@@ -50,7 +54,6 @@ const insertarInmueble = async (datosInmueble) => {
 // Traer los interesados de un inmueble
 const traerInteresados= async (datos) =>{
     const {idInmueble} = datos;
-
     if(idInmueble){
         return InteresadoRepo.getInteresadosInmueble(idInmueble);
     }else{
@@ -153,11 +156,35 @@ const eliminarInmueble = async (params) => {
 
 }
 
+// Verificar que el id de un usuario coincida con el de un customer y este sea el dueño de un inmueble
+const isUsuarioDueño = async (idUsuario, idInmueble) => {
+    // Obtener el customer
+    let datos = {};
+    datos.idUsuario = idUsuario;
+    datos.idInmueble = idInmueble;
+    const customer = await CustomerService.getAllCustomers(datos); // Traer customer 
+    
+    // Si no se encuentra el customer
+    if(!customer || !customer[0]){
+        return false;
+    }
+
+    datos.idCustomer = customer[0].dataValues.idCustomer;
+    // Usar el ID del customer y verificar si tiene un inmueble con ese ID
+    const inmuebles = await FiltrosInmuebleService.getInmueblesUsuario(datos);
+
+    const inmuebleEncontrado = inmuebles.find(inmueble => inmueble.idCustomer === datos.idCustomer);
+
+    return inmuebleEncontrado;
+}
+
+
 
 module.exports = {
     insertarInmueble,
     actualizarInmuebleDetalles,
     getAllTipos,
     eliminarInmueble,
-    traerInteresados
+    traerInteresados,
+    isUsuarioDueño
 }

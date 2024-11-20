@@ -126,7 +126,7 @@ const getInfoMultimedia = async (idMultimedia, tipo, idDetalle) => {
             return "Tipo no especificado";
         }
         if (!multimedia || multimedia.length <= 0) {
-            throw new Error("No se encontró multimedia con esos parametros");
+            throw new ErrorNegocio("No se encontró multimedia con esos parametros");
         }
 
         // Solo se retorna el primer valor
@@ -184,7 +184,6 @@ const deleteDetalle = async (idDetalle) => {
         return "Detalle eliminado correctamente"
 
     } catch (error) {
-        console.error("Error borrando detalle:", error);
         throw error;
     }
 }

@@ -45,6 +45,10 @@ const getCustomerByID = async (req, res) => {
         // Traer el customer
         const customer = await CustomerService.getAllCustomers(dato);
 
+        // Si no se encuentra el customer
+        if (!customer[0]) {
+            throw new ErrorNegocio("Customer no encontrado con los datos proporcionados");
+        }
         // Si el usuario es admin se permite el ver los datos 
         if (token.tipoUsuario == 'admin' || token.idUsuario == customer[0].dataValues.idUsuario) {
             res.status(200).json(customer); //Se retornan los usuarios
@@ -62,8 +66,10 @@ const getCustomerByID = async (req, res) => {
 const actualizarCustomer = async (req, res) => {
     try {
         const token = await traerToken(req);
-        const { idCustomer } = req.body;
-        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+        const { idCustomer } = req.params;
+        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+            // Enviar tambien el rol del usuario, asi si es admin sse permite modificar el estado
+            req.body.tipoUsuario = token.tipoUsuario;
             const msg = await CustomerService.actualizarCustomer(req.body, req.params);
             res.status(200).json(msg); //Se retornan el mensaje
         } else {
@@ -82,14 +88,15 @@ const actualizarLogo = async (req, res) => {
     let nombreFoto = null;
     let tipoArchivo = null;
     // Verifica si se subió un archivo
-    if (req.file) {
-        rutaFoto = req.file.path; // Ruta del archivo subido
-        nombreFoto = req.file.filename;
-        tipoArchivo = req.file.tipoArchivo; // Propiedad agregada en la configuracion de subida
-    } else {
-        return res.status(400).json({ error: { message: "No se subió ningún archivo." } });
-    }
     try {
+        if (req.file) {
+            rutaFoto = req.file.path; // Ruta del archivo subido
+            nombreFoto = req.file.filename;
+            tipoArchivo = req.file.tipoArchivo; // Propiedad agregada en la configuracion de subida
+        } else {
+            throw new ErrorNegocio("No se subió ningún archivo.", "FILE_ERROR", 400);
+        }
+
         const { idCustomer } = req.params;
 
         // Verificar que el customer que se intenta actualizar sea el que inicio sesion

@@ -1,8 +1,6 @@
 /*Se aplica la lógica de negocio a los datos traidos por el repositorio. 
 Tambien se encarga de interactuar con otros servicios*/
 const Inmueble = require("../entities/Inmueble");
-const TipoInmueble = require("../entities/TipoInmueble");
-const seq = require("../../../conf/database");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const DetalleInmueble = require("../entities/DetalleInmueble");
@@ -98,7 +96,6 @@ const tieneZonas = (zonasInmueble, zonas) => {
 // Traer inmuebles de un usuario
 const getInmueblesUsuario = async (datos) => {
     const { idCustomer } = datos;
-
     if (idCustomer) {
         return inmuebleRepository.getInmueblesUsuario(idCustomer);
     } else {
@@ -133,20 +130,21 @@ const getInmuebleByID = async (datos) => {
 }
 
 // Traer el customer de un inmueble dado su detalle o idInmueble
-const traerCustomerInmueble = async (idUsuario, idDetalle = null, idInmueble = null) => {
+const traerCustomerInmueble = async (idDetalle = null, idInmueble = null) => {
     try {
         let inmueble;
         if (idDetalle) {
-            const detalle = DetalleInmueble.findByPk(idDetalle);
-            inmueble = Inmueble.findByPk(detalle.idInmueble); 
-        } else if (idInmueble){
-            inmueble = Inmueble.findByPk(idInmueble); 
+            const detalle = await DetalleInmueble.findByPk(idDetalle);
+            if (detalle) {
+                inmueble = await Inmueble.findByPk(detalle.idInmueble);
+            }
+        } else if (idInmueble) {
+            inmueble = await Inmueble.findByPk(idInmueble);
         }
 
-        if(!inmueble){
+        if (!inmueble) {
             throw new ErrorNegocio("Inmueble no encontrado");
-        }
-
+        }   
         return inmueble.idCustomer;
     } catch (error) {
         throw error;

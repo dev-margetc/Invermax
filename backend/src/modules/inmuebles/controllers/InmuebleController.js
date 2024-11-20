@@ -1,12 +1,31 @@
 //Manejar las solicitudes HTTP. Llama al servicio correspondiente.
 
 const inmuebleService = require('../services/InmuebleService'); //Importar el servicio 
+const CustomerService = require('../../usuarios/services/CustomerService');
 const filtroInmueble = require('../services/FiltrosInmuebleService');
 const zonasInmueblesService = require('../services/ZonasInmueblesService');
 const errorHandler = require('../../../utils/ErrorHandler');
+
+const { traerToken } = require('../../../conf/firebaseAuth');
+const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 // Insertar un inmueble
 const insertInmueble = async (req, res) => {
     try {
+        
+        const token = await traerToken(req);
+
+        const datos = {};
+        datos.idUsuario = token.idUsuario;
+
+        // Traer al customer correspondiente
+        const customer = await CustomerService.getAllCustomers(datos);
+
+        if(!customer){
+            throw new ErrorNegocio("Customer relacionado al ID proporcionado no existe");
+        }
+
+        // Establecer el ID del usuario que inició sesion y asignarlo al cuerpo para crearlo
+        req.body.inmueble.idCustomer = customer[0].dataValues.idCustomer;
         msg = await inmuebleService.insertarInmueble(req.body);
         res.status(201).json(msg); //Se retorna un mensaje
     } catch (error) {
@@ -21,11 +40,13 @@ const agregarZona = async (req, res) => {
         const datos = req.body; //Datos del cuerpo de la solicitud (zonas)
         datos.idInmueble = req.params.idInmueble;
 
+        console.log(datos.idInmueble);
         // Traer dueño del inmueble
-        const idCustomer = filtroInmueble.traerCustomerInmueble(token.idUsuario, null, datos.idInmueble);
-
+        const idCustomer = await filtroInmueble.traerCustomerInmueble(null, datos.idInmueble);
+        console.log(idCustomer);
+        console.log( await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer));
         // Validar que sea el dueño
-        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             let msg = await zonasInmueblesService.agregarZona(datos);
             res.status(201).json(msg); //Se retorna un mensaje
         } else {
@@ -33,6 +54,7 @@ const agregarZona = async (req, res) => {
         }
 
     } catch (err) {
+        console.log(err);
         errorHandler.handleControllerError(res, err, "inmuebles");
     }
 };
@@ -91,10 +113,18 @@ const getInmueblesCodigo = async (req, res) => {
 
 // Traer los interesados de un inmueble
 const getInteresadosInmueble = async (req, res) => {
-
     try {
-        interesados = await inmuebleService.traerInteresados(req.params);
-        res.status(201).json(interesados); //Se retorna un mensaje si se encuentra un error
+        const token = await traerToken(req);
+        const {idInmueble} = req.params;
+        const isDueño = await inmuebleService.isUsuarioDueño(token.idUsuario, idInmueble);
+        // Verificar que el que inició sesión sea el dueño  
+        if(isDueño){
+            interesados = await inmuebleService.traerInteresados(req.params);
+            res.status(201).json(interesados); //Se retornan los interesados
+        }else{
+            throw new ErrorNegocio("No puede acceder a esa información de inmueble.");
+        }
+       
     } catch (err) {
         errorHandler.handleControllerError(res, err, "inmuebles");
     }
@@ -108,10 +138,9 @@ const actualizarInmuebleDetalles = async (req, res) => {
         const { idInmueble } = req.params;
 
         // Traer dueño del inmueble
-        const idCustomer = filtroInmueble.traerCustomerInmueble(token.idUsuario, null, idInmueble);
-
+        const idCustomer =await filtroInmueble.traerCustomerInmueble(null, idInmueble);
         // Validar que sea el dueño
-        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             let msg = await inmuebleService.actualizarInmuebleDetalles(req.body, req.params);
             res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
         } else {
@@ -130,10 +159,10 @@ const eliminarInmueble = async (req, res) => {
         const { idInmueble } = req.params;
 
         // Traer dueño del inmueble
-        const idCustomer = filtroInmueble.traerCustomerInmueble(token.idUsuario, null, idInmueble);
+        const idCustomer = await filtroInmueble.traerCustomerInmueble(null, idInmueble);
 
         // Validar que sea el dueño
-        if (token.tipoUsuario == "admin" || CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             msg = await inmuebleService.eliminarInmueble(req.params);
             res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
         } else {
