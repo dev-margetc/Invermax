@@ -38,13 +38,13 @@ const Navbar = () => {
     <header className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="navbar-header">
         <div className="navbar-logo">
-          <img src="img/logo.png" alt="Logo" className="logo" />
+          <img src="img/logo.png" alt="Logo" className="logo" loading="lazy" />
         </div>
         <div className="desktop-menu">
           <a href="#" >Arriendos</a>
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuComprar}>
-              Comprar <span><img src="/img/icons/Frame6.svg" alt="comprar" /></span>
+              Comprar <span><img src="/img/icons/Frame6.svg" alt="comprar" loading="lazy" /></span>
             </button>
             {submenuOpenComprar && (
               <div className="submenu-content">
@@ -57,7 +57,7 @@ const Navbar = () => {
           </div>
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
-              Otros trámites <span><img src="/img/icons/Frame6.svg" alt="" /></span>
+              Otros trámites <span><img src="/img/icons/Frame6.svg" alt="" loading="lazy"/></span>
             </button>
             {submenuOpenOtrosTramites && (
               <div className="submenu-content">
@@ -70,7 +70,7 @@ const Navbar = () => {
         </div>
         <div className="navbar-right">
           <a className="nav-link menus" href="#">
-            <img src="/img/icons/fa-icon-user.svg" alt="icon-ingresar" /> 
+            <img src="/img/icons/fa-icon-user.svg" alt="icon-ingresar" loading="lazy"/> 
             <span className="ingresar-text">Ingresar</span>
           </a>
           <a className="btn btn-danger ms-2 btn-publicar" style={{padding:"5px 10px"}} href="#">Publicar</a>
@@ -84,11 +84,11 @@ const Navbar = () => {
       {/* Menú móvil */}
       {isOpen && (
         <div className="navbar-menu mobile-menu">
-          <button className="close-button" onClick={toggleMenu}><img src="/img/icons/xmark.svg" alt="exis" /></button>
+          <button className="close-button" onClick={toggleMenu}><img src="/img/icons/xmark.svg" alt="exis" loading="lazy"/></button>
           <a href="#" className='arriendo-link' style={{paddingTop:"65px"}}>Arriendos</a>
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuComprar}>
-              Comprar <span><img src="/img/icons/Frame6.svg" alt="" /></span>
+              Comprar <span><img src="/img/icons/Frame6.svg" alt="" loading="lazy"/></span>
             </button>
             {submenuOpenComprar && (
               <div className="submenu-content">
@@ -101,7 +101,7 @@ const Navbar = () => {
           </div>
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
-              Otros trámites <span><img src="/img/icons/Frame6.svg" alt="" /></span>
+              Otros trámites <span><img src="/img/icons/Frame6.svg" alt="" loading="lazy"/></span>
             </button>
             {submenuOpenOtrosTramites && (
               <div className="submenu-content">
