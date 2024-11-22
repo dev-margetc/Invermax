@@ -3,9 +3,10 @@ const sequelize = require('../../../conf/database');
 
 
 const VistaInmueblesPublicados = sequelize.define('VistaInmueblesPublicados', {
-    id_inmueble: {
+    idInmueble: {
         type: DataTypes.INTEGER,
         primaryKey: true, // Esto indica que es una clave primaria
+        field: 'id_inmueble'
     },
     estadoInmueble: {type:DataTypes.STRING, field: 'estado_inmueble'},
     modalidad: {type:DataTypes.STRING}, 

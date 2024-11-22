@@ -80,9 +80,9 @@ const getAllTipos = async (req, res) => {
 const getInmuebleByID = async (req, res) => {
     try {
         msg = await filtroInmueble.getInmuebleByID(req.params);
-        console.log("===");
         res.status(201).json(msg); //Se retorna un mensaje
     } catch (err) {
+        console.log(err);
         errorHandler.handleControllerError(res, err, "inmuebles");
     }
 };
@@ -103,6 +103,7 @@ const getInmueblesUsuario = async (req, res) => {
         }
        
     } catch (err) {
+        console.log(err);
         errorHandler.handleControllerError(res, err, "inmuebles");
     }
 };

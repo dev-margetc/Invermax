@@ -8,6 +8,9 @@ const VistaPublicados = require("../entities/VistaInmueblesPublicados");
 const Ciudad = require("../entities/Ciudad");
 const TipoInmueble = require("../entities/TipoInmueble");
 const Zona = require("../entities/Zona");
+const Foto = require("../entities/Foto");
+const Video = require("../entities/Video");
+const Customer = require("../../usuarios/entities/Customer");
 
 //Crea un inmueble con sus detalles y proyecto si es el caso
 //Recibe los datos con detalles y una confirmación de si es proyecto
@@ -57,42 +60,51 @@ const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
   }
 };
 
+const traerAtributosAvanzados = (isFiltro = false) => {
+
+  const attributes = [
+    // Valor minimo y maximo de inmuebles
+    [sequelize.literal('(SELECT MIN(valor_Inmueble) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMinimoDetalles'],
+    [sequelize.literal('(SELECT MAX(valor_Inmueble) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMaximoDetalles'],
+
+    // Obtener una foto del primer detalle
+    [sequelize.literal('(SELECT url_foto FROM Fotos WHERE Fotos.id_detalle_inmueble IN (SELECT id_detalle FROM Detalles_Inmuebles WHERE Detalles_Inmuebles.id_inmueble = inmueble.id_Inmueble) LIMIT 1)'), 'fotoPrincipal'],
+
+  ];
+
+  if (isFiltro) {
+    attributes.push(
+      // Valor minimo de área
+      [sequelize.literal('(SELECT MIN(area) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'areaMinima'],
+
+      // Valor minimo de baños
+      [sequelize.literal('(SELECT MIN(cantidad_baños) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinBaños'],
+
+      // Valor minimo de habitaciones
+      [sequelize.literal('(SELECT MIN(cantidad_habitaciones) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinHabitaciones'],
+    );
+  }
+
+  return attributes;
+};
+
+
 
 // Traer los inmuebles con el estado de publicado (incluyendo proyectos)
 const getPublicados = async () => {
   try {
 
     const inmuebles = await VistaPublicados.findAll({
+      attributes:{exclude: ['idTipoInmueble', 'cod_ciudad', 'id_inmueble']},
       include: [
-        {
-          as: 'ciudad', // Se usa el alias definido en la relacion
-          model: Ciudad,
-          attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
-        },
         {
           model: Inmueble, // Relacion con el modelo inmueble
           as: 'inmueble',
           attributes: [ // Traer ciertos campos para aplicar el filtro
-            'idInmueble',
-
-            //Valor minimo y maximo de inmuebles usando sql (bug de sequelize no deja usar fn a este nivel)
-            [sequelize.literal('(SELECT MIN(valor_Inmueble) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMinimoDetalles'],
-            [sequelize.literal('(SELECT MAX(valor_Inmueble) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMaximoDetalles'],
-
-            // Valor minimo de area
-            [sequelize.literal('(SELECT MIN(area) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'areaMinima'],
-
-            // Valor minimo de baños
-            [sequelize.literal('(SELECT MIN(cantidad_baños) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinBaños'],
-
-            // Valor minimo de habitaciones
-            [sequelize.literal('(SELECT MIN(cantidad_habitaciones) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinHabitaciones'],
-
-            // Obtener una foto del primer detalle
-            [sequelize.literal('(SELECT url_foto FROM Fotos WHERE Fotos.id_detalle_inmueble IN (SELECT id_detalle FROM Detalles_Inmuebles WHERE Detalles_Inmuebles.id_inmueble = inmueble.id_Inmueble) LIMIT 1)'), 'fotoPrincipal'],
-
+            'idInmueble', 'codigoInmueble',
+            ...traerAtributosAvanzados(true)
           ],
-          include: [ // Incluir detalles por medio de inmueble
+          include: [ // Incluir por medio de inmueble
             {
               model: DetalleInmueble,
               as: "detalles",
@@ -107,9 +119,15 @@ const getPublicados = async () => {
             {
               model: Zona,
               as: "zonas",
-              attributes: ['idZona']
+              attributes: ['idZona'],
+              through: { attributes: [] }, // Excluir los atributos de la tabla pivote
             }
           ]
+        },
+        {
+          as: 'ciudad', // Se usa el alias definido en la relacion
+          model: Ciudad,
+          attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
         }
       ]
     });
@@ -124,7 +142,7 @@ const getPublicados = async () => {
 const getInmueblesUsuario = async (idUsuario) => {
   const inmuebles = Inmueble.findAll({
     attributes: [
-      ["id_inmueble", "id"], // Para renombrar se coloca a la izquierda el nombre que está en la BD
+      "idInmueble", // Para renombrar se coloca a la izquierda el nombre que está en la BD
       "codigoInmueble",
       "tituloInmueble",
       "estadoPublicacionInmueble"
@@ -142,15 +160,54 @@ const getInmueblesCodigo = async (codigo) => {
 
   // Solamente trae el id si encuentra un inmueble con ese codigo
   const inmuebles = Inmueble.findAll({
+    attributes: {
+      include: [
+        ...traerAtributosAvanzados(), // Atributos avanzados agregados manualmente
+      ],
+      exclude: ['id_customer', 'idCustomer', 'codigoCiudad','cod_ciudad', 'idTipoInmueble','id_tipo_inmueble']
+    },
     include: [ // Incluir detalles por medio de inmueble
       // Incluir zonas
+      {
+        model: Customer,
+        as: "customer",
+        attributes: ['idCustomer','nombreCustomer', 'logoCustomer']
+      },
+      {
+        model: TipoInmueble,
+        as: "tipoInmueble"
+      },
+      {
+        as: 'proyecto', // Se usa el alias definido en la relacion
+        model: Proyecto,
+        attributes: ['idProyecto', 'fechaEntregaProyecto'], // Traer solo el nombre de la ciudad
+      },
+      {
+        as: 'ciudad', // Se usa el alias definido en la relacion
+        model: Ciudad,
+        attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
+      },
       {
         model: Zona,
         as: "zonas"
       },
       {
         model: DetalleInmueble,
-        as: "detalles"
+        as: "detalles",
+        attributes: {
+          exclude:["idInmueble","idProyecto","id_inmueble"]
+        },
+        include: [{
+          model: Foto,
+          as: "fotos",
+          attributes: ["idFoto", "urlFoto"]
+        },
+        {
+          model: Video,
+          as: "videos",
+          attributes: ["idVideo", "urlVideo"]
+        }
+        ]
       }],
     where: {
       codigoInmueble: codigo
@@ -165,18 +222,56 @@ const getInmuebleByID = async (id) => {
 
   // Solamente trae el id si encuentra un inmueble con ese codigo
   const inmuebles = Inmueble.findAll({
+    attributes: {
+      include: [
+        ...traerAtributosAvanzados(), // Atributos avanzados agregados manualmente
+      ],
+      exclude: ['id_customer', 'idCustomer', 'codigoCiudad','cod_ciudad', 'idTipoInmueble','id_tipo_inmueble']
+    },
+   
     include: [ // Incluir detalles por medio de inmueble
       // Incluir zonas
+      {
+        model: Customer,
+        as: "customer",
+        attributes: ['idCustomer','nombreCustomer', 'logoCustomer']
+      },
+      {
+        model: TipoInmueble,
+        as: "tipoInmueble"
+      },
+      {
+        as: 'proyecto', // Se usa el alias definido en la relacion
+        model: Proyecto,
+        attributes: ['idProyecto', 'fechaEntregaProyecto'], // Traer solo el nombre de la ciudad
+      },
+      {
+        as: 'ciudad', // Se usa el alias definido en la relacion
+        model: Ciudad,
+        attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
+      },
       {
         model: Zona,
         as: "zonas"
       },
-      // Incluir detalles
       {
         model: DetalleInmueble,
-        as: "detalles"
-      }
-    ],
+        as: "detalles",
+        attributes: {
+          exclude:["idInmueble","idProyecto","id_inmueble"]
+        },
+        include: [{
+          model: Foto,
+          as: "fotos",
+          attributes: ["idFoto", "urlFoto"]
+        },
+        {
+          model: Video,
+          as: "videos",
+          attributes: ["idVideo", "urlVideo"]
+        }
+        ]
+      }],
     where: {
       idInmueble: id
     }
@@ -191,10 +286,12 @@ const actualizarInmueble = async (datos, idInmueble, transaccion) => {
   try {
     transaccion = await sequelize.transaction(); // Iniciar la transacción
 
-    await Inmueble.update(datos, { where: { idInmueble },
-      fields: [ 'codigoInmueble','estadoInmueble','modalidadInmueble','tituloInmueble','estrato','administracion',
-                'tipoVivienda','codigoCiudad','idTipoInmueble','frameMaps','descripcionInmueble','estadoPublicacionInmueble'], // Campos permitidos para actualizar
-      transaccion });
+    await Inmueble.update(datos, {
+      where: { idInmueble },
+      fields: ['codigoInmueble', 'estadoInmueble', 'modalidadInmueble', 'tituloInmueble', 'estrato', 'administracion',
+        'tipoVivienda', 'codigoCiudad', 'idTipoInmueble', 'frameMaps', 'descripcionInmueble', 'estadoPublicacionInmueble'], // Campos permitidos para actualizar
+      transaccion
+    });
 
   } catch (error) {
     throw error; // Lanzar error para que sea capturado en el controlador

@@ -44,6 +44,12 @@ Zona.belongsToMany(Inmueble, {
 // Asociacion de la intermedia
 Inmueble.hasMany(ZonaInmueble, { foreignKey: 'id_inmueble', as: 'zonasInmueble' });
 
+// Un inmueble solo pertenece a un inmueble
+Inmueble.belongsTo(Ciudad, {
+  foreignKey: 'cod_ciudad',
+  as: 'ciudad', // Alias para la relación
+});
+
 
 // Un tipo puede tener varios inmuebles asociados
 TipoInmueble.hasMany(Inmueble, { foreignKey: 'id_tipo_inmueble', as: 'inmuebles' });

@@ -81,6 +81,7 @@ const getPublicados = async (datos) => {
 
         return resultadoFiltrado;
     } catch (error) {
+        console.log(error);
         throw error;
     }
 }
