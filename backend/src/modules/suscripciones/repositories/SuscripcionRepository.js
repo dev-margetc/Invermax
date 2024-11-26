@@ -4,6 +4,7 @@ const sequelize = require("../../../conf/database");
 const Suscripcion = require("../entities/Suscripcion");
 const SaldoCaracteristica = require("../entities/SaldoCaracteristica");
 const Plan = require("../entities/Plan");
+const Caracteristica = require("../entities/Caracteristica");
 
 // Traer suscripciones dado unas condiciones ordenadas por fechaFin
 const getSuscripcionesFechaFin = async (condiciones = null) => {
@@ -22,10 +23,21 @@ const getSuscripcionesPlan = async (condiciones = null) => {
     console.log(condiciones);
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
     const suscripciones = await Suscripcion.findAll({
-        include:[{
-            model: Plan,
-            as: "plan"
-        }],
+        include: [
+            {
+                model: Plan,
+                as: "plan"
+            },
+            {
+                model: SaldoCaracteristica,
+                as: "saldosCaracteristicas",
+                include:[
+                    {
+                        model: Caracteristica,
+                        as: "caracteristica"
+                    }
+                ]
+            }],
         where: filtro,
     });
     return suscripciones;
@@ -38,7 +50,7 @@ const crearSuscripcion = async (datosSuscripcion, datosCaracteristicas) => {
         // Crear la suscripcion
         const suscripcion = await Suscripcion.create({
             ...datosSuscripcion
-        }, {transaction});
+        }, { transaction });
 
         // Ahora crear el registro en saldos caracteristica
 
@@ -54,7 +66,7 @@ const crearSuscripcion = async (datosSuscripcion, datosCaracteristicas) => {
             datosSaldo.idCaracteristica = idCaracteristica;
             datosSaldo.capacidadDisponible = saldo;
             datosSaldo.idSuscripcion = idSuscripcion;
-         await SaldoCaracteristica.create({...datosSaldo},{transaction});
+            await SaldoCaracteristica.create({ ...datosSaldo }, { transaction });
         };
         await transaction.commit();
 

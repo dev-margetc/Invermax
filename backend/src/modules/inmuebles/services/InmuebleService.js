@@ -79,11 +79,25 @@ const actualizarInmuebleDetalles = async (datos, params) => {
     const { idInmueble } = params
     const listaDetalles = inmueble.detalles;
     const zonas = inmueble.zonas;
+    const {estadoPublicacionInmueble} = inmueble;
 
     // crear transaccion
     const transaction = await sequelize.transaction(); // Iniciar la transacción
-    try {
-        
+    try {   
+        // Si se trata de cambiar el estado a publicado
+        if(estadoPublicacionInmueble == "publicado"){
+
+            // Verificar que el estado del customer sea activo (validar con modulo usuarios)
+            let customer = await CustomerService.getAllCustomers({idCustomer:datos.idCustomer});
+            let estadoCustomer = customer[0].dataValues.estadoCustomer;
+           
+            if(estadoCustomer == "inactivo"|| estadoCustomer == "nuevo"){
+                throw new ErrorNegocio("Este estado no le permite publicar inmuebles");
+            }
+            
+            // Verificar que pueda colocar mas inmuebles en este estado (validar con modulo suscripciones)
+        }
+
         //Si hay un nuevo tipo y este es arriendo se valida que arriendo no sea null
         if(inmueble.modalidadInmueble== "arriendo" && !inmueble.administracion){
             throw new ErrorNegocio("La modalidad de arriendo requiere que se especifique si la administración está incluida");     

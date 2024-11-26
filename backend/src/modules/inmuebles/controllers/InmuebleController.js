@@ -146,6 +146,9 @@ const actualizarInmuebleDetalles = async (req, res) => {
 
         // Traer dueño del inmueble
         const idCustomer =await filtroInmueble.traerCustomerInmueble(null, idInmueble);
+
+        //Agregar el idCustomer al cuerpo para pasarlo al servicio
+        req.body.idCustomer = idCustomer;
         // Validar que sea el dueño
         if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             let msg = await inmuebleService.actualizarInmuebleDetalles(req.body, req.params);

@@ -25,15 +25,6 @@ const InmuebleDestacado = sequelize.define('Suscripcion', {
             }
           },
     },
-    idSuscripcion: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'Suscripcion', //Nombre modelo
-            key: 'idSuscripcion', // KEY del modelo
-        },
-        field: 'id_suscripcion'
-    },
     idInmueble: {
         type: DataTypes.INTEGER,
         allowNull: false,

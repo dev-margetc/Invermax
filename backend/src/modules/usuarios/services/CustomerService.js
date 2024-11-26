@@ -8,6 +8,7 @@ const { filtrarCampos } = require("../../../utils/utils");
 const Customer = require("../entities/Customer");
 const CustomerRepo = require("../repositories/CustomerRepository");
 const DetalleService = require("../../inmuebles/services/DetalleService");
+const SuscripcionService = require("../../suscripciones/services/SuscripcionService");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 
 // Traer todos los customers. Valida si hay condiciones qué aplicar en la consulta
@@ -99,7 +100,12 @@ const actualizarCustomer = async (datos, params) => {
 const modificarEstadoPago = async (customer) => {
     let estadoActual = customer.estadoCustomer; // Estado actual
     let nuevoEstado = null;
-    let tieneSuscripcionActiva = false; // Validar con modulo de suscripciones
+    // Verificar si tiene suscripcion activa
+    let suscripcionActiva = await SuscripcionService.getSuscripcionesCustomer(customer.idCustomer,"activa"); // Validar con modulo de suscripciones
+    let tieneSuscripcionActiva = false;
+    if(suscripcionActiva){
+        tieneSuscripcionActiva = true;
+    }
     if (tieneSuscripcionActiva && (estadoActual == "inactivo" || estadoActual == "nuevo")) {
         nuevoEstado = "activo";
     } else if (!tieneSuscripcionActiva && (estadoActual == "activo" || estadoActual == "nuevo")) {

@@ -21,4 +21,8 @@ router.get('/customer/:idCustomer', SuscripcionController.getSuscripcionesCustom
 router.post('/suscripcion/pago', SuscripcionController.handlePago)
 
 
+//Insertar un inmueble en destacados (o actualizarlo si ya existe)
+//router.post('/destacados')
+
+
 module.exports = router;
