@@ -9,7 +9,7 @@ const getAllPlanes = async (req, res) => {
         let planes = await PlanService.getAllPlanes();
         res.status(201).json(planes); //Se retorna la respuesta
     } catch (err) {
-        console.log(err);
+        console.log(err); 
         errorHandler.handleControllerError(res, err, "usuarios");
     }
 };

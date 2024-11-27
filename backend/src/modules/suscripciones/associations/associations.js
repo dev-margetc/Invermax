@@ -63,25 +63,6 @@ Customer.hasMany(Suscripcion, { foreignKey: 'id_customer', as: 'suscripciones' }
 Suscripcion.belongsTo(Customer, { foreignKey: 'id_customer', as: 'customer' }); // La fk es de la primaria por el tipo de relacion
 
 
-/* Relaciones suscripciones-inmueblesDestacados*/
-
-// Una suscripcion puede tener varios destacados
-Suscripcion.hasMany(InmuebleDestacado, { foreignKey: 'id_suscripcion', as: 'inmueblesDestacados' }); //La fk es de la foranea y se coloca como se conocera a los "muchos" de la relacion
-
-// Un destacado solo pertenece a una suscripcion
-InmuebleDestacado.belongsTo(Suscripcion, { foreignKey: 'id_suscripcion', as: 'suscripcion' }); // La fk es de la primaria por el tipo de relacion
-
-
-/* Relaciones suscripciones-inmueblesAscenso*/
-
-// Una suscripcion puede tener varios destacados
-Suscripcion.hasMany(InmuebleAscenso, { foreignKey: 'id_suscripcion', as: 'inmueblesAscenso' }); //La fk es de la foranea y se coloca como se conocera a los "muchos" de la relacion
-
-// Un ascenso solo pertenece a una suscripcion
-InmuebleAscenso.belongsTo(Suscripcion, { foreignKey: 'id_suscripcion', as: 'suscripcion' }); // La fk es de la primaria por el tipo de relacion
-
-
-
 /* Relaciones inmueblesAscenso-inmuebles*/
 
 // Un inmueble puede tener varios registros en ascenso

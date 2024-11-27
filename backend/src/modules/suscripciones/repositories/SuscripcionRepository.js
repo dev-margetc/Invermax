@@ -23,6 +23,9 @@ const getSuscripcionesPlan = async (condiciones = null) => {
     console.log(condiciones);
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
     const suscripciones = await Suscripcion.findAll({
+        attributes: {
+            exclude: ['idPlan', 'id_plan', 'idCustomer', 'id_customer']
+        },
         include: [
             {
                 model: Plan,
@@ -31,7 +34,10 @@ const getSuscripcionesPlan = async (condiciones = null) => {
             {
                 model: SaldoCaracteristica,
                 as: "saldosCaracteristicas",
-                include:[
+                attributes: [
+                    'capacidadDisponible', 'idCaracteristica'
+                ],
+                include: [
                     {
                         model: Caracteristica,
                         as: "caracteristica"

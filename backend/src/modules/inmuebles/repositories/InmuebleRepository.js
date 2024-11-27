@@ -315,5 +315,6 @@ module.exports = {
   getInmueblesUsuario,
   getInmueblesCodigo,
   actualizarInmueble,
-  borrarInmueble
+  borrarInmueble,
+  traerAtributosAvanzados
 }

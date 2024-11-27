@@ -1,8 +1,10 @@
 //Manejar las solicitudes HTTP. Llama al servicio correspondiente.
 const errorHandler = require('../../../utils/ErrorHandler');
+const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 
-const SuscripcionService = require('../services/SuscripcionService')
-
+const SuscripcionService = require('../services/SuscripcionService');
+const CustomerService = require('../../usuarios/services/CustomerService')
+const { traerToken } = require('../../../conf/firebaseAuth');
 
 // Info de prueba de un pago
 let infoPago={
@@ -35,11 +37,16 @@ const handlePago = async (req, res) => {
 // Traer todas las suscripciones de un customer y su plan
 const getSuscripcionesCustomer = async (req, res)=>{
     try{
+        const token = await traerToken(req);
         const {idCustomer} = req.params;
-        let suscripciones = await SuscripcionService.getSuscripcionesCustomer(idCustomer);
-        res.status(201).json(suscripciones); //Se retorna la respuesta
+        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
+            let suscripciones = await SuscripcionService.getSuscripcionesCustomer(idCustomer);
+            res.status(201).json(suscripciones); //Se retorna la respuesta
+        }else {
+            throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el solicitado.")
+        }
+       
     }catch(err){
-        console.log(err);
         errorHandler.handleControllerError(res, err, "suscripciones");
     }
 }
