@@ -1,0 +1,335 @@
+/* Fondo general con bordes puntudos */
+.tabla-planes-wrapper {
+    background-color: #EFF5F4; /* Fondo gris claro */
+    padding: 1rem;
+    font-family: 'Arial', sans-serif;
+    overflow-y: visible;
+    position: relative;
+    z-index: 1;
+    padding-top: 50px;
+    padding-left: 5%;
+    padding-bottom: 50px;
+}
+
+.separador{
+    display: none;
+    height: 70px !important;
+    background-color: #FFFFFF;
+}
+
+/* Bordes puntudos horizontales */
+.tabla-planes-wrapper::before,
+.tabla-planes-wrapper::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 20px; /* Altura de las puntas */
+    background: #EFF5F4; /* Color del fondo */
+    z-index: -1;
+}
+
+.tabla-planes-wrapper::before {
+    top: 0; /* Borde superior */
+    clip-path: polygon(0 100%, 5% 0, 10% 100%, 15% 0, 20% 100%, 25% 0, 30% 100%, 35% 0, 40% 100%, 45% 0, 50% 100%, 55% 0, 60% 100%, 65% 0, 70% 100%, 75% 0, 80% 100%, 85% 0, 90% 100%, 95% 0, 100% 100%);
+}
+
+.tabla-planes-wrapper::after {
+    bottom: 0; /* Borde inferior */
+    clip-path: polygon(0 0, 5% 100%, 10% 0, 15% 100%, 20% 0, 25% 100%, 30% 0, 35% 100%, 40% 0, 45% 100%, 50% 0, 55% 100%, 60% 0, 65% 100%, 70% 0, 75% 100%, 80% 0, 85% 100%, 90% 0, 95% 100%, 100% 0);
+}
+
+/* Tabs (visibles solo en PC) */
+.tabla-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 2px; /* Menos separación entre tabs */
+    background-color: #ffffff; /* Fondo gris claro para el contenedor */
+    
+}
+
+.tabla-tab {
+    background-color: #ffffff; /* Fondo gris claro de las tabs inactivas */
+    border: 1px #EFF5F4 solid;
+    font-size: 1rem;
+    padding: 1rem 3rem; /* Tabs más anchos y altos */
+    cursor: pointer;
+    color: #6c757d; /* Texto gris oscuro */
+    transition: all 0.3s ease; /* Transición para el hover y activación */
+}
+
+.tabla-tab.active {
+    background-color: #EFF5F4; /* Fondo blanco para el tab activo */
+    color: #000; /* Texto negro */
+    font-weight: bold;
+    border-radius: 10px 0px 0px 0px;
+    position: relative;
+    top: 2px; /* Sobresale ligeramente hacia arriba */
+    border: none;
+}
+
+.tabla-tab:hover {
+    background-color: #fff; /* Fondo blanco en hover */
+    color: #000; /* Texto negro */
+}
+
+/* Oculta las tabs en móvil */
+@media (max-width: 768px) {
+    .tabla-tabs {
+        display: none;
+    }
+
+    .separador{
+        display: block;
+        height: 70px !important;
+        background-color: #FFFFFF;
+    }
+
+    .tabla-planes-wrapper {
+        background-color: #EFF5F4; /* Fondo gris claro */
+        padding: 1rem;
+        font-family: 'Arial', sans-serif;
+        overflow-y: visible;
+        position: relative;
+        z-index: 1;
+        padding-top: 10px;
+        padding-left: 5%;
+        padding-bottom: 50px;
+    
+    }
+}
+
+/* Select (visible solo en móvil) */
+.tabla-planes-select {
+    display: none; /* Oculto en PC */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    margin-top: 1.8rem;
+}
+
+.tabla-planes-select label {
+    display: block;
+    font-size: 0.9rem;
+    color: #000;
+    margin-bottom: 0.5rem;
+    text-align: left;
+}
+
+.select-black {
+    width: 90%;
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #000; /* Fondo negro */
+    color: #fff; /* Texto blanco */
+}
+
+/* Contenedor de la tabla con scroll horizontal */
+/* Tabla con scroll horizontal */
+.tabla-planes-container {
+    overflow-x: auto; /* Scroll horizontal */
+    overflow-y: none; /* Sin scroll vertical */
+    scrollbar-color: red transparent;
+    scrollbar-width: thin;
+}
+
+.tabla-planes-container::-webkit-scrollbar {
+    height: 2px; /* Altura del scroll horizontal */
+}
+
+.tabla-planes-container::-webkit-scrollbar-thumb {
+    background-color: red;
+    border-radius: 4px;
+}
+
+.tabla-planes {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 0;
+}
+
+/* Columna negra con sombra */
+.tabla-columna-izquierda {
+    background-color: #000; /* Fondo negro */
+    color: #fff; /* Texto blanco */
+    text-align: left;
+    padding: 10px; /* Aumenta el tamaño interno */
+    min-width: 200px;
+    border-radius: 10px 0 0 10px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: visible;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3); /* Sombra sutil para darle altura */
+}
+
+/* Bordes internos alineados con la columna negra */
+.tabla-columna {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border-top: 1px solid #ddd; /* Borde superior alineado */
+    border-bottom: 1px solid #ddd; /* Borde inferior alineado */
+    border-right: 1px solid #ddd; /* Borde derecho */
+    border-left: none; /* Sin borde izquierdo */
+    padding: 1.5rem;
+    width: 300px;
+    text-align: left;
+    height: auto;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.tabla-columna-izquierda p {
+    margin: 0px; /* Espaciado mayor entre textos */
+    font-size: 1rem;
+    border-bottom: 1px dashed #fff; /* Bordes punteados */
+    padding: 27px 20px;
+}
+
+.cara-izquierda{
+    border-bottom: 1px dashed #fff;
+    height: 220px;
+    justify-content: center;
+    align-items: center;
+  
+}
+
+.cara-izquierda h6{
+    padding-top: 50%;
+    padding-left: 10px;
+}
+
+/* Contenedor de las columnas */
+.tabla-planes {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+}
+
+.tabla-columna {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border-top: 1px dotted #ddd;
+    border-bottom: 1px dotted #ddd;
+    border-right: 1px solid #ddd;
+    border-left: none;
+    padding: 20px 0px;
+    width: 300px;
+    text-align: left;
+    height: auto;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.tabla-columna h3{
+    border-bottom: 1px dashed #d4d4d4; /* Bordes punteados */
+}
+
+.pp{
+    border-bottom: 1px dashed #d4d4d4; /* Bordes punteados */
+}
+
+.tabla-columna button{
+    border-top: 1px dashed #000000; /* Bordes punteados */
+}
+
+.buton{
+    border-top: 1px dashed #b3b2b2; /* Bordes punteados */
+    padding: 10px;
+}
+
+.tabla-titulo {
+    font-size: 1.4rem;
+    color: #000;
+    white-space: normal;
+    border-bottom: 1px dashed #fff; /* Bordes punteados */
+    padding: 20px;
+    height: 100px;
+}
+
+.tabla-proyecto {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    white-space: normal;
+    padding: 20px;
+}
+
+.tabla-proyecto p{
+    border-bottom: 1px dashed #000000; /* Bordes punteados */
+}
+
+.tabla-caracteristicas {
+    list-style: none;
+    padding: 0;
+    height: 200px; /* Altura fija */
+    overflow-y: auto; /* Scroll vertical si hay desbordamiento */
+    padding: 10px;
+   
+}
+
+.tabla-caracteristicas ul {
+    margin: 0; /* Elimina cualquier margen adicional del <ul> */
+}
+
+.tabla-caracteristicas ul li {
+    display: flex;
+    align-items: flex-start;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    border-bottom: 1px dashed #000; /* Línea punteada debajo de cada ítem */
+}
+
+
+
+/* Botón */
+.tabla-boton {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    text-align: center;
+    margin-top: auto;
+}
+
+.tabla-boton:hover {
+    background-color: red;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .tabla-planes {
+        flex-direction: row;
+        gap: 0;
+    }
+
+    .tabla-columna-izquierda {
+        display: none;
+    }
+
+    .tabla-planes-select {
+        display: block;
+    }
+
+    .tabla-caracteristicas ul li{
+        margin-left: 10px;
+    }
+}

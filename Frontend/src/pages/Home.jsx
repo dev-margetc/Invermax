@@ -3,7 +3,6 @@ import React from 'react';
 import Banner from '../components/Banner'; 
 import CarouselDestacados from '../components/CarouselDestacados'; 
 import CarouselAltaDemanda from '../components/CarouselAltaDemanda'; 
-import Footer from '../components/Footer'; 
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
@@ -12,6 +11,10 @@ const Home = () => {
   const handleSearch = (formData) => {
     // Navega a la página de Filter y pasa los datos del formulario
     navigate('/filter', { state: { formData } });
+  };
+
+  const handleBlog = () => {
+    navigate('/blog'); // Navega a la ruta "/plantilla"
   };
 
   return (
@@ -116,7 +119,7 @@ const Home = () => {
         
         {/* Botón de Ver Más Entradas */}
         <div className="text-center">
-          <a href="#" className="btn-more">Ver más entradas</a>
+          <a href="#" className="btn-more" onClick={handleBlog}>Ver más entradas</a>
         </div>
       </section>
     </div>

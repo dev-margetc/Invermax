@@ -1,0 +1,1015 @@
+/* .----------------------------------------------------------CSS PARA EL BLOG ---------------------------------------------------*/
+.blog-container {
+    font-family: Arial, sans-serif;
+    margin: 0%;
+    max-width: 100%;
+    padding: 20px;
+    background-color: rgb(241, 241, 241);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .blog-titulo {
+    text-align: center; 
+    width: 100%; 
+  }
+
+  .fondo-blog-titulo {
+    background: url(/public/img/edificios-filtro.png) center center;
+    background-size: cover; 
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: center;
+    height: 94.7px; 
+    width: 100%; 
+  }
+
+  .blog-content{
+    padding: 0%;
+    border-radius: 10px;
+    padding: 0%;
+  }
+
+  /* -------------------------------------------------------------- */
+  .blog-header {
+    position: relative;
+    background-color: yellow;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+        .banner-blog {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Ajusta según necesites */
+            overflow: hidden;
+            border-radius: 10px; /* Bordes redondeados */
+        }
+        
+        .banner-image-blog {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Asegura que la imagen cubra todo el espacio */
+        }
+
+        .banner-content-blog {
+            position: absolute;
+            bottom: 0; /* Pegado al borde inferior */
+            left: 0; /* Pegado al borde izquierdo */
+            color: white;
+            background: rgba(94, 94, 94, 0.5); /* Fondo semi-transparente */
+            border-radius: 0px 8px 8px 8px; /* Bordes redondeados en la parte inferior */
+            padding: 10px; /* Espaciado interno */
+            max-width: 550px; /* Ancho máximo */
+            box-sizing: border-box; /* Asegura que el padding no rompa el diseño */
+            max-height: 50%; /* Altura máxima */
+            display: grid;
+            grid-template-columns: 10fr 1fr 2fr; /* Distribución de columnas */
+            gap: 10px; /* Espaciado entre columnas */
+            /* Evita que los elementos internos se desborden */
+          }
+                
+          .banner-date-blog {
+            position: absolute;
+            top: -25px; /* Sobresale más hacia arriba */
+            left: 20px; /* Alineado con el borde izquierdo */
+            z-index: 10; /* Asegura que esté sobre otros elementos */
+            background: red;
+            color: white;
+            padding: 10px 3px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+          }
+          
+        .date-day-blog {
+            font-size: 16px;
+            line-height: 1;
+        }
+        
+        .date-month-blog {
+            font-size: 10px;
+        }
+        
+        .banner-text-blog {
+
+            max-width: auto; /* Limita el ancho del texto */
+            padding-left: 70px;
+        
+        }
+        
+        .banner-text-blog h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: white;
+        }
+        
+        .banner-text-blog p {
+            font-size: 14px;
+        }
+
+        .vertical-dotted-line-blog {
+            border-left: 1px dotted white; /* Línea vertical punteada */
+            height: auto; /* Ajusta la altura de la línea */
+            margin: 0 auto; /* Centra la línea en su contenedor */
+            padding: 0%;
+          }
+          
+
+        .contenedor-bottom-blog{
+            align-items: center;
+        }
+        
+        .banner-button-blog {
+            background:none;
+            color:white;
+            border: none;
+            padding: 10px 0px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 50%;
+            text-decoration: underline;
+        }
+        
+        .banner-button-blog:hover {
+            background:none;
+            color: rgb(255, 0, 0);
+        }
+
+        @media (max-width: 990px) {
+            .blog-header {
+              background-color: black;
+              border-radius: 10px;
+              
+            }
+          
+            .banner-content-blog {
+              position: static; /* Elimina el posicionamiento absoluto */
+              bottom: auto;
+              left: auto;
+              color: white;
+              background: none; /* Quita el fondo semi-transparente */
+              padding: 10px;
+              display: block; /* Cambia a bloque para apilar los elementos */
+              max-width: none; /* Permite que ocupe el ancho completo */
+              max-height: none; /* Quita la restricción de altura */
+              text-align: left;
+            }
+          
+            .banner-image-blog {
+              width: 100%;
+              border-radius: 10px;
+            }
+          
+            .banner-text-blog {
+              padding: 0; /* Elimina el padding lateral */
+              height: auto;
+            }
+
+            .banner-date-blog {
+                position: relative;
+                top: -30px; /* Sobresale más hacia arriba */
+                left: 0px; /* Alineado con el borde izquierdo */
+                z-index: 10; /* Asegura que esté sobre otros elementos */
+                background: red;
+                color: white;
+                padding: 10px 3px;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+                text-align: center;
+                width: 60px;
+            }
+          
+            .banner-text-blog h1 {
+              font-size: 18px;
+              color: white;
+              margin-bottom: 10px;
+            }
+          
+            .banner-text-blog p {
+              font-size: 12px;
+              margin-bottom: 15px;
+              color: white;
+            }
+          
+            .vertical-dotted-line-blog {
+              display: none; /* Oculta la línea vertical en móvil */
+            }
+          
+            .contenedor-bottom-blog {
+              text-align: left;
+              height: auto;
+            }
+          
+            .banner-button-blog {
+              background: none;
+              color: white;
+              font-size: 12px;
+              margin-top: 0px;
+              margin-left: 80%;
+              border: none;
+              text-decoration: underline;
+              cursor: pointer;
+            }
+          }
+          
+  /* --------------------------------------------------------------- */
+
+  .blog-end{
+    background-color: brown;
+  }
+
+.blog-medium{
+  display: flex;
+  justify-content: center;
+}
+  
+/* BlogGrid.css */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Fuerza 3 columnas */
+  gap: 20px; /* Espacio entre los elementos */
+  width: 100%; /* Asegura que ocupe todo el ancho disponible */
+  max-width: 100%; /* Permite que se adapte a pantallas grandes */
+  margin: 0 auto; /* Centra la grid horizontalmente */
+  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño */
+}
+
+.blog-card {
+  border: 1px solid #ddd;
+  background-color:white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+}
+
+.blog-image {
+  width: 100%;
+  height: auto;
+}
+
+.blog-content {
+  padding: 15px;
+}
+
+.blog-date {
+  position: relative;
+  top: -30px;
+  display: inline-block;
+  background-color: red;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.blog-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.blog-description {
+  font-size: 14px;
+  color: #555;
+}
+
+.blog-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: red;
+  font-weight: bold;
+  text-decoration:underline;
+  margin-left: 70%;
+}
+
+.blog-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .blog-content {
+    padding: 10px;
+  }
+
+  .blog-title {
+    font-size: 16px;
+  }
+
+  .blog-description {
+    font-size: 12px;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.pagination-arrow {
+  background: none;
+  border: none;
+  /* border-radius: 4px; */
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 18px;
+  color: black;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination-arrow:disabled {
+  cursor: not-allowed;
+  color: #ccc;
+  border-color: #ccc;
+}
+
+.pagination-number {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  color: black;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination-number.active {
+  background: white;
+  color: red;
+  font-weight: bold;
+}
+
+.pagination-number:hover:not(.active) {
+  background: #f0f0f0;
+}
+
+
+/* ---------------------------- */
+/* Categorías Container */
+.categorias-container {
+  display: flex;
+  flex-wrap: nowrap; /* Elementos en una sola línea */
+  overflow-x: auto; /* Scroll horizontal en dispositivos móviles */
+  gap: 10px; /* Espaciado entre los elementos */
+  padding: 0px 40px;
+}
+
+.categorias-container::-webkit-scrollbar {
+  height: 8px; /* Altura del scrollbar */
+}
+
+.categorias-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.categorias-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Categorías Items */
+.categoria-item {
+  white-space: nowrap; /* Mantiene el texto en una sola línea */
+  padding: 6px 3px;
+  border: 1px solid #000;
+  border-radius: 5px;
+  background-color: rgb(241, 241, 241);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.categoria-item:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.categoria-item.active {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Pantallas grandes: Distribuir en varias líneas */
+@media (min-width: 768px) {
+  .categorias-container {
+    flex-wrap: wrap; /* Permite que los elementos pasen a una nueva línea */
+    overflow-x: hidden; /* Elimina el scroll horizontal en PC */
+    
+  }
+
+  .categoria-item {
+    flex: 1 1 calc(20% - 10px); /* Ajusta los elementos al 20% del contenedor */
+    text-align: center; /* Centra el texto */
+  
+  
+  }
+}
+
+/* POST ------------------------------------------ */
+
+.post-container {
+  font-family: Arial, sans-serif;
+  margin: 0%;
+  max-width: 100%;
+  padding: 0px 20px 20px 20px;
+  background-color: rgb(241, 241, 241);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.title-icon-post{
+  display: grid;
+  grid-template-columns: 1fr 6fr;
+}
+
+.title-icon-post h1{
+  font-size: 30px;
+}
+
+.text-dark-post{
+  text-align: left;
+}
+
+.post-date {
+  display: inline-block;
+  background-color: red;
+  color: white;
+
+  border-radius: 4px;
+  font-size: 14px;
+  
+}
+
+.date-day-post {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.date-month-post {
+  font-size: 24px;
+}
+
+.container-post-text{
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;  
+}
+
+.post-text{
+  max-width: 846px;
+}
+
+.post-text p{
+  color: #5A5555;
+  font-size: 16px;
+}
+
+.contenedor-btn-post{
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;    /* Centra verticalmente (opcional si es necesario) */
+}
+
+.btn-post{
+  margin: 20px 0;
+  max-width: 153px;
+}
+
+
+/* ------------------------------------------------- */
+/* NotasComponent.css */
+.notas-component {
+  margin-top: 20px;
+  border-top: 2px solid #ddd;
+  padding: 10px 0;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.nota-anterior,
+.nota-siguiente {
+  display: flex;
+  align-items: center;
+}
+
+
+
+.arrow {
+  font-size: 20px;
+  color: red;
+  margin-right: 5px;
+}
+
+.nota-siguiente .arrow {
+  margin-left: 5px;
+  margin-right: 0;
+}
+
+.label {
+  font-size: 14px;
+  text-align: right;
+}
+
+.nota-texto {
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .texto-nota {
+    font-size: 16px;
+  
+    text-transform: uppercase;
+  }
+
+  .post-text{
+    padding: 0px 0px;
+  }
+
+  .nota-texto {
+    display: none;
+  }
+
+  .nota-anterior,
+  .nota-siguiente {
+    justify-content: center;
+  }
+
+  .arrow {
+    margin: 0;
+  }
+}
+
+/* ---------------------------------------------------- */
+/* NotaDiseno.css */
+/* NotaDiseno.css */
+.nota-diseno {
+  padding: -20px 0px 20px 20px;
+  margin-bottom: 0px;
+}
+
+.post-titulo{
+  background: url(/public/img/edificios-filtro.png) center center;
+  background-size: cover; /* Asegura que la imagen cubra todo el ancho */
+  display: flex;
+  flex-direction: column; /* Coloca los elementos en bloque, uno debajo del otro */
+  align-items: center;
+  justify-content: center;
+  height: 84px; /* Ajusta la altura según tu diseño */
+  width: 100%; /* Ocupa todo el ancho del contenedor */
+  margin-top: 0%;
+}
+
+.fecha-cuadro {
+  background-color: #ff0000;
+  color: #fff;
+  text-align: center;
+  padding: 5px 15px;
+  border-radius: 4px;
+  margin:10px;
+}
+
+.fecha-cuadro .dia {
+  font-size: 16px;
+  font-weight: bold;
+  display: block;
+}
+
+.fecha-cuadro .mes {
+  font-size: 12px;
+}
+
+.texto-nota {
+  font-size: 32px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.texto-nota strong {
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .texto-nota {
+    font-size: 20px;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+}
+
+/* Otros servicios */
+/* Estilo general de la sección */
+.otros-servicios-section {
+  position: relative;
+  background-color: #f7f7f7;
+}
+
+/* Parte superior: Banner con la imagen */
+.otros-servicios-banner {
+  background-image: url("/public/img/otrosServicios.png"); /* Ruta de la imagen del banner */
+  background-size: cover;
+  background-position: center;
+  height: 300px; /* Ajusta la altura del banner */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: relative;
+}
+
+.background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Oscurece la imagen del banner */
+  z-index: 1;
+}
+
+.titulo-principal {
+  position: relative;
+  z-index: 2; /* Sobrepasa el overlay */
+  font-size: 48px !important;
+  text-align: center;
+  color: white;
+  margin-top: 50px;
+}
+
+/* Parte inferior: Fondo gris */
+.otros-servicios-container {
+  display: flex;
+  justify-content: center;
+  background-color: #f7f7f7; /* Color de fondo gris */
+  padding: 50px 20px;
+  border-radius: 0 0 8px 8px; /* Bordes redondeados solo abajo */
+  margin-top: -20px; /* Opcional, ajusta el espacio */
+  z-index: 2;
+}
+
+.servicios-card {
+  background-color: #fff;
+  padding: 64px 84px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  position: relative; /* Habilita el posicionamiento relativo */
+  margin-top: -120px; /* Ajusta para que quede superpuesto sobre el banner */
+  z-index: 3; /* Asegúrate de que esté por encima del banner */
+  max-width: 1064px;
+}
+
+.titulo-otros-ss{
+  max-width: 888px;
+  padding: 0px 100px;
+}
+
+@media (max-width: 768px) {
+  .servicios-card {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative; /* Habilita el posicionamiento relativo */
+    margin-top: -120px; /* Ajusta para que quede superpuesto sobre el banner */
+    z-index: 3; /* Asegúrate de que esté por encima del banner */
+    max-width: 1064px;
+  }
+
+  .titulo-otros-ss{
+    max-width: 888px;
+    padding: 10px;
+  }
+
+}
+
+.centered-line-post {
+  width: 50px; /* Ancho de la línea */
+  height: 5px; /* Grosor de la línea */
+  background-color: red; /* Color de la línea */
+  margin: 0 auto; /* Centrar horizontalmente */
+  margin-bottom: 50px;
+  margin-top: 0px;
+}
+
+/* ---------------------------------- */
+/* OtrosServicios.css */
+
+/* Encabezado del botón del acordeón */
+.accordion-button {
+  color: #000 !important; /* Texto negro por defecto */
+  background-color: #fff !important; /* Fondo blanco */
+  font-size: 20px !important; /* Tamaño del texto */
+  font-weight: bold !important; /* Negrita */
+  border: none 1px solid white; /* Sin bordes laterales */
+  border-radius: 0 !important; /* Sin bordes redondeados */
+  transition: color 0.3s ease, background-color 0.3s ease !important;
+  box-shadow: none !important; /* Eliminar sombra azul de Bootstrap */
+  position: relative; /* Necesario para posicionar el ícono */
+  padding-right: 40px; /* Espacio para el ícono */
+}
+
+/* Eliminar la flecha predeterminada de Bootstrap */
+.accordion-button::after {
+  display: none; /* Oculta el ícono predeterminado de Bootstrap */
+}
+
+/* Ícono personalizado del acordeón (flecha) */
+.accordion-button::before {
+  content: ''; /* Ícono personalizado */
+  position: absolute;
+  right: 10px; /* Posición a la derecha */
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg); /* Flecha hacia la derecha */
+  border: solid #000; /* Flecha negra por defecto */
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 5px;
+  transition: border-color 0.3s ease, transform 0.3s ease; /* Transición suave */
+}
+
+/* Hover: Cambiar texto e ícono a rojo */
+.accordion-button:hover {
+  color: #C81C1C !important; /* Rojo oscuro al pasar el mouse */
+}
+
+.accordion-button:hover::before {
+  border-color: #C81C1C !important; /* Ícono rojo al pasar el mouse */
+}
+
+/* Cuando el acordeón está expandido */
+.accordion-button:not(.collapsed) {
+  color: #C81C1C !important; /* Rojo oscuro para el texto activo */
+  font-weight: bold !important;
+  box-shadow: none !important; /* Sin sombra */
+}
+
+.accordion-button:not(.collapsed)::before {
+  transform: translateY(-50%) rotate(-135deg); /* Gira la flecha hacia abajo */
+  border-color: #C81C1C !important; /* Flecha roja cuando está expandido */
+}
+
+/* Quitar contorno azul al enfocar */
+.accordion-button:focus {
+  box-shadow: none !important; /* Sin sombra de enfoque */
+  outline: none !important; /* Sin contorno adicional */
+}
+
+/* Encabezado del acordeón */
+.accordion-header {
+  font-weight: bold;
+  font-size: 18px;
+  border-top: none; /* Sin borde superior */
+  border-top: 2px solid #000 !important; /* Solo borde inferior */
+  padding: 10px 15px;
+  border-left: none !important; /* Sin bordes laterales */
+  border-right: none !important;
+  border-right: 0px solid #ffffff !important;
+}
+
+/* Personalizar bordes del primer y último acordeón */
+.accordion-item:first-child .accordion-header {
+  border-top: 2px solid #000 !important; /* Borde superior solo en el primer elemento */
+}
+
+.accordion-item:last-child .accordion-header {
+  border-bottom: 2px solid #000 !important; /* Borde inferior solo en el último elemento */
+}
+
+/* Contenido del acordeón */
+.accordion-body {
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  background-color: #fff; /* Fondo blanco */
+  border-top: 1px solid #fff !important; /* Sin bordes visibles */
+  border-bottom: 1px solid #fff !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Personalización del botón */
+.btn-asesor {
+  background-color: #000 !important; /* Fondo negro */
+  color: #fff !important; /* Texto blanco */
+  font-size: 14px !important; /* Tamaño del texto */
+  padding: 10px 20px !important;
+  border: none !important; /* Sin bordes */
+  border-radius: 5px !important; /* Bordes redondeados */
+}
+
+.btn-asesor:hover {
+  background-color: #ff0202 !important; /* Fondo más oscuro al pasar el mouse */
+}
+
+
+
+/* PLANES-------------------------------------------- */
+/* Banner superior */
+.planes-banner {
+  position: relative;
+  background-image: url('/public/img/banner-planes.png');
+  background-size: cover;
+  background-position: center;
+  padding: 80px 20px 0px 20px;
+  text-align: center;
+  color: #fff;
+  height: 413px; /* Ajusta según tu diseño */
+}
+
+.planes-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Filtro oscuro (0.5 es el nivel de opacidad) */
+  z-index: 1; /* Asegúrate de que el overlay esté encima del fondo */
+}
+
+.planes-banner h1,
+.planes-banner p,
+.sub-banner-planes,
+.linea-roja {
+  position: relative;
+  z-index: 2; /* Asegúrate de que el texto esté encima del overlay */
+}
+
+
+.sub-banner-padre{
+  display: flex;
+  justify-content: center;
+  background-color: yellow;
+  max-height: 221px;
+}
+
+.sub-banner-planes {
+  position: absolute; /* Cambia a fixed si quieres que esté fijo en la pantalla */
+  bottom: 0; /* Lo posiciona en la parte inferior del contenedor */
+  left: 50%; /* Centra horizontalmente */
+  transform: translateX(-50%); /* Ajusta el elemento para que esté completamente centrado */
+  background-color: #FFFFFF;
+  border-radius: 10px 10px 0px 0px;
+  margin-bottom: 0px;
+  max-width: 1064px;
+  max-height: 221px;
+  width: 100%; /* Asegura que el ancho se adapte al contenedor */
+  padding: 64px 89px 50px 89px;
+}
+
+.titulo-principal-planes {
+  font-size: 48px;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.subtitulo-planes {
+  font-size: 35px;
+  color: #000000;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .planes-banner {
+    position: relative;
+    background-image: url('/public/img/banner-planes.png');
+    background-size: cover;
+    background-position: center;
+    padding: 30px 20px;
+    text-align: center;
+    color: #fff;
+    height: 220px; /* Ajusta según tu diseño */
+  }
+
+  .sub-banner-planes {
+    position: absolute; /* Cambia a fixed si quieres que esté fijo en la pantalla */
+    bottom:-100px; /* Lo posiciona en la parte inferior del contenedor */
+    left: 50%; /* Centra horizontalmente */
+    transform: translateX(-50%); /* Ajusta el elemento para que esté completamente centrado */
+    background-color: #ffffff;
+    border-radius: 10px 10px 0px 0px;
+    margin-bottom: 0px;
+    max-width: 350px;
+    max-height: 221px;
+    width: 100%; /* Asegura que el ancho se adapte al contenedor */
+    padding:20px;
+   
+  }
+
+  .titulo-principal-planes {
+    font-size: 30px;
+    font-weight: bold;
+    color: #FFFFFF;
+  }
+
+  .subtitulo-planes {
+    font-size: 24px;
+    color: #000000;
+    font-weight: 700;
+    margin-bottom: 0%;
+  }
+
+  .separador{
+  display: none;
+  }
+
+  .tabla-superior {
+    margin-top: 120px;
+  }
+
+}
+
+.linea-roja {
+  width: 50px;
+  height: 5px;
+  background-color: red;
+  margin: 10px auto;
+}
+
+.descripcion-planes {
+  font-size: 16px;
+  color: #000000;
+}
+
+/* Estilo general de la tabla */
+.tabla-planes-container {
+  overflow-x: auto; /* Habilitar scroll horizontal */
+  white-space: nowrap; 
+  position: relative;
+}
+
+.tabla-superior {
+  margin-left: 5%;
+}
+
+/* Estilo general de la tabla */
+.tabla-planes {
+  background-color: #fff;
+  color: #000;
+  text-align: center;
+  border-collapse: collapse;
+  width: max-content; 
+  table-layout: fixed; /* Fijar ancho de columnas */
+  margin: 0px auto;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-spacing: 0; 
+}
+
+/* Listas personalizadas */
+.tabla-planes ul {
+  list-style-type: none; 
+  padding: 0;
+  margin: 0;
+}
+
+.tabla-planes ul li {
+  position: relative;
+  padding-left: 30px; /* Espacio para el ícono */
+  margin-bottom: 10px; 
+}
+
+/* Checkmarks con fondo rojo */
+.tabla-planes ul li::before {
+  content: "\2713"; /* Símbolo de checkmark */
+  font-size: 16px; /* Tamaño del ícono */
+  color: #fff; /* Color del checkmark */
+  background-color: red; /* Fondo rojo */
+  border-radius: 50%; /* Forma circular */
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0; /* Alineado a la izquierda */
+  top: 0;
+  margin-left: 5px;
+}

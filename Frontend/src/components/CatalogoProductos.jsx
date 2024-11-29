@@ -49,7 +49,7 @@ const CatalogoProductos = ({ showOnlyFour = false }) => {
   };
 
   const handleNavigate = () => {
-    navigate('/plantilla'); // Navega a la ruta "/plantilla"
+    navigate('/plantillas'); // Navega a la ruta "/plantilla"
   };
 
   return (
