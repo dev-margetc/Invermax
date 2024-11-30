@@ -11,7 +11,7 @@ const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 // Insertar un inmueble
 const insertInmueble = async (req, res) => {
     try {
-        
+
         const token = await traerToken(req);
 
         const datos = {};
@@ -20,10 +20,13 @@ const insertInmueble = async (req, res) => {
         // Traer al customer correspondiente
         const customer = await CustomerService.getAllCustomers(datos);
 
-        if(!customer){
+        if (!customer) {
             throw new ErrorNegocio("Customer relacionado al ID proporcionado no existe");
         }
-
+        // Validar que el estado del customer sea activo si es customer
+        if (token.tipoUsuario == "customer" && customer[0].dataValues.estadoCustomer != "activo") {
+            throw new ErrorNegocio("Su estado actual no le permite realizar esta accion");
+        }
         // Establecer el ID del usuario que inició sesion y asignarlo al cuerpo para crearlo
         req.body.inmueble.idCustomer = customer[0].dataValues.idCustomer;
         msg = await inmuebleService.insertarInmueble(req.body);
@@ -33,7 +36,7 @@ const insertInmueble = async (req, res) => {
     }
 };
 
-// Insertar un inmueble
+// Agrgar una zona
 const agregarZona = async (req, res) => {
     try {
         const token = await traerToken(req);
@@ -93,15 +96,15 @@ const getInmueblesUsuario = async (req, res) => {
     try {
         const token = await traerToken(req);
         // Verificar si el id de quien inicio sesion es el mismo del que se intenta acceder
-        let {idCustomer} = req.params;
+        let { idCustomer } = req.params;
         let coincide = await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer);
-        if(token.tipoUsuario == "admin"|| coincide){
+        if (token.tipoUsuario == "admin" || coincide) {
             msg = await filtroInmueble.getInmueblesUsuario(req.params);
             res.status(201).json(msg);
-        }else {
+        } else {
             throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el solicitado.")
         }
-       
+
     } catch (err) {
         console.log(err);
         errorHandler.handleControllerError(res, err, "inmuebles");
@@ -122,16 +125,16 @@ const getInmueblesCodigo = async (req, res) => {
 const getInteresadosInmueble = async (req, res) => {
     try {
         const token = await traerToken(req);
-        const {idInmueble} = req.params;
+        const { idInmueble } = req.params;
         const isDueño = await inmuebleService.isUsuarioDueño(token.idUsuario, idInmueble);
         // Verificar que el que inició sesión sea el dueño  
-        if(isDueño){
+        if (isDueño) {
             interesados = await inmuebleService.traerInteresados(req.params);
             res.status(201).json(interesados); //Se retornan los interesados
-        }else{
+        } else {
             throw new ErrorNegocio("No puede acceder a esa información de inmueble.");
         }
-       
+
     } catch (err) {
         errorHandler.handleControllerError(res, err, "inmuebles");
     }
@@ -145,7 +148,7 @@ const actualizarInmuebleDetalles = async (req, res) => {
         const { idInmueble } = req.params;
 
         // Traer dueño del inmueble
-        const idCustomer =await filtroInmueble.traerCustomerInmueble(null, idInmueble);
+        const idCustomer = await filtroInmueble.traerCustomerInmueble(null, idInmueble);
 
         //Agregar el idCustomer al cuerpo para pasarlo al servicio
         req.body.idCustomer = idCustomer;

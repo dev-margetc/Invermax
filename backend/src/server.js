@@ -17,6 +17,13 @@ const usuariosRoutes = require('./modules/usuarios/routes/UsuariosRoutes'); // I
 const suscripcionesRoutes = require('./modules/suscripciones/routes/SuscripcionesRoutes'); // Importar las rutas de usuarios
 const globalErrorHandler = require("./middleware/globalErrorHandler"); // Handler de errores
 
+
+
+// Importar cron jobs
+//require('./utils/tareasProgramadas/cronJobs'); // Importar tareas programadas
+
+
+
 //Configuración aplicacion
 const app = express();
 const PORT = process.env.PORT || 3000;

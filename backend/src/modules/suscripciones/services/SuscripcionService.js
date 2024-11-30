@@ -6,6 +6,8 @@ const sequelize = require("../../../conf/database");
 const suscripcionRepository = require("../repositories/SuscripcionRepository");
 const planRepo = require("../repositories/PlanRepository");
 const Plan = require("../entities/Plan");
+const Suscripcion = require("../entities/Suscripcion");
+const { Sequelize } = require("sequelize");
 
 /* Metodos POST */
 
@@ -70,21 +72,21 @@ const crearSuscripcion = async (infoPago) => {
         datos.fechaFinSuscripcion = fechaFin;
 
         // Traer las caracteristicas del plan seleccionado
-        const datosCara = await planRepo.getAllPlanes({idPlan:idPlan});
+        const datosCara = await planRepo.getAllPlanes({ idPlan: idPlan });
 
         // Es un objeto de sequelize, por eso se accede asi
         datosCaracteristicas = datosCara[0].dataValues.caracteristicasPlanes;
-        
+
         // Crear la suscripcion y los saldos en el repository
         let creada = suscripcionRepository.crearSuscripcion(datos, datosCaracteristicas)
         console.log(datos);
         //let creada = true;
-        if(creada){
+        if (creada) {
             return "Suscripción creada";
-        }else{
+        } else {
             return "error en la creación";
         }
-        
+
     } catch (err) {
 
         console.log(err);
@@ -95,34 +97,153 @@ const crearSuscripcion = async (infoPago) => {
 /* METODOS GET*/
 // Traer suscripciones de customers, se puede especificar el estado
 // De no especificarse customer los trae todos y si no se especifica estado los trae todos
-const getSuscripcionesCustomer = async (idCustomer = null, estado=null) => {
-    try{
+const getSuscripcionesCustomer = async (idCustomer = null, estado = null) => {
+    try {
         let cond = {};
-         // Si el idCustomer es null se traen todas
-        if(idCustomer){
+        // Si el idCustomer es null se traen todas
+        if (idCustomer) {
             cond.idCustomer = idCustomer;
         }
 
-        if(estado){
+        if (estado) {
             cond.estadoSuscripcion = estado;
         }
-        
+
 
         let suscripcionesActivas = await suscripcionRepository.getSuscripcionesPlan(cond);
-    
+
         return suscripcionesActivas
+
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+
+
+}
+
+/*Metodo prueba*/
+/*
+       // Obtener usuarios afectados por suscripciones activadas y desactivadas
+       const usuariosActivados = suscripcionesPendientes[1].map(s => s.usuario_id);
+       const usuariosDesactivados = suscripcionesVencidas[1].map(s => s.usuario_id);
+
+       // **4. Actualizar el estado de los usuarios**
+       // 4.1. Actualizar a "activo" los usuarios que tienen suscripción activada y no tienen una vencida
+       for (const usuario_id of usuariosActivados) {
+           if (!usuariosConCambio.includes(usuario_id)) { // Verificar que usuariosConCambio tenga el id
+               await Usuario.update(
+                   { estado: 'activo' },
+                   { where: { id: usuario_id }, transaction: t } // Incluir la transacción
+               );
+           }
+       }
+
+       // 4.2. Actualizar a "inactivo" los usuarios que tienen suscripción vencida y no tienen una activa
+       for (const usuario_id of usuariosDesactivados) {
+           if (!usuariosConCambio.includes(usuario_id)) {
+               await Usuario.update(
+                   { estado: 'inactivo' },
+                   { where: { id: usuario_id }, transaction: t } // Incluir la transacción
+               );
+           }
+       }
+
        
-        }catch(err){
-            console.log(err);
-            throw err;
-        }
-    
-   
+//        console.log(`Suscripciones activadas: ${suscripcionesPendientes[1].length}`);
+ //      console.log(`Suscripciones desactivadas: ${suscripcionesVencidas[1].length}`);
+
+*/
+/* Metodos PUT*/
+
+//Actualizar estados de las suscripciones dada la fecha actual. 
+const actualizarEstadoSuscripciones = async () => {
+
+    // Obtener fecha actual
+    const fechaActual = new Date().toISOString(); // Genera una fecha en formato ISO 8601
+
+    // Iniciar una transacción
+    const t = await sequelize.transaction();
+
+    try {
+        // **1. Activar suscripciones cuya fecha de inicio ya pasó**
+        console.log("hi");
+
+        // Buscar las suscripciones pendientes para luego usar su idUsuario
+        const suscripcionesPendientes = await Suscripcion.findAll(
+            {
+                where: {
+                    estadoSuscripcion: 'pendiente',
+                    fechaInicioSuscripcion: { [Sequelize.Op.lte]: fechaActual },
+                },
+                transaction: t, // Incluir la transacción
+            }
+        );
+
+        // Actualizar las suscripciones pendientes
+        await Suscripcion.update(
+            { estadoSuscripcion: 'activa' },
+            {
+                where: {
+                    estadoSuscripcion: 'pendiente',
+                    fechaInicioSuscripcion: { [Sequelize.Op.lte]: fechaActual },
+                },
+                transaction: t, // Incluir la transacción
+            }
+        );
+
+        // **2. Desactivar suscripciones vencidas**
+
+         // Buscar las suscripciones activas a vencer para luego usar su idUsuario
+         const suscripcionesActivas = await Suscripcion.findAll(
+            {
+                where: {
+                    estadoSuscripcion: 'activa',
+                    fechaFinSuscripcion: { [Sequelize.Op.lte]: fechaActual },
+                },
+                transaction: t, // Incluir la transacción
+            }
+        );
+       await Suscripcion.update(
+           { estadoSuscripcion: 'inactiva' },
+           {
+               where: {
+                   estadoSuscripcion: 'activa',
+                   fechaFinSuscripcion: { [Sequelize.Op.lte]: fechaActual },
+               },
+               transaction: t, // Incluir la transacción
+           }
+       );
+
+
+        // Obtener customer afectados por suscripciones activadas y desactivadas
+
+        const customerActivados = suscripcionesPendientes.map(s => s.idCustomer);
+        const customerDesactivados = suscripcionesActivas.map(s=>s.idCustomer);
+
+        
+       // **3. Verificar usuarios que están en ambas listas (ya no necesitan cambios)**
+       const customerConCambio = customerActivados.filter(idCustomer => customerDesactivados.includes(idCustomer));
+
+
+        console.log(customerActivados);
+        console.log(customerDesactivados);
+        console.log(customerConCambio);
+
+        throw new ErrorNegocio("problem?");
+        await t.commit();
+
+    } catch (err) {
+        console.log(err);
+        await t.rollback();
+
+        throw err;
+    }
 }
 
 
 module.exports = {
     crearSuscripcion,
     getSuscripcionesCustomer,
-
+    actualizarEstadoSuscripciones
 }

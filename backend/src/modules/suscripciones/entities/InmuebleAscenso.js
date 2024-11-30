@@ -11,10 +11,10 @@ const InmuebleAscenso = sequelize.define('InmuebleAscenso', {
         field: 'id_ascenso'
     },fechaInicio: { // Fecha en la que inició el inmueble como
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
         field: 'fecha_inicio'
     },
-    estado_destacado:{
+    estadoAscenso:{
         type: DataTypes.TINYINT(1),
         allowNull: false,
         validate: {
@@ -23,6 +23,7 @@ const InmuebleAscenso = sequelize.define('InmuebleAscenso', {
               msg: "El valor de 'estado' no es correcto"
             }
           },
+          field: 'estado_ascenso'
     },
     idInmueble: {
         type: DataTypes.INTEGER,

@@ -15,7 +15,7 @@ let infoPago={
     "created_at": "2024-11-22T14:32:00Z",
     "payment_method": "credit_card",
     "order_id": "order_78910",
-    "id_customer": "12",
+    "id_customer": "9",
     "signature": "abc123456789xyz",
     "id_plan": "1"
 }

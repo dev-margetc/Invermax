@@ -3,14 +3,13 @@ const errorHandler = require('../../../utils/ErrorHandler');
 const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 const { traerToken } = require('../../../conf/firebaseAuth');
 
-const DestacadoService = require("../services/DestacadoService");
+const AscensoService = require("../services/AscensoService");
 const filtroService = require("../../inmuebles/services/FiltrosInmuebleService");
 
 const CustomerService = require("../../usuarios/services/CustomerService");
 
-
 // Insertar un inmueble en la tabla de ascensos o modificar su estado de activo a inactivo o visceversa
-const insertarDestacado = async (req, res) => {
+const insertarInmuebleAscenso = async (req, res) => {
     try {
         const token = await traerToken(req);
         const { idInmueble } = req.params;
@@ -20,7 +19,7 @@ const insertarDestacado = async (req, res) => {
 
         // Validar que sea el dueño
         if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
-            let msg = await DestacadoService.manejarRegistroDestacado(idInmueble);
+            let msg = await AscensoService.manejarRegistroAscenso(idInmueble);
             res.status(201).json(msg); //Se retorna la respuesta
         } else {
             throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el del dueño del inmueble.")
@@ -36,11 +35,11 @@ const insertarDestacado = async (req, res) => {
 
 /* Metodos de consulta*/
 
-// Traer todos los destacados
-const getDestacados = async (req, res) => {
+// Traer todos los inmuebles en ascenso
+const getInmueblesAscenso = async (req, res) => {
     try{
-        let destacados = await DestacadoService.getDestacadoCustomerEstado();
-        res.status(201).json(destacados); //Se retorna la respuesta
+        let ascendidos = await AscensoService.getAscensoCustomerEstado();
+        res.status(201).json(ascendidos); //Se retorna la respuesta
     }catch(err){
         console.log(err);
         errorHandler.handleControllerError(res, err, "suscripciones");
@@ -49,10 +48,10 @@ const getDestacados = async (req, res) => {
 }
 
 // Traer todos los destacados activos
-const getDestacadosActivos = async (req, res) => {
+const getAscendidosActivos = async (req, res) => {
     try{
-        let destacados = await DestacadoService.getDestacadoCustomerEstado(1,null,true);
-        res.status(201).json(destacados); //Se retorna la respuesta
+        let ascendidos = await AscensoService.getAscensoCustomerEstado(1,null,true);
+        res.status(201).json(ascendidos); //Se retorna la respuesta
     }catch(err){
         console.log(err);
         errorHandler.handleControllerError(res, err, "suscripciones");
@@ -60,13 +59,13 @@ const getDestacadosActivos = async (req, res) => {
 
 }
 
-// Traer todos los destacados de un customer
-const getDestacadosCustomer = async (req, res) => {
+// Traer todos los inmuebles en ascenso de un customer
+const getAscensoCustomer = async (req, res) => {
     try{
         const {idCustomer} = req.params;
-        // Traer todos los destacados del customer, sin importar estado
-        let destacados = await DestacadoService.getDestacadoCustomerEstado(null,idCustomer);
-        res.status(201).json(destacados); //Se retorna la respuesta
+        // Traer todos los ascendidos del customer, sin importar estado
+        let ascendidos = await AscensoService.getAscensoCustomerEstado(null,idCustomer);
+        res.status(201).json(ascendidos); //Se retorna la respuesta
     }catch(err){
         console.log(err);
         errorHandler.handleControllerError(res, err, "suscripciones");
@@ -76,8 +75,8 @@ const getDestacadosCustomer = async (req, res) => {
 
 
 module.exports = {
-    insertarDestacado,
-    getDestacados,
-    getDestacadosActivos,
-    getDestacadosCustomer
+    insertarInmuebleAscenso ,
+    getInmueblesAscenso,
+    getAscendidosActivos,
+    getAscensoCustomer
 }

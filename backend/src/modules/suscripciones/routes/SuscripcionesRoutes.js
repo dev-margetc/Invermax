@@ -6,6 +6,7 @@ const { protegerRuta } = require('../../../middleware/authMiddleware'); // middl
 const PlanController = require('../controllers/PlanController');
 const SuscripcionController = require('../controllers/SuscripcionController');
 const DestacadosController = require('../controllers/DestacadosController');
+const AscensoController = require('../controllers/AscensoController');
 
 /* Rutas Get */
 
@@ -28,6 +29,17 @@ router.get('/destacados/customer/:idCustomer', DestacadosController.getDestacado
 
 
 
+// Traer todos los inmuebles en ascenso
+router.get('/ascenso/', AscensoController.getInmueblesAscenso)
+
+// Traer todos los inmuebles en ascenso activos
+router.get('/ascenso/activos', AscensoController.getAscendidosActivos)
+
+// Traer todos los inmueebles en ascenso de un customer
+router.get('/ascenso/customer/:idCustomer', AscensoController.getAscensoCustomer)
+
+
+
 /* Rutas POST */
 
 // Recibir un pago
@@ -36,6 +48,11 @@ router.post('/suscripcion/pago', SuscripcionController.handlePago)
 
 //Insertar un inmueble en destacados (o actualizarlo si ya existe)
 router.post('/destacados/:idInmueble', protegerRuta(['admin', 'customer']), DestacadosController.insertarDestacado)
+
+
+
+//Insertar un inmueble en ascenso (o actualizarlo si ya existe)
+router.post('/ascenso/:idInmueble', protegerRuta(['admin', 'customer']), AscensoController.insertarInmuebleAscenso)
 
 
 module.exports = router;

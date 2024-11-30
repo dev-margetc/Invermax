@@ -5,31 +5,31 @@ const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const CustomerService = require("../../usuarios/services/CustomerService");
 const InmuebleRepo = require("../../inmuebles/repositories/InmuebleRepository");
 
-const destacadoRepo = require("../repositories/DestacadoRepository");
+const ascensoRepo = require("../repositories/AscensoRepository");
 
 /* Metodos GET */
 
-// Trae un InmuebleDestacado segun su idInmueble
-const getDestacadoInmueble = async (idInmueble) => {
+// Trae un InmuebleAscenso segun su idInmueble
+const getAscensoInmueble = async (idInmueble) => {
     try {
         let cond = {}
 
         if (idInmueble) {
             cond.idInmueble = idInmueble;
         }
-        let destacado = await destacadoRepo.traerDestacados(cond);
+        let ascenso = await ascensoRepo.traerInmueblesAscenso(cond);
 
-        return destacado;
+        return ascenso;
     } catch (err) {
         console.log(err);
         throw err;
     }
 }
 
-// Traer destacados segun idCustomer o estado (0 o 1), se puede especificar si traer info especifica de inmueble
-const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, infoInmueble = null) => {
+// Traer inmuebles en ascenso segun idCustomer o estado (0 o 1), se puede especificar si traer info especifica de inmueble
+const getAscensoCustomerEstado = async (estado = null, idCustomer = null, infoInmueble = null) => {
     try {
-        let whereDestacado = {} // Objeto que contendrá parametros adicionales del destacado
+        let whereAscenso = {} // Objeto que contendrá parametros adicionales del ascensoInmueble
 
         let whereInmueble = {} // Objeto que contendrá parametros adicionales del inmueble
 
@@ -37,7 +37,7 @@ const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, info
         let atributosInmueble = {};
 
         if (estado) {
-            whereDestacado.estadoDestacado = estado;
+            whereAscenso.estadoAscenso = estado;
         }
 
         if (idCustomer) {
@@ -50,8 +50,8 @@ const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, info
             atributosInmueble = [];
         }
 
-        let destacados = await destacadoRepo.traerDestacados(whereDestacado, whereInmueble, atributosInmueble);
-        return destacados;
+        let inmueblesAscenso = await ascensoRepo.traerInmueblesAscenso(whereAscenso, whereInmueble, atributosInmueble);
+        return inmueblesAscenso;
     } catch (err) {
         console.log(err);
         throw err;
@@ -62,8 +62,8 @@ const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, info
 
 /* Metodos POST */
 
-// Insertar o actualizar un inmueble destacado
-const manejarRegistroDestacado = async (idInmueble) => {
+// Insertar o actualizar un inmueble en ascenso
+const manejarRegistroAscenso = async (idInmueble) => {
     try {
 
         // Si el estado del inmueble no es publicado entonces no lo deja
@@ -87,32 +87,34 @@ const manejarRegistroDestacado = async (idInmueble) => {
                 throw new ErrorNegocio("El estado del inmueble: " + dataInmueble.estadoPublicacionInmueble + " no permite que haga uso de esta función");
             }
 
-            // Verificar si existe ya el inmueble destacado
-            let destacado = await getDestacadoInmueble(idInmueble);
+            // Verificar si existe ya el inmueble en ascenso
+            let ascenso = await getAscensoInmueble(idInmueble);
+
+            console.log(ascenso);
 
             // Si existe cambiar el estado por el inverso al que tiene
-            if (destacado && destacado.length >0) {
+            if (ascenso && ascenso.length>0) {
 
-                let datos = destacado[0].dataValues;
+                let datos = ascenso[0].dataValues;
                 let nuevaData = {};
-                nuevaData.estadoDestacado = 1; // Colocar estado activo por defecto
+                nuevaData.estadoAscenso = 1; // Colocar estado activo por defecto
                 nuevaData.fechaInicio = new Date();
 
                 // Si el estado actual es inactivo entonces se colocará en activo y viceversa
-                if (datos.estadoDestacado == 1) {
-                    nuevaData.estadoDestacado = 0;
+                if (datos.estadoAscenso == 1) {
+                    nuevaData.estadoAscenso = 0;
                 }
 
 
                 // Si el estado nuevo es inactivo colocar la fecha en null, caso contrario se usa la fecha actual
-                if (nuevaData.estadoDestacado == 0) {
+                if (nuevaData.estadoAscenso == 0) {
                     nuevaData.fechaInicio = null;
                 }
 
-                await destacadoRepo.modificarDestacado(nuevaData, datos.idDestacado)
+                await ascensoRepo.modificarAscenso(nuevaData, datos.idAscenso);
 
                 // Actualizar registro
-                return "Inmueble destacado actualizado";
+                return "Inmueble en ascenso actualizado";
             } else {
 
                 // Si no existe registrar
@@ -123,9 +125,10 @@ const manejarRegistroDestacado = async (idInmueble) => {
                 datos.idInmueble = idInmueble;
 
                 datos.fechaInicio = new Date();
-                datos.estadoDestacado = 1;
+                datos.estadoAscenso = 1;
 
-                await destacadoRepo.insertarDestacado(datos);
+                await ascensoRepo.insertarInmuebleAscenso(datos);
+                
 
                 return "Inmueble registrado como destacado";
             }
@@ -139,7 +142,7 @@ const manejarRegistroDestacado = async (idInmueble) => {
 }
 
 module.exports = {
-    getDestacadoInmueble,
-    manejarRegistroDestacado,
-    getDestacadoCustomerEstado
+    getAscensoInmueble,
+    manejarRegistroAscenso,
+    getAscensoCustomerEstado
 }
