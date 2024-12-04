@@ -41,9 +41,10 @@ const autenticarUsuario = async (req, res) => {
             if (user) {
                 // El correo estaría asociado a otro usuario
                 throw new ErrorNegocio("El correo ya se encuentra asociado a otra cuenta. Contacte soporte.", null, 400);
+                
             } else {
-                // Crear un usuario nuevo si no existe ni el correo ni el UID
-                user = await UsuarioService.insertBasicUser(uid, correo);
+                // Si no existe el usuario nuevo ni con correo o UID  en la BD del sistema crearlo            
+               user = await UsuarioService.insertBasicUser(uid, correo);
             }
 
         }

@@ -8,6 +8,7 @@ const InmuebleAscenso = require("../entities/InmuebleAscenso");
 const InmuebleDestacado = require("../entities/InmuebleDestacado");
 const CaracteristicaPlan = require("../entities/CaracteristicaPlan");
 const SaldoCaracteristica = require("../entities/SaldoCaracteristica");
+const PerfilCustomer = require("../../usuarios/entities/PerfilCustomer");
 
 /* Relaciones caracteristicas-caracteristicasPlanes */
 
@@ -79,6 +80,12 @@ Inmueble.hasMany(InmuebleDestacado, { foreignKey: 'id_inmueble', as: 'inmueblesD
 // Un ascenso solo pertenece a una suscripcion
 InmuebleDestacado.belongsTo(Inmueble, { foreignKey: 'id_inmueble', as: 'inmueble' }); // La fk es de la primaria por el tipo de relacion
 
+/* Relaciones Plan - PerfilCustomer*/
 
+// Un tipo de perfil puede tener muchos planes asociados
+PerfilCustomer.hasMany(Plan, {foreignKey: 'id_perfil', as: 'planes'});
+
+// Un plan solo puede pertenecer a un perfil
+Plan.belongsTo(PerfilCustomer, {foreignKey:'id_perfil', as: "perfil"});
 
 

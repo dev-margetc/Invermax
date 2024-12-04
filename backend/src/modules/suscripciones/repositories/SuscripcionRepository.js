@@ -6,6 +6,9 @@ const SaldoCaracteristica = require("../entities/SaldoCaracteristica");
 const Plan = require("../entities/Plan");
 const Caracteristica = require("../entities/Caracteristica");
 
+
+/* Metodos de consulta */
+
 // Traer suscripciones dado unas condiciones ordenadas por fechaFin
 const getSuscripcionesFechaFin = async (condiciones = null) => {
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
@@ -20,7 +23,6 @@ const getSuscripcionesFechaFin = async (condiciones = null) => {
 
 // Traer suscripciones dado unas condiciones junto con el plan
 const getSuscripcionesPlan = async (condiciones = null) => {
-    console.log(condiciones);
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
     const suscripciones = await Suscripcion.findAll({
         attributes: {
@@ -48,6 +50,21 @@ const getSuscripcionesPlan = async (condiciones = null) => {
     });
     return suscripciones;
 }
+
+
+// Traer las suscripciones unicamente dado unas caracteristicas
+const getSuscripciones = async (condiciones = null) => {
+    const filtro = { ...condiciones || {} } // Combinar condiciones extra
+    const suscripciones = await Suscripcion.findAll(
+        {
+            where: filtro
+        }
+    );
+    return suscripciones;
+}
+
+
+/* Metodos creación */
 
 // Crear una suscripcion y los saldos del plan
 const crearSuscripcion = async (datosSuscripcion, datosCaracteristicas) => {
@@ -85,8 +102,41 @@ const crearSuscripcion = async (datosSuscripcion, datosCaracteristicas) => {
 
 }
 
+/**  
+ * Metodos actualización
+ */
+/**
+ * Actualizar suscripciones dadas unas condiciones, con una transacción opcional.
+ * @param {Object} datos - Datos a actualizar.
+ * @param {Object} condiciones - Condiciones para la actualización.
+ * @param {Object} [transaccion=null] - Transacción opcional.
+ */
+const updateSuscripciones = async (datos, condiciones = null, transaccion = null) => {
+    try {
+        const filtro = { ...condiciones || {} } // Combinar condiciones extra
+
+        if (transaccion) {
+            // Si se proporciona transacción
+            await Suscripcion.update(datos, {
+                where: filtro,
+                transaction: transaccion,
+            });
+        } else {
+            // Si no se proporciona, ejecuta sin transacción
+            await Suscripcion.update(datos, {
+                where: filtro,
+            });
+        }
+
+    } catch (err) {
+        throw err;
+    }
+
+}
 module.exports = {
     getSuscripcionesFechaFin,
     getSuscripcionesPlan,
-    crearSuscripcion
+    getSuscripciones,
+    crearSuscripcion,
+    updateSuscripciones
 }

@@ -1,10 +1,13 @@
 // Se ncarga de realizar tareas programadas cada cierto tiempo
-
+require('dotenv').config();
 const cron = require('node-cron');
 const { actualizarEstadoSuscripciones } = require('../../modules/suscripciones/services/SuscripcionService'); // Importar lógica de suscripciones
 
-// Configurar cron job para ejecutar actualización de suscripciones y usuarios a las 2 AM todos los días
-cron.schedule('*/4 * * * * *', async () => {
+
+const frecuenciaSuscripciones = process.env.CRON_FRECUENCIA_SUSCRIPCIONES || '0 * * * *'; // Predeterminado: cada hora
+
+// Configurar cron job para ejecutar actualización de suscripciones y usuario
+cron.schedule( frecuenciaSuscripciones, async () => {
     console.log('Iniciando actualización de suscripciones y usuarios...');
     try {
         await actualizarEstadoSuscripciones();

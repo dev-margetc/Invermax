@@ -1,11 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../../conf/database');
 
-
-//Tipos de customer permitidos
-const PERFILES = ['constructora', 'inmobiliaria', 'agente inmobiliario', 'propietario'];
-
-
 //Estados de customer permitidos
 const ESTADOS = ['activo', 'inactivo', 'nuevo'];
 
@@ -49,17 +44,6 @@ const Customer = sequelize.define('Customer', {
         unique: true,
         field: 'codigo_customer'
     },
-    perfilCustomer: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            isIn: {
-                args: [PERFILES],
-                msg: `Perfil de customer no valido. Los tipos permitidos son: ${PERFILES.join(', ')}.`
-            }
-        },
-        field: 'perfil'
-    },
     numComercialCustomer: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -85,6 +69,15 @@ const Customer = sequelize.define('Customer', {
         },
         allowNull: false,
         field: 'id_usuario' //Nombre del campo FK
+    },
+    idPerfil: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: 'perfiles_customer',  // Nombre de la tabla asociada
+            key: 'id_perfil' //Nombre de la clave primaria de la tabla asociada
+        },
+        allowNull: false,
+        field: 'id_perfil' //Nombre del campo FK
     }
 }, {
     tableName: 'customers',

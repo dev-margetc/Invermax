@@ -4,18 +4,17 @@ const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const sequelize = require("../../../conf/database");
 
 const suscripcionRepository = require("../repositories/SuscripcionRepository");
+const customerRepo = require("../../usuarios/repositories/CustomerRepository");
 const planRepo = require("../repositories/PlanRepository");
 const Plan = require("../entities/Plan");
-const Suscripcion = require("../entities/Suscripcion");
 const { Sequelize } = require("sequelize");
+const Customer = require("../../usuarios/entities/Customer");
 
 /* Metodos POST */
 
 // Crear una suscripcion con la informacion del pago
 const crearSuscripcion = async (infoPago) => {
-    const { id_customer, id_plan } = infoPago;
-    let idCustomer = id_customer;
-    let idPlan = id_plan;
+    const { idCustomer, idPlan } = infoPago;
     let datos = {};
     let datosCaracteristicas = {};
     datos.idCustomer = idCustomer;
@@ -121,39 +120,6 @@ const getSuscripcionesCustomer = async (idCustomer = null, estado = null) => {
 
 
 }
-
-/*Metodo prueba*/
-/*
-       // Obtener usuarios afectados por suscripciones activadas y desactivadas
-       const usuariosActivados = suscripcionesPendientes[1].map(s => s.usuario_id);
-       const usuariosDesactivados = suscripcionesVencidas[1].map(s => s.usuario_id);
-
-       // **4. Actualizar el estado de los usuarios**
-       // 4.1. Actualizar a "activo" los usuarios que tienen suscripción activada y no tienen una vencida
-       for (const usuario_id of usuariosActivados) {
-           if (!usuariosConCambio.includes(usuario_id)) { // Verificar que usuariosConCambio tenga el id
-               await Usuario.update(
-                   { estado: 'activo' },
-                   { where: { id: usuario_id }, transaction: t } // Incluir la transacción
-               );
-           }
-       }
-
-       // 4.2. Actualizar a "inactivo" los usuarios que tienen suscripción vencida y no tienen una activa
-       for (const usuario_id of usuariosDesactivados) {
-           if (!usuariosConCambio.includes(usuario_id)) {
-               await Usuario.update(
-                   { estado: 'inactivo' },
-                   { where: { id: usuario_id }, transaction: t } // Incluir la transacción
-               );
-           }
-       }
-
-       
-//        console.log(`Suscripciones activadas: ${suscripcionesPendientes[1].length}`);
- //      console.log(`Suscripciones desactivadas: ${suscripcionesVencidas[1].length}`);
-
-*/
 /* Metodos PUT*/
 
 //Actualizar estados de las suscripciones dada la fecha actual. 
@@ -167,68 +133,70 @@ const actualizarEstadoSuscripciones = async () => {
 
     try {
         // **1. Activar suscripciones cuya fecha de inicio ya pasó**
-        console.log("hi");
 
         // Buscar las suscripciones pendientes para luego usar su idUsuario
-        const suscripcionesPendientes = await Suscripcion.findAll(
-            {
-                where: {
-                    estadoSuscripcion: 'pendiente',
-                    fechaInicioSuscripcion: { [Sequelize.Op.lte]: fechaActual },
-                },
-                transaction: t, // Incluir la transacción
-            }
-        );
+        let condicionesActivar = {};
+        condicionesActivar.estadoSuscripcion = 'pendiente';
+        
+        // FechaInicio debe ser igual o menor que la actual (que sea menor implica que ya pasó la fecha)
+        condicionesActivar.fechaInicioSuscripcion = { [Sequelize.Op.lte]: fechaActual };
+        const suscripcionesPendientes = await suscripcionRepository.getSuscripciones(condicionesActivar);
 
         // Actualizar las suscripciones pendientes
-        await Suscripcion.update(
-            { estadoSuscripcion: 'activa' },
-            {
-                where: {
-                    estadoSuscripcion: 'pendiente',
-                    fechaInicioSuscripcion: { [Sequelize.Op.lte]: fechaActual },
-                },
-                transaction: t, // Incluir la transacción
-            }
-        );
+        let datosActivar = {estadoSuscripcion: 'activa'}; //Campo que se actualizará de la suscripción
+        await suscripcionRepository.updateSuscripciones(datosActivar,condicionesActivar, t);
 
         // **2. Desactivar suscripciones vencidas**
 
-         // Buscar las suscripciones activas a vencer para luego usar su idUsuario
-         const suscripcionesActivas = await Suscripcion.findAll(
-            {
-                where: {
-                    estadoSuscripcion: 'activa',
-                    fechaFinSuscripcion: { [Sequelize.Op.lte]: fechaActual },
-                },
-                transaction: t, // Incluir la transacción
-            }
-        );
-       await Suscripcion.update(
-           { estadoSuscripcion: 'inactiva' },
-           {
-               where: {
-                   estadoSuscripcion: 'activa',
-                   fechaFinSuscripcion: { [Sequelize.Op.lte]: fechaActual },
-               },
-               transaction: t, // Incluir la transacción
-           }
-       );
+        // Buscar las suscripciones activas a vencer para luego usar su idUsuario
+        let condicionesDesactivar = {};
+        condicionesDesactivar.estadoSuscripcion = 'activa';
 
+        // FechaFin debe ser igual o menor que la actual (que sea menor implica que ya pasó la fecha)
+        condicionesDesactivar.fechaFinSuscripcion = { [Sequelize.Op.lte]: fechaActual };
+        const suscripcionesActivas = await suscripcionRepository.getSuscripciones(condicionesDesactivar)
+
+        // Actualizar las suscripciones activas
+        let datosDesactivar = {estadoSuscripcion: 'inactiva'}; //Campo que se actualizará de la suscripción
+       
+        await suscripcionRepository.updateSuscripciones(datosDesactivar,condicionesDesactivar, t);
 
         // Obtener customer afectados por suscripciones activadas y desactivadas
 
         const customerActivados = suscripcionesPendientes.map(s => s.idCustomer);
-        const customerDesactivados = suscripcionesActivas.map(s=>s.idCustomer);
+        const customerDesactivados = suscripcionesActivas.map(s => s.idCustomer);
 
-        
-       // **3. Verificar usuarios que están en ambas listas (ya no necesitan cambios)**
-       const customerConCambio = customerActivados.filter(idCustomer => customerDesactivados.includes(idCustomer));
+        // **3. Verificar customer que están en ambas listas (ya no necesitan cambios)**
+        const customerConCambio = customerActivados.filter(idCustomer => customerDesactivados.includes(idCustomer));
 
 
         console.log(customerActivados);
         console.log(customerDesactivados);
         console.log(customerConCambio);
+
+        // **4. Actualizar el estado de los customer**
+
+        // 4.1. Actualizar a "activo" los customer que tienen suscripción recien activada y no se les desactivó otra 
+        // ( Su estado antes de esto sería inactivo)
+        for (const idCustomer of customerActivados) {
+            if (!customerConCambio.includes(idCustomer)) { // Usar solo aquellos id que no estén en la lista conCambio
+                console.log("actualizando "+idCustomer);
+                let dataActivarCustomer = {};
+                dataActivarCustomer.estadoCustomer = "activo";
+                await customerRepo.actualizarCustomer(dataActivarCustomer, idCustomer, t);
+            }
+        }
+
+        // 4.2. Actualizar a "inactivo" los customer que tienen suscripción recien desactivada y no se les activó otra 
+        // ( Su estado antes de esto sería activo)
+        for (const idCustomer of customerDesactivados) {
+            if (!customerConCambio.includes(idCustomer)) { // Usar solo aquellos id que no estén en la lista conCambio
+                console.log("actualizando "+idCustomer);
+                let dataDesactivarCustomer = {};
+                dataDesactivarCustomer.estadoCustomer = "inactivo";
+                await customerRepo.actualizarCustomer(dataDesactivarCustomer, idCustomer, t);
+            }
+        }
 
         throw new ErrorNegocio("problem?");
         await t.commit();

@@ -1,13 +1,22 @@
 // Se interactua con la base de datos haciendo uso de sequelize o personalizadas
 const Usuario = require("../entities/Usuario");
 const Customer = require("../entities/Customer");
+const Perfil = require("../entities/PerfilCustomer");
 const sequelize = require("../../../conf/database");
-
 
 /* traer todos los customers, puede incluir condiciones 
 Las condiciones ya llegan con el formato de nombreCampo:valor*/
 const getAllCustomers = async (condiciones) => {
     const customers = Customer.findAll({
+        attributes: {
+            exclude: ['idPerfil', 'id_perfil']
+        },
+        include: [
+            {
+                model: Perfil,
+                as: 'perfil'
+            }
+        ],
         where: condiciones
     });
     return customers;
@@ -19,16 +28,27 @@ const getAllCustomers = async (condiciones) => {
     Una transaccion en caso de que se necesite
 */
 const insertarCustomer = async (datosCustomer, transaccion) => {
+    let transaccionPropia = false;
+    let trans = transaccion;
     try {
         if (!transaccion) {
-            transaccion = await sequelize.transaction(); // Iniciar la transacción
+            trans = await sequelize.transaction(); // Iniciar la transacción
+            transaccionPropia = true;
         }
 
         const customer = await Customer.create({
             ...datosCustomer
-        }, { transaction: transaccion });
+        }, { transaction: trans });
+
+        if (transaccionPropia) {
+            trans.commit();
+        }
         return customer;
     } catch (error) {
+        // Si hay un error, hacer rollback de la transacción
+        if (transaccionPropia) {
+            await trans.rollback();
+        }
         throw error;
     }
 }

@@ -6,10 +6,12 @@ const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig")
 const { filtrarCampos } = require("../../../utils/utils");
 
 const Customer = require("../entities/Customer");
+const PerfilService = require("./PerfilCustomerService");
 const CustomerRepo = require("../repositories/CustomerRepository");
-const DetalleService = require("../../inmuebles/services/DetalleService");
 const SuscripcionService = require("../../suscripciones/services/SuscripcionService");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
+
+/* Metodos de consulta */
 
 // Traer todos los customers. Valida si hay condiciones qué aplicar en la consulta
 const getAllCustomers = async (datos) => {
@@ -17,7 +19,7 @@ const getAllCustomers = async (datos) => {
 
     const condiciones = {};
     if (perfilCustomer) {
-        condiciones.perfilCustomer = perfilCustomer;
+        condiciones.idPerfil = perfilCustomer;
     }
 
     if (idUsuario) {
@@ -27,6 +29,7 @@ const getAllCustomers = async (datos) => {
     if (idCustomer) {
         condiciones.idCustomer = idCustomer;
     }
+    console.log(condiciones);
     const customers = await CustomerRepo.getAllCustomers(condiciones);
     return customers;
 }
@@ -37,7 +40,7 @@ const coincideIdUsuario = async (idUsuario, idCustomer) => {
     let dato = {};
     dato.idCustomer = idCustomer;
     const customer = await getAllCustomers(dato); // Traer customer
-    if(!customer || !customer[0]){
+    if (!customer || !customer[0]) {
         return false;
     }
     return (customer[0].dataValues.idUsuario == idUsuario); // Validar si es el mismo que el del parametro
@@ -47,10 +50,12 @@ const coincideIdUsuario = async (idUsuario, idCustomer) => {
 //Valida si hay condiciones qué aplicar en la consulta
 const getAllCustomersBasic = async (datos) => {
     const { perfilCustomer } = datos;
-
     const condiciones = {};
     if (perfilCustomer) {
-        condiciones.perfilCustomer = perfilCustomer;
+        // Buscar los perfiles que coincidan con el nombre dado
+        let perfiles = await PerfilService.getPerfilNombre(perfilCustomer);
+        // Si encuentra tomar el primer valor y colocarlo en las condiciones
+        condiciones.idPerfil = perfiles[0].dataValues.idPerfil;
     }
     const customers = await CustomerRepo.getAllCustomers(condiciones);
 
@@ -63,6 +68,7 @@ const getAllCustomersBasic = async (datos) => {
     return results;
 }
 
+/* Metodos de actualizacion*/
 // Actualizar un customer
 const actualizarCustomer = async (datos, params) => {
     const { customer } = datos;
@@ -101,9 +107,9 @@ const modificarEstadoPago = async (customer) => {
     let estadoActual = customer.estadoCustomer; // Estado actual
     let nuevoEstado = null;
     // Verificar si tiene suscripcion activa
-    let suscripcionActiva = await SuscripcionService.getSuscripcionesCustomer(customer.idCustomer,"activa"); // Validar con modulo de suscripciones
+    let suscripcionActiva = await SuscripcionService.getSuscripcionesCustomer(customer.idCustomer, "activa"); // Validar con modulo de suscripciones
     let tieneSuscripcionActiva = false;
-    if(suscripcionActiva){
+    if (suscripcionActiva) {
         tieneSuscripcionActiva = true;
     }
     if (tieneSuscripcionActiva && (estadoActual == "inactivo" || estadoActual == "nuevo")) {
@@ -161,10 +167,40 @@ const actualizarLogo = async (idCustomer, nombreArchivo, tipoArchivo) => {
         throw err;
     }
 }
+
+/* Metodos de creacion */
+
+// Crear un customer con datos basicos, se pide su perfil , ID usuario y correo para notificaciones
+const crearCustomerBasico = async (idUsuario, idPerfil, correoUsuario) => {
+    try {
+
+        if(!idUsuario || !idPerfil || !correoUsuario){
+            throw new ErrorNegocio("Faltan datos en la creacion del customer");
+        }
+
+        let datosCustomer = {};
+        datosCustomer.idUsuario = idUsuario;
+        datosCustomer.idPerfil = idPerfil;
+
+
+        datosCustomer.nombreCustomer = "NOMBRE CUSTOMER";
+        datosCustomer.correoNotiCustomer = correoUsuario;
+        datosCustomer.telefonoNotiCustomer = "NUMERO NOTIFICACION"
+        datosCustomer.telefonoFijoCustomer = "TELEFONO FIJO";
+        datosCustomer.estadoCustomer = "nuevo";
+
+        let customer = await CustomerRepo.insertarCustomer(datosCustomer);
+        return customer;
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
 module.exports = {
     getAllCustomers,
     getAllCustomersBasic,
     actualizarCustomer,
     actualizarLogo,
-    coincideIdUsuario
+    coincideIdUsuario,
+    crearCustomerBasico
 }

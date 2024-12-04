@@ -24,7 +24,16 @@ const Plan = sequelize.define('Plan', {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: 'duracion'
-    }
+    },
+    idPerfil: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: 'perfiles_customer',  // Nombre de la tabla asociada
+            key: 'id_perfil' //Nombre de la clave primaria de la tabla asociada
+        },
+        allowNull: false,
+        field: 'id_perfil' //Nombre del campo FK
+    },
 
 }, {
     tableName: 'planes',

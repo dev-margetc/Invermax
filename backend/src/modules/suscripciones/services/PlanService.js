@@ -8,9 +8,14 @@ const planRepo = require("../repositories/PlanRepository");
 /* Metodos GET */
 
 // Traer todos los planes junto con sus caracteristicas
-const getAllPlanes= async () =>{
+const getAllPlanes= async (condiciones = null) =>{
     try{
-        return planRepo.getAllPlanes();
+        if(condiciones){
+            return planRepo.getAllPlanes(condiciones);
+        }else{
+            return planRepo.getAllPlanes();
+        }
+        
 
     }catch(err){
         
@@ -18,7 +23,6 @@ const getAllPlanes= async () =>{
         throw err;
     }
 }
-
 module.exports = {
     getAllPlanes
   }
