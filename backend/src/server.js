@@ -20,7 +20,7 @@ const globalErrorHandler = require("./middleware/globalErrorHandler"); // Handle
 
 
 // Importar cron jobs
-//require('./utils/tareasProgramadas/cronJobs'); // Importar tareas programadas
+require('./utils/tareasProgramadas/cronJobs'); // Importar tareas programadas
 
 
 

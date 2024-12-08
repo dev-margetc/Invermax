@@ -1,5 +1,4 @@
 //Tabla intermedia entre zonas e inmuebles
-const { DataTypes } = require('sequelize');
 const sequelize = require('../../../conf/database');
 
 const ZonaInmueble = sequelize.define('ZonaInmueble', {}, {

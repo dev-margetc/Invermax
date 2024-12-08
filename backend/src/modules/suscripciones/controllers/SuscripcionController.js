@@ -11,7 +11,7 @@ const { traerToken } = require('../../../conf/firebaseAuth');
 // Manejar el pago
 const handlePago = async (req, res) => {
     try {
-        let { idUsuario, idPlan } = req.body.metadata; // El id del plan y el usuario llegan en el body
+        let { idUsuario, idPlan, idPrecioPlan } = req.body.metadata; // El id del plan y el usuario llegan en el body
         let { status } = req.body; // Informacion que llegaría del pago
 
         let infoSuscripcion = {};
@@ -43,7 +43,8 @@ const handlePago = async (req, res) => {
             }
 
             // Crear la suscripcion para el customer
-            infoSuscripcion.idPlan = plan[0].dataValues.idPlan;
+            infoSuscripcion.idPlan = idPlan;
+            infoSuscripcion.idPrecioPlan = idPrecioPlan;
             let msg = await SuscripcionService.crearSuscripcion(infoSuscripcion);
             res.status(201).json(msg); //Se retorna la respuesta
         }

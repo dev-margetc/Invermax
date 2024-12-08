@@ -7,7 +7,7 @@ const sequelize = require("../../../conf/database");
 /* traer todos los customers, puede incluir condiciones 
 Las condiciones ya llegan con el formato de nombreCampo:valor*/
 const getAllCustomers = async (condiciones) => {
-    const customers = Customer.findAll({
+    const customers = await Customer.findAll({
         attributes: {
             exclude: ['idPerfil', 'id_perfil']
         },
@@ -19,6 +19,7 @@ const getAllCustomers = async (condiciones) => {
         ],
         where: condiciones
     });
+    console.log(customers[0].nombreCustomer);
     return customers;
 
 }

@@ -3,8 +3,11 @@ const sequelize = require("../../../conf/database");
 
 const Plan = require("../entities/Plan");
 const Caracteristica = require("../entities/Caracteristica");
+const PrecioPlan = require("../entities/PrecioPlan");
 const Perfil = require("../../usuarios/entities/PerfilCustomer");
 const CaracteristicaPlan = require("../entities/CaracteristicaPlan");
+
+const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 
 const getAllPlanes = async (condiciones = null) => {
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
@@ -29,6 +32,13 @@ const getAllPlanes = async (condiciones = null) => {
                 {
                     model: Perfil,
                     as: 'perfil'
+                },
+                {
+                    model: PrecioPlan,
+                    as: 'precios',
+                    attributes: {
+                        exclude: ['idPlan', 'id_plan']
+                    },
                 }
             ]
         });
@@ -39,6 +49,25 @@ const getAllPlanes = async (condiciones = null) => {
     }
 }
 
+// Verificar que el id de un precioPlan si corresponda
+const verificarPrecioPlan= async (idPlan, idPrecioPlan) =>{
+    console.log(idPlan);
+    try{
+        let precioPlanCorrespondiente = await PrecioPlan.findOne({
+            where:{
+                idPlan: idPlan,
+                idPrecioPlan: idPrecioPlan
+            }
+        });
+        if (!precioPlanCorrespondiente) {
+            throw new ErrorNegocio('No existe una asociación entre este pago y este plan.');
+        }
+    }catch(err){
+        throw err;
+    }
+}
+
 module.exports = {
-    getAllPlanes
+    getAllPlanes,
+    verificarPrecioPlan
 }

@@ -33,14 +33,14 @@ const Suscripcion = sequelize.define('Suscripcion', {
         },
         field: 'estado'
     },
-    idPlan: {
+    idPrecioPlan: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Plan', //Nombre modelo
-            key: 'idPlan', // KEY del modelo
+            model: 'PrecioPlan', //Nombre modelo
+            key: 'idPrecioPlan', // KEY del modelo
         },
-        field: 'id_plan'
+        field: 'id_precio_plan'
     },
 
     idCustomer: {

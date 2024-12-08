@@ -15,15 +15,16 @@ const Plan = sequelize.define('Plan', {
         allowNull: false,
         field: 'tipo_plan'
     },
-    precioPlan: {
-        type: DataTypes.DECIMAL,
+    estadoPlan:{
+        type: DataTypes.TINYINT(1),
         allowNull: false,
-        field: 'precio'
-    },
-    duracionPlan: { //Se coloca en meses
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        field: 'duracion'
+        validate: {
+            isIn: {
+              args: [[0, 1]],  // Valores permitidos
+              msg: "El valor de 'estado' no es correcto"
+            }
+          },
+          field: 'estado_plan'
     },
     idPerfil: {
         type: DataTypes.INTEGER,

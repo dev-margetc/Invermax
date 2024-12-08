@@ -3,6 +3,7 @@ const Plan = require("../entities/Plan");
 const Customer = require("../../usuarios/entities/Customer");
 const Inmueble = require("../../inmuebles/entities/Inmueble");
 const Suscripcion = require("../entities/Suscripcion");
+const PrecioPlan = require("../entities/PrecioPlan");
 const Caracteristica = require("../entities/Caracteristica");
 const InmuebleAscenso = require("../entities/InmuebleAscenso");
 const InmuebleDestacado = require("../entities/InmuebleDestacado");
@@ -37,13 +38,23 @@ Plan.hasMany(CaracteristicaPlan, { foreignKey: 'id_plan', as: 'caracteristicasPl
 CaracteristicaPlan.belongsTo(Plan, { foreignKey: 'id_plan', as: 'plan' }); // La fk es de la primaria por el tipo de relacion
 
 
-/* Relaciones planes-suscripciones*/
+/* Relaciones planes-precios*/
 
-// Un plan puede tener varias suscripciones
-Plan.hasMany(Suscripcion, { foreignKey: 'id_plan', as: 'suscripciones' }); //La fk es de la foranea y se coloca como se conocera a los "muchos" de la relacion
+// Un plan puede tener varios precios y duraciones
+Plan.hasMany(PrecioPlan, { foreignKey: 'id_plan', as: 'precios' }); //La fk es de la foranea y se coloca como se conocera a los "muchos" de la relacion
 
 // Una suscripcion solo pertenece a un plan
-Suscripcion.belongsTo(Plan, { foreignKey: 'id_plan', as: 'plan' }); // La fk es de la primaria por el tipo de relacion
+PrecioPlan.belongsTo(Plan, { foreignKey: 'id_plan', as: 'plan' }); // La fk es de la primaria por el tipo de relacion
+
+
+/* Relaciones precios-suscripciones*/
+
+// Un precio puede asociarse a varias suscripciones
+PrecioPlan.hasMany(Suscripcion, { foreignKey: 'id_precio_plan', as: 'suscripciones' }); //La fk es de la foranea y se coloca como se conocera a los "muchos" de la relacion
+
+// Una suscripcion solo se asocia a un precio
+Suscripcion.belongsTo(PrecioPlan, { foreignKey: 'id_precio_plan', as: 'precioPlan' }); // La fk es de la primaria por el tipo de relacion
+
 
 
 /* Relaciones suscripciones-saldosCaracteristica*/

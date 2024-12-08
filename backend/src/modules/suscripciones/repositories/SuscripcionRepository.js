@@ -4,6 +4,7 @@ const sequelize = require("../../../conf/database");
 const Suscripcion = require("../entities/Suscripcion");
 const SaldoCaracteristica = require("../entities/SaldoCaracteristica");
 const Plan = require("../entities/Plan");
+const PrecioPlan = require("../entities/PrecioPlan");
 const Caracteristica = require("../entities/Caracteristica");
 
 
@@ -26,12 +27,21 @@ const getSuscripcionesPlan = async (condiciones = null) => {
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
     const suscripciones = await Suscripcion.findAll({
         attributes: {
-            exclude: ['idPlan', 'id_plan', 'idCustomer', 'id_customer']
+            exclude: ['idPrecioPlan', 'id_precio_plan', 'idCustomer', 'id_customer']
         },
         include: [
             {
-                model: Plan,
-                as: "plan"
+                model: PrecioPlan,
+                attributes: {
+                    exclude: ['idPlan', 'id_plan', 'idCustomer', 'id_customer']
+                },
+                as: "precioPlan",
+                include:[
+                    {
+                        model: Plan,
+                        as: "plan"
+                    }
+                ]
             },
             {
                 model: SaldoCaracteristica,

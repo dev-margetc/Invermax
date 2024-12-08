@@ -11,6 +11,7 @@ const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
 const zonaInmuebleService = require("./ZonasInmueblesService");
 const InteresadoRepo = require("../repositories/InteresadoRepository");
+const TipoInmueblePerfilService = require("../services/TipoInmueblePerfilService");
 const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
 
 
@@ -28,6 +29,12 @@ const insertarInmueble = async (datosInmueble) => {
            throw new ErrorNegocio("Tipo de inmueble no encontrado");
         }
 
+        // traer el perfil de customer
+        let customer = await CustomerService.getAllCustomers({idCustomer: datosInmueble.inmueble.idCustomer});
+        let perfil = customer[0].perfil;
+        // Verificar que el tipo de customer si pueda crear este tipo de inmuebles
+        await TipoInmueblePerfilService.verificarPerfil(perfil.idPerfil, tipoInmueble.idTipoInmueble)
+
         // Verificar si el tipo es "proyecto" y es valido
         if (tipoInmueble.tipoInmueble === 'proyecto' && estadoInmueble !== 'nuevo') {
             throw new ErrorNegocio("Los inmuebles de tipo 'proyecto' deben ser nuevos.");
@@ -43,10 +50,11 @@ const insertarInmueble = async (datosInmueble) => {
         datosInmueble.inmueble.estadoPublicacionInmueble = "borrador";
 
         /*Si es valido se crea el inmueble con los detalles*/
-        msg = await inmuebleRepository.insertarInmuebleDetalles(datosInmueble.inmueble, tipoInmueble.tipoInmueble === 'proyecto');
+        let msg = await inmuebleRepository.insertarInmuebleDetalles(datosInmueble.inmueble, tipoInmueble.tipoInmueble === 'proyecto'); 
         return msg;
 
     } catch (error) {
+        console.log(error);
         throw error;
     }
 }

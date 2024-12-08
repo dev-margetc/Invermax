@@ -12,6 +12,8 @@ const Foto = require('../entities/Foto');
 const Video = require('../entities/Video');
 const VistaInmueblesPublicados = require('../entities/VistaInmueblesPublicados');
 const Customer = require('../../usuarios/entities/Customer');
+const TipoInmueblePerfil = require('../entities/TipoInmueblePerfil');
+const PerfilCustomer = require('../../usuarios/entities/PerfilCustomer');
 
 // Un departamento tiene muchas ciudades
 Departamento.hasMany(Ciudad, { foreignKey: 'id_departamento', as: 'ciudades' }); //La fk es de ciudad
@@ -41,7 +43,7 @@ Zona.belongsToMany(Inmueble, {
   as: "inmuebles" // Llave foranea relacionada en la intermedia
 });
 
-// Asociacion de la intermedia
+// Asociacion de la intermedia de zonas inmueble
 Inmueble.hasMany(ZonaInmueble, { foreignKey: 'id_inmueble', as: 'zonasInmueble' });
 
 // Un inmueble solo pertenece a un inmueble
@@ -56,6 +58,16 @@ TipoInmueble.hasMany(Inmueble, { foreignKey: 'id_tipo_inmueble', as: 'inmuebles'
 
 // Un inmueble tiene asociado un tipo
 Inmueble.belongsTo(TipoInmueble, { foreignKey: 'id_tipo_inmueble', as: 'tipoInmueble' });
+
+/* Asociacion de tipoInmueblePerfil */
+
+// Asociacion de la intermedia de tipos y perfiles
+TipoInmueble.hasMany(TipoInmueblePerfil, { foreignKey: 'id_tipo_inmueble', as: 'tipos' });
+// Asociacion de la intermedia de perfiles y tipos
+PerfilCustomer.hasMany(TipoInmueblePerfil, { foreignKey: 'id_perfil', as: 'perfiles' });
+TipoInmueblePerfil.belongsTo(TipoInmueble, { foreignKey: 'id_tipo_inmueble', as: 'tipoInmueble' });
+TipoInmueblePerfil.belongsTo(PerfilCustomer, { foreignKey: 'id_perfil', as: 'perfil' });
+
 
 // Un inmueble solo tiene un proyecto asociado
 Inmueble.hasOne(Proyecto, {
@@ -96,6 +108,7 @@ Video.belongsTo(DetalleInmueble, { foreignKey: 'id_detalle_inmueble', as: 'detal
     foreignKey: 'id_inmueble',
     as: 'inmueble', // Alias para la relación
 });
+
 
 /* Relaciones con el modulo de usuarios*/
 //Un inmueble pertenece a un customer

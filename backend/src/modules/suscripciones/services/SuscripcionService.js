@@ -6,19 +6,20 @@ const sequelize = require("../../../conf/database");
 const suscripcionRepository = require("../repositories/SuscripcionRepository");
 const customerRepo = require("../../usuarios/repositories/CustomerRepository");
 const planRepo = require("../repositories/PlanRepository");
-const Plan = require("../entities/Plan");
 const { Sequelize } = require("sequelize");
 const Customer = require("../../usuarios/entities/Customer");
+const PrecioPlan = require("../entities/PrecioPlan");
 
 /* Metodos POST */
 
 // Crear una suscripcion con la informacion del pago
 const crearSuscripcion = async (infoPago) => {
-    const { idCustomer, idPlan } = infoPago;
+    const { idCustomer, idPlan, idPrecioPlan } = infoPago;
     let datos = {};
     let datosCaracteristicas = {};
     datos.idCustomer = idCustomer;
     datos.idPlan = idPlan;
+    datos.idPrecioPlan = idPrecioPlan;
     try {
         // Verificar si el customer no tiene suscripciones activas
         let cond = { idCustomer: idCustomer, estado: "activa" };
@@ -47,11 +48,11 @@ const crearSuscripcion = async (infoPago) => {
         if (ultimaPendiente) {
             datos.estadoSuscripcion = "pendiente";
             // Si hay una pendiente, la nueva comienza después de su fechaFin
-            fechaInicio = new Date(ultimaPendiente.dataValues.fechaFinSuscripcion);
+            fechaInicio = new Date(ultimaPendiente.fechaFinSuscripcion);
         } else if (suscripcionActiva) {
             datos.estadoSuscripcion = "pendiente";
             // Si hay una activa, la nueva comienza luego de su fechaFin
-            fechaInicio = new Date(suscripcionActiva.dataValues.fechaFinSuscripcion);
+            fechaInicio = new Date(suscripcionActiva.fechaFinSuscripcion);
         } else {
             datos.estadoSuscripcion = "activa";
             // Si no hay pendientes ni activas se generará con la fecha de inicio hoy
@@ -61,24 +62,24 @@ const crearSuscripcion = async (infoPago) => {
         // Asignar fecha
         datos.fechaInicioSuscripcion = fechaInicio;
 
-        // Traer el plan para tomar la duración
-        const plan = await Plan.findByPk(idPlan);
+        // Traer el precioPlan para tomar la duración
+        const precioPlan = await PrecioPlan.findByPk(idPrecioPlan);
+        
+        // Verificar que el plan si tenga ese idPrecioPlan asociado
+        await planRepo.verificarPrecioPlan(idPlan,idPrecioPlan);
 
-        // Calcular la fecha de fin sumando los meses del plan
+        // Calcular la fecha de fin sumando los meses del 
         const fechaFin = new Date(fechaInicio);
-        fechaFin.setMonth(fechaFin.getMonth() + plan.duracionPlan);
-
+        fechaFin.setMonth(fechaFin.getMonth() + precioPlan.duracion);
         datos.fechaFinSuscripcion = fechaFin;
 
         // Traer las caracteristicas del plan seleccionado
         const datosCara = await planRepo.getAllPlanes({ idPlan: idPlan });
 
         // Es un objeto de sequelize, por eso se accede asi
-        datosCaracteristicas = datosCara[0].dataValues.caracteristicasPlanes;
-
+        datosCaracteristicas = datosCara[0].caracteristicasPlanes;
         // Crear la suscripcion y los saldos en el repository
         let creada = suscripcionRepository.crearSuscripcion(datos, datosCaracteristicas)
-        console.log(datos);
         //let creada = true;
         if (creada) {
             return "Suscripción creada";
@@ -144,8 +145,12 @@ const actualizarEstadoSuscripciones = async () => {
 
         // Actualizar las suscripciones pendientes
         let datosActivar = {estadoSuscripcion: 'activa'}; //Campo que se actualizará de la suscripción
-        await suscripcionRepository.updateSuscripciones(datosActivar,condicionesActivar, t);
-
+        if(suscripcionesPendientes.length>0){
+            await suscripcionRepository.updateSuscripciones(datosActivar,condicionesActivar, t);
+        }else{
+            console.log("No hay suscripciones pendientes que activar. "+ fechaActual);
+        }
+        
         // **2. Desactivar suscripciones vencidas**
 
         // Buscar las suscripciones activas a vencer para luego usar su idUsuario
@@ -158,9 +163,11 @@ const actualizarEstadoSuscripciones = async () => {
 
         // Actualizar las suscripciones activas
         let datosDesactivar = {estadoSuscripcion: 'inactiva'}; //Campo que se actualizará de la suscripción
-       
+        if(suscripcionesActivas.length>0){
         await suscripcionRepository.updateSuscripciones(datosDesactivar,condicionesDesactivar, t);
-
+        }else{
+            console.log("No hay suscripciones activas para desactivar. "+fechaActual)
+        }
         // Obtener customer afectados por suscripciones activadas y desactivadas
 
         const customerActivados = suscripcionesPendientes.map(s => s.idCustomer);
@@ -169,18 +176,12 @@ const actualizarEstadoSuscripciones = async () => {
         // **3. Verificar customer que están en ambas listas (ya no necesitan cambios)**
         const customerConCambio = customerActivados.filter(idCustomer => customerDesactivados.includes(idCustomer));
 
-
-        console.log(customerActivados);
-        console.log(customerDesactivados);
-        console.log(customerConCambio);
-
         // **4. Actualizar el estado de los customer**
 
         // 4.1. Actualizar a "activo" los customer que tienen suscripción recien activada y no se les desactivó otra 
         // ( Su estado antes de esto sería inactivo)
         for (const idCustomer of customerActivados) {
             if (!customerConCambio.includes(idCustomer)) { // Usar solo aquellos id que no estén en la lista conCambio
-                console.log("actualizando "+idCustomer);
                 let dataActivarCustomer = {};
                 dataActivarCustomer.estadoCustomer = "activo";
                 await customerRepo.actualizarCustomer(dataActivarCustomer, idCustomer, t);
@@ -198,7 +199,7 @@ const actualizarEstadoSuscripciones = async () => {
             }
         }
 
-        throw new ErrorNegocio("problem?");
+        //throw new ErrorNegocio("problem?");
         await t.commit();
 
     } catch (err) {
