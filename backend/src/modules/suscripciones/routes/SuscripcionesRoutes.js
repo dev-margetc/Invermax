@@ -14,6 +14,13 @@ const AscensoController = require('../controllers/AscensoController');
 
 router.get('/planes/', PlanController.getAllPlanes);
 
+//Traer todos los planes activos junto con sus detalles
+
+router.get('/planes/activo', PlanController.getPlanesActivos);
+
+// Verificar validez de plan y precioPago
+router.get('/planes/:idPlan/precio/:idPrecioPlan/validar', PlanController.validarPrecioPago);
+
 // Traer todas las suscripciones de un customer junto con su plan
 router.get('/customer/:idCustomer',protegerRuta(['admin','customer']), SuscripcionController.getSuscripcionesCustomer)
 

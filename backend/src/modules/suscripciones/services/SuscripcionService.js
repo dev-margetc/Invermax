@@ -17,9 +17,21 @@ const crearSuscripcion = async (infoPago) => {
     const { idCustomer, idPlan, idPrecioPlan } = infoPago;
     let datos = {};
     let datosCaracteristicas = {};
+
+    // Datos propios de la suscripcion dados por la pasarela
     datos.idCustomer = idCustomer;
     datos.idPlan = idPlan;
     datos.idPrecioPlan = idPrecioPlan;
+
+    // Asignar monto pagado
+    datos.montoPagado = infoPago.montoPago;
+
+    // Asignar medio de pago
+    datos.medioPago = infoPago.medioPago;
+
+    // Asignar id de transaccion
+    datos.idTransaccion = infoPago.idTransaccion;
+
     try {
         // Verificar si el customer no tiene suscripciones activas
         let cond = { idCustomer: idCustomer, estado: "activa" };
@@ -57,16 +69,22 @@ const crearSuscripcion = async (infoPago) => {
             datos.estadoSuscripcion = "activa";
             // Si no hay pendientes ni activas se generará con la fecha de inicio hoy
             fechaInicio = new Date();
+
+            // Al ser activa se modificará el estado del customer a activo
+            await customerRepo.actualizarCustomer({estadoCustomer:"activo"}, idCustomer);
         }
 
         // Asignar fecha
         datos.fechaInicioSuscripcion = fechaInicio;
 
+        // Asignar fecha de pago aprobado
+        datos.fechaPago = fechaInicio;
+
         // Traer el precioPlan para tomar la duración
         const precioPlan = await PrecioPlan.findByPk(idPrecioPlan);
-        
+
         // Verificar que el plan si tenga ese idPrecioPlan asociado
-        await planRepo.verificarPrecioPlan(idPlan,idPrecioPlan);
+        await planRepo.verificarPrecioPlan(idPlan, idPrecioPlan);
 
         // Calcular la fecha de fin sumando los meses del 
         const fechaFin = new Date(fechaInicio);
@@ -78,6 +96,8 @@ const crearSuscripcion = async (infoPago) => {
 
         // Es un objeto de sequelize, por eso se accede asi
         datosCaracteristicas = datosCara[0].caracteristicasPlanes;
+
+
         // Crear la suscripcion y los saldos en el repository
         let creada = suscripcionRepository.crearSuscripcion(datos, datosCaracteristicas)
         //let creada = true;
@@ -138,19 +158,19 @@ const actualizarEstadoSuscripciones = async () => {
         // Buscar las suscripciones pendientes para luego usar su idUsuario
         let condicionesActivar = {};
         condicionesActivar.estadoSuscripcion = 'pendiente';
-        
+
         // FechaInicio debe ser igual o menor que la actual (que sea menor implica que ya pasó la fecha)
         condicionesActivar.fechaInicioSuscripcion = { [Sequelize.Op.lte]: fechaActual };
         const suscripcionesPendientes = await suscripcionRepository.getSuscripciones(condicionesActivar);
 
         // Actualizar las suscripciones pendientes
-        let datosActivar = {estadoSuscripcion: 'activa'}; //Campo que se actualizará de la suscripción
-        if(suscripcionesPendientes.length>0){
-            await suscripcionRepository.updateSuscripciones(datosActivar,condicionesActivar, t);
-        }else{
-            console.log("No hay suscripciones pendientes que activar. "+ fechaActual);
+        let datosActivar = { estadoSuscripcion: 'activa' }; //Campo que se actualizará de la suscripción
+        if (suscripcionesPendientes.length > 0) {
+            await suscripcionRepository.updateSuscripciones(datosActivar, condicionesActivar, t);
+        } else {
+            console.log("No hay suscripciones pendientes que activar. " + fechaActual);
         }
-        
+
         // **2. Desactivar suscripciones vencidas**
 
         // Buscar las suscripciones activas a vencer para luego usar su idUsuario
@@ -162,11 +182,11 @@ const actualizarEstadoSuscripciones = async () => {
         const suscripcionesActivas = await suscripcionRepository.getSuscripciones(condicionesDesactivar)
 
         // Actualizar las suscripciones activas
-        let datosDesactivar = {estadoSuscripcion: 'inactiva'}; //Campo que se actualizará de la suscripción
-        if(suscripcionesActivas.length>0){
-        await suscripcionRepository.updateSuscripciones(datosDesactivar,condicionesDesactivar, t);
-        }else{
-            console.log("No hay suscripciones activas para desactivar. "+fechaActual)
+        let datosDesactivar = { estadoSuscripcion: 'inactiva' }; //Campo que se actualizará de la suscripción
+        if (suscripcionesActivas.length > 0) {
+            await suscripcionRepository.updateSuscripciones(datosDesactivar, condicionesDesactivar, t);
+        } else {
+            console.log("No hay suscripciones activas para desactivar. " + fechaActual)
         }
         // Obtener customer afectados por suscripciones activadas y desactivadas
 
@@ -192,7 +212,7 @@ const actualizarEstadoSuscripciones = async () => {
         // ( Su estado antes de esto sería activo)
         for (const idCustomer of customerDesactivados) {
             if (!customerConCambio.includes(idCustomer)) { // Usar solo aquellos id que no estén en la lista conCambio
-                console.log("actualizando "+idCustomer);
+                console.log("actualizando " + idCustomer);
                 let dataDesactivarCustomer = {};
                 dataDesactivarCustomer.estadoCustomer = "inactivo";
                 await customerRepo.actualizarCustomer(dataDesactivarCustomer, idCustomer, t);

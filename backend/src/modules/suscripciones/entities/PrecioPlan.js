@@ -22,8 +22,19 @@ const PrecioPlan = sequelize.define('PrecioPlan', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    estadoPrecio:{
+        type: DataTypes.TINYINT(1),
+        allowNull: false,
+        validate: {
+            isIn: {
+              args: [[0, 1]],  // Valores permitidos
+              msg: "El valor de 'estado' no es correcto"
+            }
+          },
+          field: 'estado_precio'
+    },
     precio: {
-        type: DataTypes.DECIMAL,
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     }
 }, {

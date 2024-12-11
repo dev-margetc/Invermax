@@ -7,13 +7,13 @@ const planRepo = require("../repositories/PlanRepository");
 
 /* Metodos GET */
 
-// Traer todos los planes junto con sus caracteristicas
-const getAllPlanes= async (condiciones = null) =>{
+// Traer todos los planes junto con sus caracteristicas. Puede agregarsele condiciones de precioPlan
+const getAllPlanes= async (condiciones = null, condicionesPrecio = null) =>{
     try{
-        if(condiciones){
-            return planRepo.getAllPlanes(condiciones);
+        if(condiciones|| condicionesPrecio){
+            return await planRepo.getAllPlanes(condiciones, condicionesPrecio);
         }else{
-            return planRepo.getAllPlanes();
+            return await planRepo.getAllPlanes();
         }
         
 
@@ -23,7 +23,27 @@ const getAllPlanes= async (condiciones = null) =>{
         throw err;
     }
 }
+
+// Verificar que un plan dado sea activo junto con su precioPlan tambien sea activo
+const isEstadoActivoPlanPrecio = async (idPlan, idPrecioPlan) =>{
+    try{
+        let msg = {};
+
+        let precioPlan = await planRepo.isActivoPlanPrecio(idPlan, idPrecioPlan);
+
+        console.log(precioPlan);
+        if(precioPlan){
+            return "El plan y el precio seleccionado son validos";
+        }else{
+            return "El plan y precio seleccionados no son validos";
+        }
+    }catch(err){
+        console.log(err);
+        throw err;
+    }
+}
 module.exports = {
-    getAllPlanes
+    getAllPlanes,
+    isEstadoActivoPlanPrecio
   }
   

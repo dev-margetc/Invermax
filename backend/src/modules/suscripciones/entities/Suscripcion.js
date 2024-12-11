@@ -33,6 +33,28 @@ const Suscripcion = sequelize.define('Suscripcion', {
         },
         field: 'estado'
     },
+    medioPago: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        field: 'medio_pago'
+    },
+    idTransaccion: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        field: 'id_transaccion'
+    },
+    fechaPago: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'fecha_pago'
+    },
+    montoPagado: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+          field: 'monto_pagado'
+    },
     idPrecioPlan: {
         type: DataTypes.INTEGER,
         allowNull: false,

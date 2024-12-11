@@ -9,8 +9,10 @@ const CaracteristicaPlan = require("../entities/CaracteristicaPlan");
 
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 
-const getAllPlanes = async (condiciones = null) => {
+// Traer los planes dadas unas condiciones de plan o de condiciones de precio
+const getAllPlanes = async (condiciones = null, condicionesPrecio = null) => {
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
+    const filtroPrecio = { ...condicionesPrecio || {} } // Combinar condiciones extra
     try {
 
         const planes = Plan.findAll({
@@ -36,6 +38,7 @@ const getAllPlanes = async (condiciones = null) => {
                 {
                     model: PrecioPlan,
                     as: 'precios',
+                    where: filtroPrecio,
                     attributes: {
                         exclude: ['idPlan', 'id_plan']
                     },
@@ -51,7 +54,6 @@ const getAllPlanes = async (condiciones = null) => {
 
 // Verificar que el id de un precioPlan si corresponda
 const verificarPrecioPlan= async (idPlan, idPrecioPlan) =>{
-    console.log(idPlan);
     try{
         let precioPlanCorrespondiente = await PrecioPlan.findOne({
             where:{
@@ -67,7 +69,36 @@ const verificarPrecioPlan= async (idPlan, idPrecioPlan) =>{
     }
 }
 
+// Verificar que un precioPlan esté activo y el plan correspondiente tambien
+const isActivoPlanPrecio= async (idPlan, idPrecioPlan) =>{
+    try{
+        let precioPlan = await PrecioPlan.findOne({
+            where:{
+                idPlan: idPlan,
+                idPrecioPlan: idPrecioPlan,
+                estadoPrecio: 1 // Activo
+            },
+            include:[
+                {
+                    model: Plan,
+                    as:"plan",
+                    where:{
+                        estadoPlan: 1 // Plan activo
+                    }
+                }
+            ]
+        });
+        if (!precioPlan) {
+            throw new ErrorNegocio('El plan o el precio ingresado no está activo.');
+        }
+        return precioPlan;
+    }catch(err){
+        throw err;
+    }
+}
+
 module.exports = {
     getAllPlanes,
-    verificarPrecioPlan
+    verificarPrecioPlan,
+    isActivoPlanPrecio
 }

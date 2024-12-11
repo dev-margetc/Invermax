@@ -12,11 +12,18 @@ const { traerToken } = require('../../../conf/firebaseAuth');
 const handlePago = async (req, res) => {
     try {
         let { idUsuario, idPlan, idPrecioPlan } = req.body.metadata; // El id del plan y el usuario llegan en el body
-        let { status } = req.body; // Informacion que llegaría del pago
+        let { status, id, amount, payment_method } = req.body; // Informacion que llegaría de la pasarela de pago
 
         let infoSuscripcion = {};
 
         if (status == "success") { // Si el pago fue recibido correctamente se crea la suscripcion
+            // Asignar info extra
+            infoSuscripcion.montoPago = amount;
+
+            infoSuscripcion.medioPago = payment_method;
+
+            infoSuscripcion.idTransaccion = id;
+            
             // Traer informacion del plan
             let plan = await PlanService.getAllPlanes({ idPlan: idPlan });
 
