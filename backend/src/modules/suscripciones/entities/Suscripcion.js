@@ -19,7 +19,7 @@ const Suscripcion = sequelize.define('Suscripcion', {
     },
     fechaFinSuscripcion: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
         field: 'fecha_fin'
     },
     estadoSuscripcion: {
@@ -35,24 +35,24 @@ const Suscripcion = sequelize.define('Suscripcion', {
     },
     medioPago: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
         field: 'medio_pago'
     },
     idTransaccion: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
         field: 'id_transaccion'
     },
     fechaPago: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
         field: 'fecha_pago'
     },
     montoPagado: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
+        allowNull: true,
           field: 'monto_pagado'
     },
     idPrecioPlan: {

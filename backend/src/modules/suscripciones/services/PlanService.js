@@ -27,11 +27,8 @@ const getAllPlanes= async (condiciones = null, condicionesPrecio = null) =>{
 // Verificar que un plan dado sea activo junto con su precioPlan tambien sea activo
 const isEstadoActivoPlanPrecio = async (idPlan, idPrecioPlan) =>{
     try{
-        let msg = {};
-
         let precioPlan = await planRepo.isActivoPlanPrecio(idPlan, idPrecioPlan);
 
-        console.log(precioPlan);
         if(precioPlan){
             return "El plan y el precio seleccionado son validos";
         }else{

@@ -2,39 +2,19 @@
 Tambien se encarga de interactuar con otros servicios*/
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const sequelize = require("../../../conf/database");
-
 const suscripcionRepository = require("../repositories/SuscripcionRepository");
 const customerRepo = require("../../usuarios/repositories/CustomerRepository");
 const planRepo = require("../repositories/PlanRepository");
 const { Sequelize } = require("sequelize");
-const Customer = require("../../usuarios/entities/Customer");
 const PrecioPlan = require("../entities/PrecioPlan");
 
 /* Metodos POST */
-
-// Crear una suscripcion con la informacion del pago
-const crearSuscripcion = async (infoPago) => {
-    const { idCustomer, idPlan, idPrecioPlan } = infoPago;
-    let datos = {};
-    let datosCaracteristicas = {};
-
-    // Datos propios de la suscripcion dados por la pasarela
-    datos.idCustomer = idCustomer;
-    datos.idPlan = idPlan;
-    datos.idPrecioPlan = idPrecioPlan;
-
-    // Asignar monto pagado
-    datos.montoPagado = infoPago.montoPago;
-
-    // Asignar medio de pago
-    datos.medioPago = infoPago.medioPago;
-
-    // Asignar id de transaccion
-    datos.idTransaccion = infoPago.idTransaccion;
-
+// Crear suscripcion Pago
+const crearSuscripcionPagada = async (infoSuscripcion) => {
     try {
-        // Verificar si el customer no tiene suscripciones activas
-        let cond = { idCustomer: idCustomer, estado: "activa" };
+        /* Verificar si el customer no tiene suscripciones activas */
+
+        let cond = { idCustomer: infoSuscripcion.customer.idCustomer, estado: "activa" };
         let suscripcionesActiva = await suscripcionRepository.getSuscripcionesFechaFin(cond);
 
         let suscripcionActiva = null;
@@ -48,9 +28,10 @@ const crearSuscripcion = async (infoPago) => {
             // Verificar que no tenga otras suscripciones pendientes
             cond.estado = "pendiente";
             let suscripcionesPendientes = await suscripcionRepository.getSuscripcionesFechaFin(cond);
+
             if (suscripcionesPendientes.length > 0) {
-                // La más cercana será la última de la lista (porque es orden descendente)
-                ultimaPendiente = suscripcionesPendientes[suscripcionesPendientes.length - 1];
+                // La más cercana será la primera de la lista (porque es orden descendente)
+                ultimaPendiente = suscripcionesPendientes[0];
             }
         }
 
@@ -58,48 +39,69 @@ const crearSuscripcion = async (infoPago) => {
         let fechaInicio;
 
         if (ultimaPendiente) {
-            datos.estadoSuscripcion = "pendiente";
+            infoSuscripcion.estadoSuscripcion = "pendiente";
             // Si hay una pendiente, la nueva comienza después de su fechaFin
             fechaInicio = new Date(ultimaPendiente.fechaFinSuscripcion);
         } else if (suscripcionActiva) {
-            datos.estadoSuscripcion = "pendiente";
-            // Si hay una activa, la nueva comienza luego de su fechaFin
-            fechaInicio = new Date(suscripcionActiva.fechaFinSuscripcion);
+
+            // Si la suscripcion activa tiene fechaFin null es porque es gratuita
+            if (suscripcionActiva.fechaFinSuscripcion == null) {
+                // Cancelar la gratuita
+                let datosModGratuita = {};
+                datosModGratuita.estadoSuscripcion = "inactiva";
+                datosModGratuita.fechaFinSuscripcion = new Date();
+
+                let datosGratuita = {};
+                datosGratuita.idSuscripcion = suscripcionActiva.idSuscripcion;
+                await suscripcionRepository.updateSuscripciones({ datosGratuita, datosGratuita });
+                // Activar la nueva
+                infoSuscripcion.estadoSuscripcion = "pendiente";
+                // Si hay una pendiente, la nueva comienza después de su fechaFin
+                fechaInicio = new Date();
+            } else {
+                infoSuscripcion.estadoSuscripcion = "pendiente";
+                // Si hay una activa, la nueva comienza luego de su fechaFin
+                fechaInicio = new Date(suscripcionActiva.fechaFinSuscripcion);
+            }
+
         } else {
-            datos.estadoSuscripcion = "activa";
+
+            infoSuscripcion.estadoSuscripcion = "activa";
             // Si no hay pendientes ni activas se generará con la fecha de inicio hoy
             fechaInicio = new Date();
 
-            // Al ser activa se modificará el estado del customer a activo
-            await customerRepo.actualizarCustomer({estadoCustomer:"activo"}, idCustomer);
+            // Al ser activa se modificará el estado del customer a activo si el estado actual no es nuevo
+            if (infoSuscripcion.customer.estadoCustomer != "nuevo") {
+                await customerRepo.actualizarCustomer({ estadoCustomer: "activo" }, infoSuscripcion.idCustomer);
+            }
         }
 
         // Asignar fecha
-        datos.fechaInicioSuscripcion = fechaInicio;
+        infoSuscripcion.fechaInicioSuscripcion = fechaInicio;
 
         // Asignar fecha de pago aprobado
-        datos.fechaPago = fechaInicio;
+        infoSuscripcion.fechaPago = new Date();
 
         // Traer el precioPlan para tomar la duración
-        const precioPlan = await PrecioPlan.findByPk(idPrecioPlan);
+        const precioPlan = await PrecioPlan.findByPk(infoSuscripcion.idPrecioPlan);
 
         // Verificar que el plan si tenga ese idPrecioPlan asociado
-        await planRepo.verificarPrecioPlan(idPlan, idPrecioPlan);
+        await planRepo.verificarPrecioPlan(infoSuscripcion.idPlan, infoSuscripcion.idPrecioPlan);
 
         // Calcular la fecha de fin sumando los meses del 
         const fechaFin = new Date(fechaInicio);
         fechaFin.setMonth(fechaFin.getMonth() + precioPlan.duracion);
-        datos.fechaFinSuscripcion = fechaFin;
+        infoSuscripcion.fechaFinSuscripcion = fechaFin;
 
         // Traer las caracteristicas del plan seleccionado
-        const datosCara = await planRepo.getAllPlanes({ idPlan: idPlan });
+        const datosCara = await planRepo.getAllPlanes({ idPlan: infoSuscripcion.idPlan });
 
         // Es un objeto de sequelize, por eso se accede asi
         datosCaracteristicas = datosCara[0].caracteristicasPlanes;
 
 
         // Crear la suscripcion y los saldos en el repository
-        let creada = suscripcionRepository.crearSuscripcion(datos, datosCaracteristicas)
+        let creada = suscripcionRepository.crearSuscripcion(infoSuscripcion, datosCaracteristicas)
         //let creada = true;
         if (creada) {
             return "Suscripción creada";
@@ -108,11 +110,92 @@ const crearSuscripcion = async (infoPago) => {
         }
 
     } catch (err) {
-
         console.log(err);
         throw err;
     }
 }
+
+
+// Crear suscripcion gratis
+const crearSuscripcionGratuita = async (infoSuscripcion) => {
+    try {
+        // Verificar que el plan si tenga ese idPrecioPlan asociado
+        await planRepo.verificarPrecioPlan(infoSuscripcion.idPlan, infoSuscripcion.idPrecioPlan);
+
+        // Verificar que el plan y el precioPlan estén activos
+        await planRepo.isActivoPlanPrecio(infoSuscripcion.idPlan, infoSuscripcion.idPrecioPlan);
+
+        // Verificar que ese precioPlan sea gratuito
+        const datosPlan = await planRepo.getAllPlanes({ idPlan: infoSuscripcion.idPlan }, { idPrecioPlan: infoSuscripcion.idPrecioPlan });
+
+        let precio = datosPlan[0].precios[0].precio;
+        let duracion = datosPlan[0].precios[0].duracion;
+        let gratuito = false;
+
+        if (precio == 0 || precio == null) {
+            if (duracion == 0 || duracion == null) {
+                gratuito = true;
+            }
+        }
+
+        if(!gratuito){
+            throw new ErrorNegocio("El plan no es gratuito");
+        }
+
+        /* Verificar si el customer no tiene suscripciones activas */
+
+        let cond = { idCustomer: infoSuscripcion.customer.idCustomer, estado: "activa" };
+        let suscripcionesActiva = await suscripcionRepository.getSuscripcionesFechaFin(cond);
+
+        // Verificar que no tenga otras suscripciones pendientes
+        cond.estado = "pendiente";
+        let suscripcionesPendientes = await suscripcionRepository.getSuscripcionesFechaFin(cond);
+
+        // Si tiene una suscripcion activa o pendiente entonces no se generará una nueva
+        if (suscripcionesActiva.length > 0 || suscripcionesPendientes.length > 0) {
+            throw new ErrorNegocio("El usuario ya tiene una suscripcion activa o pendiente, no se puede activar una gratuita");
+        }
+
+        // Determinar la fecha de inicio
+        let fechaInicio;
+
+        infoSuscripcion.estadoSuscripcion = "activa";
+
+        // Se generará con la fecha de inicio hoy
+        fechaInicio = new Date();
+
+        // Al ser activa se modificará el estado del customer a activo si el estado actual no es nuevo
+        if (infoSuscripcion.customer.estadoCustomer != "nuevo") {
+            await customerRepo.actualizarCustomer({ estadoCustomer: "activo" }, infoSuscripcion.customer.idCustomer);
+        }
+
+        // Asignar fecha
+        infoSuscripcion.fechaInicioSuscripcion = fechaInicio;
+
+        // Asignar fecha de pago aprobado
+        infoSuscripcion.fechaPago = null;
+
+        // Al ser un plan gratuito la fecha fin será null
+        infoSuscripcion.fechaFinSuscripcion = null;
+
+        // Extraer los datos de caracteristicas
+        let datosCaracteristicas = datosPlan[0].caracteristicasPlanes;
+
+        // Crear la suscripcion y los saldos en el repository
+        let creada = suscripcionRepository.crearSuscripcion(infoSuscripcion, datosCaracteristicas)
+        //let creada = true;
+        if (creada) {
+            return "Suscripción creada";
+        } else {
+            return "error en la creación";
+        }
+
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
+
 
 /* METODOS GET*/
 // Traer suscripciones de customers, se puede especificar el estado
@@ -129,11 +212,9 @@ const getSuscripcionesCustomer = async (idCustomer = null, estado = null) => {
             cond.estadoSuscripcion = estado;
         }
 
-
         let suscripcionesActivas = await suscripcionRepository.getSuscripcionesPlan(cond);
 
         return suscripcionesActivas
-
     } catch (err) {
         console.log(err);
         throw err;
@@ -232,7 +313,8 @@ const actualizarEstadoSuscripciones = async () => {
 
 
 module.exports = {
-    crearSuscripcion,
+    crearSuscripcionPagada,
+    crearSuscripcionGratuita,
     getSuscripcionesCustomer,
     actualizarEstadoSuscripciones
 }

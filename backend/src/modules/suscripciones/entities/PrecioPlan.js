@@ -20,7 +20,7 @@ const PrecioPlan = sequelize.define('PrecioPlan', {
     },
     duracion: { // Duración en meses
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
     },
     estadoPrecio:{
         type: DataTypes.TINYINT(1),

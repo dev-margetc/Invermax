@@ -18,6 +18,10 @@ router.get('/planes/', PlanController.getAllPlanes);
 
 router.get('/planes/activo', PlanController.getPlanesActivos);
 
+//Traer todos los planes activos dado un tipo de customer junto con sus detalles
+
+router.get('/planes/tipoCustomer/:idPerfil/activo', PlanController.getPlanesActivosTipoCustomer);
+
 // Verificar validez de plan y precioPago
 router.get('/planes/:idPlan/precio/:idPrecioPlan/validar', PlanController.validarPrecioPago);
 
@@ -52,10 +56,12 @@ router.get('/ascenso/customer/:idCustomer', AscensoController.getAscensoCustomer
 // Recibir un pago
 router.post('/suscripcion/pago', SuscripcionController.handlePago)
 
+// Generar una suscripcion para un plan gratuito
+router.post('/suscripcion/gratuita', SuscripcionController.generarSuscripcionGratuita)
+
 
 //Insertar un inmueble en destacados (o actualizarlo si ya existe)
 router.post('/destacados/:idInmueble', protegerRuta(['admin', 'customer']), DestacadosController.insertarDestacado)
-
 
 
 //Insertar un inmueble en ascenso (o actualizarlo si ya existe)

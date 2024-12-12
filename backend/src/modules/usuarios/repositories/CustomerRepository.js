@@ -19,7 +19,6 @@ const getAllCustomers = async (condiciones) => {
         ],
         where: condiciones
     });
-    console.log(customers[0].nombreCustomer);
     return customers;
 
 }

@@ -17,7 +17,6 @@ const getSuscripcionesFechaFin = async (condiciones = null) => {
         where: filtro,
         order: [['fechaFinSuscripcion', 'DESC']],
     });
-
     return suscripciones;
 }
 

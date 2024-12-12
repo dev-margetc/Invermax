@@ -7,6 +7,7 @@ const { filtrarCampos } = require("../../../utils/utils");
 
 const Customer = require("../entities/Customer");
 const PerfilService = require("./PerfilCustomerService");
+const UsuarioRepo = require("../repositories/UsuariosRepository");
 const CustomerRepo = require("../repositories/CustomerRepository");
 const SuscripcionService = require("../../suscripciones/services/SuscripcionService");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
@@ -174,15 +175,13 @@ const actualizarLogo = async (idCustomer, nombreArchivo, tipoArchivo) => {
 const crearCustomerBasico = async (idUsuario, idPerfil, correoUsuario) => {
     try {
 
-        if(!idUsuario || !idPerfil || !correoUsuario){
+        if (!idUsuario || !idPerfil || !correoUsuario) {
             throw new ErrorNegocio("Faltan datos en la creacion del customer");
         }
 
         let datosCustomer = {};
         datosCustomer.idUsuario = idUsuario;
         datosCustomer.idPerfil = idPerfil;
-
-
         datosCustomer.nombreCustomer = "NOMBRE CUSTOMER";
         datosCustomer.correoNotiCustomer = correoUsuario;
         datosCustomer.telefonoNotiCustomer = "NUMERO NOTIFICACION"
@@ -196,11 +195,38 @@ const crearCustomerBasico = async (idUsuario, idPerfil, correoUsuario) => {
         throw err;
     }
 }
+
+// Generar o traer un customer dado un idUsuario
+const generarOCrearCustomer = async (idUsuario, idPerfil) => {
+
+    // Verificar que el customer asociado exista
+    let result = await getAllCustomers({ idUsuario: idUsuario });
+
+    let customer;
+    // Si no existe crearlo
+    if (!result || result.length == 0) {
+
+        // Buscar el correo del usuario respectivo
+        let usuario = await UsuarioRepo.getAllUsuarios({ idUsuario: idUsuario });
+
+        if (!usuario || usuario.length == 0) {
+            throw new ErrorNegocio("Error, no existe este usuario");
+        }
+
+        // Crear el customer
+        customer = await crearCustomerBasico(idUsuario, idPerfil, usuario[0].dataValues.emailUsuario);
+    } else {
+        // Si exite el customer se accede a su ID
+        customer = result[0];
+    }
+    return customer;
+}
 module.exports = {
     getAllCustomers,
     getAllCustomersBasic,
     actualizarCustomer,
     actualizarLogo,
     coincideIdUsuario,
-    crearCustomerBasico
+    crearCustomerBasico,
+    generarOCrearCustomer
 }
