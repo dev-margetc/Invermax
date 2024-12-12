@@ -5,17 +5,13 @@ import Carousel from 'react-bootstrap/Carousel';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 import CatalogoProductos from '../components/CatalogoProductos';
-
-
+import EJ from '../components/EJ';
 import '../style/App2.css';
-
-// Importa los íconos SVG
 import CameraIcon from '../assets/icons/camera.svg';
 import VideoIcon from '../assets/icons/video.svg';
 import MapIcon from '../assets/icons/map.svg';
 import VrIcon from '../assets/icons/vr.svg';
 import ExpandIcon from '../assets/icons/expand.svg'; // Ícono de ampliar
-
 import ParqueaderoIcon from '../assets/icons/Parqueadero.svg';
 import RecepcionIcon from '../assets/icons/recepcion.svg';
 import LavadoIcon from '../assets/icons/lavado.svg';
@@ -26,12 +22,10 @@ import EspacioComunalIcon from '../assets/icons/espacio_comunal.svg';
 import ElevadorIcon from '../assets/icons/elevador.svg';
 import ZonasVerdesIcon from '../assets/icons/zonas_verdes.svg';
 import VigilanciaIcon from '../assets/icons/vigilancia.svg';
-
 import Bano from '../assets/icons/bano.svg';
 import Carro from '../assets/icons/carro.svg';
 import Area from '../assets/icons/area.svg';
 import Cama from '../assets/icons/cama.svg';
-
 import TransportePublicoIcon from '../assets/icons/transporte_publico.svg';
 import GimnasiosIcon from '../assets/icons/gimnasios.svg';
 import HospitalesIcon from '../assets/icons/hospitales.svg';
@@ -66,23 +60,6 @@ const Plantilla = () => {
     setMostrarResultados(false);
   };
 
-  // Abre o cierra "SIMULA TU CRÉDITO"
-  // const handleCalculadora = () => {
-  //   setCalculadora(!calculadora); // Alterna la visibilidad de la calculadora
-  //   setMostrarResultados(false); // Oculta los resultados si se vuelve a abrir la calculadora
-  // };
-
-  // Muestra los resultados y cierra "SIMULA TU CRÉDITO"
-  // const handleResultados = () => {
-  //   setMostrarResultados(true); // Muestra los resultados
-  //   setCalculadora(true); // Oculta la calculadora
-  // };
-
-  // Oculta tanto los resultados como la calculadora
-  // const handleOcultarTodo = () => {
-  //   setMostrarResultados(false);
-  //   setCalculadora(false);
-  // };
 
   const handleSelect = (selectedIndex) => {
     setIndex(selectedIndex);
@@ -105,9 +82,17 @@ const Plantilla = () => {
     setSelectedType((prevType) => (prevType === type ? "G" : type));
   };
 
+    const toggleSwitch = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      furnished: !prevData.furnished,
+    }));
+  };
+
   useEffect(() => {
+
     const carousels = document.querySelectorAll(".carrusel-container");
-  
+
     carousels.forEach((carousel) => {
       let isDown = false;
       let startX;
@@ -148,8 +133,6 @@ const Plantilla = () => {
     });
   }, []);
   
-  
-
   useEffect(() => {
     if (propertyData) {
       const typeData = propertyData.informacionPorTipo[selectedType];
@@ -157,12 +140,10 @@ const Plantilla = () => {
     }
   }, [selectedType, propertyData]);
 
-  
-
   useEffect(() => {
     setTimeout(() => {
       const mockData = {
-        title: "Proyecto Residencial Ejemplo",
+        title: "TÍTULO PROYECTO/INMUEBLE",
         codigo: "784-84947-54616",
         status: "Nuevo / En venta",
         tipo: "Compra",
@@ -343,8 +324,6 @@ const Plantilla = () => {
         nombreInmobiliaria: "Inmobiliaria Ejemplo"
       };
       
-      
-
       setPropertyData(mockData);
     }, 1000); // Simula el retraso de una llamada al backend
   }, []);
@@ -359,7 +338,6 @@ const Plantilla = () => {
     );
   }
   
-
   return (
     <>
       {/* Título */}
@@ -374,168 +352,159 @@ const Plantilla = () => {
 
         {/* Sección 1 */}
         <div className='seccion-plantilla-1'>
-        <div className="sticky-buttons">
-        {propertyData.medidasTipo.map((tipo, index) => {
-  const typeKey = String.fromCharCode(65 + index); // A, B, C, D...
-  return (
-    <button
-      key={index}
-      className={`tipo-btn ${selectedType === typeKey ? "active" : ""}`}
-      onClick={() => handleTypeSelect(typeKey)}
-    >
-      <b>TIPO {typeKey}</b>
-      <br />
-      {tipo[`tipo${typeKey}`]}
-    </button>
-  );
-})}
-
-</div>
-
+          <div className="sticky-buttons">
+            {propertyData.medidasTipo.map((tipo, index) => {
+            const typeKey = String.fromCharCode(65 + index); // A, B, C, D...
+            return (
+              <button
+                key={index}
+                className={`tipo-btn ${selectedType === typeKey ? "active" : ""}`}
+                onClick={() => handleTypeSelect(typeKey)}
+              >
+                <b>TIPO {typeKey}</b>
+                <br />
+                {tipo[`tipo${typeKey}`]}
+              </button>
+            );
+          })}
         </div>
+      </div>
         
-
-
-
         {/* Sección 2 */}
-        <div className='seccion-plantilla-2'>
-
+      <div className='seccion-plantilla-2'>
           {/* Primera sub-sección de la sección 2 */}
           <div className='seccion-1-2'>
             <div className='sub-2-1-1'>
               <Tabs defaultActiveKey="fotos" id="uncontrolled-tab-example" className="mb-3">
                 <Tab eventKey="fotos" title={<><img src={CameraIcon} alt="Fotos" style={{ width: 15}} loading="lazy" /> Fotos</>}>
                   {/* Carrusel de imágenes */}
-                  <div className="custom-carousel-container"><Carousel
-  activeIndex={index}
-  onSelect={handleSelect}
-  controls={false} // Desactiva los controles automáticos
-  indicators={false} // Desactiva los indicadores automáticos
-  interval={null}
-  className="custom-carousel-container"
->
-  {Array.isArray(dynamicData.images) && dynamicData.images.length > 0 ? (
-    dynamicData.images.map((image, idx) => (
-      <Carousel.Item key={idx}>
-        <img
-          className="d-block w-100"
-          src={image}
-          alt={`Slide ${idx + 1}`}
-          style={{ border: "10px solid white" }}
-          loading="lazy"
-        />
-      </Carousel.Item>
-    ))
-  ) : (
-    <Carousel.Item>
-      <p className="text-center">No hay imágenes disponibles</p>
-    </Carousel.Item>
-  )}
-</Carousel>
+                  <div className="custom-carousel-container">
+                    <Carousel
+                      activeIndex={index}
+                      onSelect={handleSelect}
+                      controls={false} // Desactiva los controles automáticos
+                      indicators={false} // Desactiva los indicadores automáticos
+                      interval={null}
+                      className="custom-carousel-container"
+                    >
+                    {Array.isArray(dynamicData.images) && dynamicData.images.length > 0 ? (
+                      dynamicData.images.map((image, idx) => (
+                        <Carousel.Item key={idx}>
+                          <img
+                            className="d-block w-100"
+                            src={image}
+                            alt={`Slide ${idx + 1}`}
+                            style={{ border: "10px solid white" }}
+                            loading="lazy"
+                          />
+                        </Carousel.Item>
+                      ))
+                    ) : (
+                      <Carousel.Item>
+                        <p className="text-center">No hay imágenes disponibles</p>
+                      </Carousel.Item>
+                    )}
+                    </Carousel>
 
-{/* Botón de avanzar */}
-<button
-  className="carousel-button-plantilla right"
-  onClick={() =>
-    handleSelect(
-      Array.isArray(dynamicData.images) && dynamicData.images.length > 0
-        ? (index + 1) % dynamicData.images.length
-        : 0
-    )
-  }
->
-  <img src="/img/icons/frame26.svg" alt="Siguiente" loading="lazy"/>
-</button>
+                    {/* Botón de avanzar */}
+                    <button
+                      className="carousel-button-plantilla right"
+                      onClick={() =>
+                        handleSelect(
+                          Array.isArray(dynamicData.images) && dynamicData.images.length > 0
+                            ? (index + 1) % dynamicData.images.length
+                            : 0
+                        )
+                      }
+                    >
+                      <img src="/img/icons/frame26.svg" alt="Siguiente" loading="lazy"/>
+                    </button>
 
-{/* Botón de retroceder */}
-<button
-  className="carousel-button-plantilla left"
-  onClick={() =>
-    handleSelect(
-      Array.isArray(dynamicData.images) && dynamicData.images.length > 0
-        ? index === 0
-          ? dynamicData.images.length - 1
-          : index - 1
-        : 0
-    )
-  }
->
-  <img src="/img/icons/frame27.svg" alt="Anterior" loading="lazy" />
-</button>
+                    {/* Botón de retroceder */}
+                    <button
+                      className="carousel-button-plantilla left"
+                      onClick={() =>
+                        handleSelect(
+                          Array.isArray(dynamicData.images) && dynamicData.images.length > 0
+                            ? index === 0
+                              ? dynamicData.images.length - 1
+                              : index - 1
+                            : 0
+                        )
+                      }
+                    >
+                      <img src="/img/icons/frame27.svg" alt="Anterior" loading="lazy" />
+                    </button>
 
-{/* Botón de ampliar */}
-<button className="expand-button rightb " onClick={handleExpandImage}>
-  <img src={ExpandIcon} alt="Expandir" loading="lazy" />
-</button>
-
-
-
-                  </div>
+                    {/* Botón de ampliar */}
+                    <button className="expand-button rightb " onClick={handleExpandImage}>
+                      <img src={ExpandIcon} alt="Expandir" loading="lazy" />
+                    </button>
+                    </div>
                 </Tab>
 
                 <Tab eventKey="videos" title={<><img src={VideoIcon} alt="Videos" style={{  width: 15 }} loading="lazy"/> Videos</>}>
                   {/* Carrusel de videos */}
                   <div className="custom-carousel-container">
                   <Carousel
-  activeIndex={videoIndex}
-  onSelect={handleVideoSelect}
-  controls={false}
-  indicators={false}
-  interval={null}
->
-  {Array.isArray(dynamicData.videos) && dynamicData.videos.length > 0 ? (
-    dynamicData.videos.map((video, idx) => (
-      <Carousel.Item key={idx}>
-        <video
-          className="d-block w-100"
-          controls
-          src={video}
-          type="video/mp4" // Especifica el tipo MIME
-          alt={`Video ${idx + 1}`}
-          style={{ border: "10px solid white" }}
-        >
-          Tu navegador no soporta la reproducción de videos.
-        </video>
-      </Carousel.Item>
-    ))
-  ) : (
-    <Carousel.Item>
-      <p className="text-center">No hay videos disponibles</p>
-    </Carousel.Item>
-  )}
-</Carousel>
+                  activeIndex={videoIndex}
+                  onSelect={handleVideoSelect}
+                  controls={false}
+                  indicators={false}
+                  interval={null}
+                >
+                {Array.isArray(dynamicData.videos) && dynamicData.videos.length > 0 ? (
+                  dynamicData.videos.map((video, idx) => (
+                    <Carousel.Item key={idx}>
+                      <video
+                        className="d-block w-100"
+                        controls
+                        src={video}
+                        type="video/mp4" // Especifica el tipo MIME
+                        alt={`Video ${idx + 1}`}
+                        style={{ border: "10px solid white" }}
+                      >
+                        Tu navegador no soporta la reproducción de videos.
+                      </video>
+                    </Carousel.Item>
+                  ))
+                ) : (
+                  <Carousel.Item>
+                    <p className="text-center">No hay videos disponibles</p>
+                  </Carousel.Item>
+                )}
+                </Carousel>
 
-{/* Botón de retroceder */}
-<button
-  className="carousel-button-plantilla left"
-  onClick={() =>
-    handleVideoSelect(
-      Array.isArray(dynamicData.videos) && dynamicData.videos.length > 0
-        ? videoIndex === 0
-          ? dynamicData.videos.length - 1
-          : videoIndex - 1
-        : 0
-    )
-  }
->
-  <img src="/img/icons/frame27.svg" alt="Anterior" loading="lazy"/>
-</button>
+              {/* Botón de retroceder */}
+              <button
+                className="carousel-button-plantilla left"
+                onClick={() =>
+                  handleVideoSelect(
+                    Array.isArray(dynamicData.videos) && dynamicData.videos.length > 0
+                      ? videoIndex === 0
+                        ? dynamicData.videos.length - 1
+                        : videoIndex - 1
+                      : 0
+                  )
+                }
+              >
+                <img src="/img/icons/frame27.svg" alt="Anterior" loading="lazy"/>
+              </button>
 
-{/* Botón de avanzar */}
-<button
-  className="carousel-button-plantilla right"
-  onClick={() =>
-    handleVideoSelect(
-      Array.isArray(dynamicData.videos) && dynamicData.videos.length > 0
-        ? (videoIndex + 1) % dynamicData.videos.length
-        : 0
-    )
-  }
->
-  <img src="/img/icons/frame26.svg" alt="Siguiente" loading="lazy"/>
-</button>
-
-                  </div>
+              {/* Botón de avanzar */}
+              <button
+                className="carousel-button-plantilla right"
+                onClick={() =>
+                  handleVideoSelect(
+                    Array.isArray(dynamicData.videos) && dynamicData.videos.length > 0
+                      ? (videoIndex + 1) % dynamicData.videos.length
+                      : 0
+                  )
+                }
+              >
+                <img src="/img/icons/frame26.svg" alt="Siguiente" loading="lazy"/>
+              </button>
+                </div>
                 </Tab>
 
                 <Tab eventKey="mapa" title={<><img src={MapIcon} alt="Mapa" style={{  width: 15 }} loading="lazy" /> Mapa</>}>
@@ -565,116 +534,103 @@ const Plantilla = () => {
             </div>
 
             <div className='sub-2-1-2'>
-     
-              <div className='logo-nombreInmobilaria'>
-              <a href="#" target="_blank" rel="#">
-  <img src={propertyData.logoImage} alt="logo" loading="lazy" />
-</a>
-<a href="#" style={{ textDecoration: 'none', color:"black" }}>
-  <h4 className='pt-2'><b>{propertyData.nombreInmobiliaria}</b></h4>
-</a>
 
-                
+              <div className='logo-nombreInmobilaria'>
+                <a href="#" target="_blank" rel="#">
+                  <img src={propertyData.logoImage} alt="logo" loading="lazy" />
+                </a>
+                <a href="#" style={{ textDecoration: 'none', color:"black" }}>
+                  <h4 className='pt-2'><b>{propertyData.nombreInmobiliaria}</b></h4>
+                </a>
               </div>
 
               <hr style={{ border: 'none', borderTop: '1px solid gray', margin: '10px 0' }} />
 
               <div className='span-dive'>
-              
                   <h5><b>{propertyData.tipo}</b></h5>
-
                   <div>
-  {selectedType === "G" ? (
-    // Información para tipo "6"
-    <>
-      <span>Desde</span>
-      <h5 className='n'><b>{dynamicData.minPrice || "N/A"}</b></h5>
-      <span className='hasta'>Hasta</span>
-      <h5 className='n'><b>{dynamicData.maxPrice || "N/A"}</b></h5>
-      <span>Fecha próxima de entrega</span>
-      <h6><b>{propertyData.fechaEntrega}</b></h6>
+                    {selectedType === "G" ? (
+                      // Información para tipo "GENERAL"
+                      <>
+                        <span>Desde</span>
+                        <h5 className='n'><b>{dynamicData.minPrice || "N/A"}</b></h5>
+                        <span className='hasta'>Hasta</span>
+                        <h5 className='n'><b>{dynamicData.maxPrice || "N/A"}</b></h5>
+                        <span>Fecha próxima de entrega</span>
+                        <h6><b>{propertyData.fechaEntrega}</b></h6>
 
-      <div className='desde-hasta-medidas'>
-        <div>
-          <h6>
-            <b>Medidas: </b> 
-            {propertyData?.medidasTipo?.[0]?.tipoA || "No disponible"}
-          </h6>
-        </div>
-        <div>
-          <h6>
-            <b>Hasta: </b> 
-            {propertyData?.medidasTipo?.[3]?.tipoD || "No disponible"}
-          </h6>
-        </div>
-      </div>
-    </>
-  ) : (
-    // Información para tipos diferentes a "6"
-    <>
-<div >
-  {/* Valor del inmueble */}
-  <div className="valor-inmueble">
-    <p>Valor del inmueble:</p>
-    <h5 className="valor-destacado">
-      {dynamicData.minPrice || "N/A"}
-    </h5>
-  </div>
+                        <div className='desde-hasta-medidas'>
+                          <div>
+                            <h6>
+                              <b>Medidas: </b> 
+                              {propertyData?.medidasTipo?.[0]?.tipoA || "No disponible"}
+                            </h6>
+                          </div>
+                          <div>
+                            <h6>
+                              <b>Hasta: </b> 
+                              {propertyData?.medidasTipo?.[3]?.tipoD || "No disponible"}
+                            </h6>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      // Información para tipos diferentes a "GENERAL"
+                    <>
+                      <div >
+                        {/* Valor del inmueble */}
+                        <div className="valor-inmueble">
+                          <p>Valor del inmueble:</p>
+                          <h5 className="valor-destacado">
+                            {dynamicData.minPrice || "N/A"}
+                          </h5>
+                        </div>
 
-  {/* Características */}
-  <div className="caracteristicas">
-  <div className="caracteristica">
-    <img src={Area} alt="Área m²" className="caracteristica-icon" loading="lazy"/>
-    <div className="caracteristica-text">
-      <p>Área m²</p>
-      <strong>{propertyData?.medidasTipo?.find(item => item[`tipo${selectedType}`])?.[`tipo${selectedType}`] || "No disponible"}</strong>
-    </div>
-  </div>
-  <div className="caracteristica">
-    <img src={Cama} alt="Habitaciones" className="caracteristica-icon" loading="lazy"/>
-    <div className="caracteristica-text">
-      <p>Habit.</p>
-      <strong>{dynamicData.habitaciones || "N/A"}</strong>
-    </div>
-  </div>
-  <div className="caracteristica">
-    <img src={Bano} alt="Baños" className="caracteristica-icon" loading="lazy"/>
-    <div className="caracteristica-text">
-      <p>Baños</p>
-      <strong>{dynamicData.banos || "N/A"}</strong>
-    </div>
-  </div>
-  <div className="caracteristica">
-    <img src={Carro} alt="Parqueadero" className="caracteristica-icon" loading="lazy"/>
-    <div className="caracteristica-text">
-      <p>Parqueadero</p>
-      <strong>{dynamicData.parqueadero || "N/A"}</strong>
-    </div>
-  </div>
-</div>
+                        {/* Características */}
+                        <div className="caracteristicas">
+                          <div className="caracteristica">
+                            <img src={Area} alt="Área m²" className="caracteristica-icon" loading="lazy"/>
+                            <div className="caracteristica-text">
+                              <p>Área m²</p>
+                              <strong>{propertyData?.medidasTipo?.find(item => item[`tipo${selectedType}`])?.[`tipo${selectedType}`] || "No disponible"}</strong>
+                            </div>
+                          </div>
+                          <div className="caracteristica">
+                            <img src={Cama} alt="Habitaciones" className="caracteristica-icon" loading="lazy"/>
+                            <div className="caracteristica-text">
+                              <p>Habit.</p>
+                              <strong>{dynamicData.habitaciones || "N/A"}</strong>
+                            </div>
+                          </div>
+                          <div className="caracteristica">
+                            <img src={Bano} alt="Baños" className="caracteristica-icon" loading="lazy"/>
+                            <div className="caracteristica-text">
+                              <p>Baños</p>
+                              <strong>{dynamicData.banos || "N/A"}</strong>
+                            </div>
+                          </div>
+                          <div className="caracteristica">
+                            <img src={Carro} alt="Parqueadero" className="caracteristica-icon" loading="lazy"/>
+                            <div className="caracteristica-text">
+                              <p>Parqueadero</p>
+                              <strong>{dynamicData.parqueadero || "N/A"}</strong>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Resumen */}
+                        <div className="resumen">
+                          <h6><b>Resumen</b></h6>
+                          <p>{dynamicData.resumen || "No hay descripción disponible."}</p>
+                        </div>
+                      </div>
+                    </>
+                    )}
+                </div>
 
-
-
-
-
-  {/* Resumen */}
-  <div className="resumen">
-    <h6><b>Resumen</b></h6>
-    <p>{dynamicData.resumen || "No hay descripción disponible."}</p>
-  </div>
-</div>
-
-    </>
-  )}
-</div>
-
-
-
-                  
-                  <div className='btn-obtener-contacto'>
+                <div className='btn-obtener-contacto'>
                   <button className='btn btn-dark'>Obtener numero de contacto</button> 
-                  </div>
-                   
+                </div>
+   
               </div>
             </div>
           </div>
@@ -690,31 +646,29 @@ const Plantilla = () => {
 
             <h2><b>Zonas Comunes</b></h2>
             <div className="centered-line-plantilla"></div>
+
             <div className="zonas-comunes-container">
-            {(Array.isArray(dynamicData.zonasComunes) ? dynamicData.zonasComunes : propertyData?.zonasComunes || []).map((zona, index) => (
-  <div className="zona-comun" key={index}>
-    <img src={zona.icon} alt={zona.name} className="zona-icon" loading="lazy"/>
-    <span>{zona.name}</span>
-  </div>
-))}
-
-</div>
-
+              {(Array.isArray(dynamicData.zonasComunes) ? dynamicData.zonasComunes : propertyData?.zonasComunes || []).map((zona, index) => (
+              <div className="zona-comun" key={index}>
+                <img src={zona.icon} alt={zona.name} className="zona-icon" loading="lazy"/>
+                <span>{zona.name}</span>
+              </div>
+              ))}
+            </div>
 
             <hr style={{ border: 'none', borderTop: '1px dotted #555555', margin: '10px 0' }} />
 
             <h2><b>Cerca de</b></h2>
             <div class="centered-line-plantilla"></div>
-<div className="cerca-de-container">
-{(Array.isArray(dynamicData.cercaDe) ? dynamicData.cercaDe : propertyData?.cercaDe || []).map((item, index) => (
-  <div className="cerca-item" key={index}>
-    <img src={item.icon} alt={item.name} className="zona-icon" loading="lazy"/>
-    <span>{item.name}</span>
-  </div>
-))}
 
-</div>
-
+            <div className="cerca-de-container">
+            {(Array.isArray(dynamicData.cercaDe) ? dynamicData.cercaDe : propertyData?.cercaDe || []).map((item, index) => (
+              <div className="cerca-item" key={index}>
+                <img src={item.icon} alt={item.name} className="zona-icon" loading="lazy"/>
+                <span>{item.name}</span>
+              </div>
+            ))}
+            </div>
 
             <hr style={{ border: 'none', borderTop: '1px dotted #555555', margin: '10px 0' }} />
 
@@ -725,259 +679,152 @@ const Plantilla = () => {
             </div>
 
             <div>
-      {/* Botón para abrir/cerrar la calculadora */}
-      {/* <div className="btn-calcular-credito text-center">
-        <button onClick={handleCalculadora}>
-          <b>
-            Calcular crédito{" "}
-            <span>
-              <img
-                src="/img/icons/Frame6.svg"
-                alt="comprar"
-                loading="lazy"
-              />
-            </span>
-          </b>{" "}
-          {calculadora ? "Cerrar Calculadora" : "Abrir Calculadora"}
-        </button>
-      </div> */}
+              <div className="calculadora-container">
+                {/* Botón inicial: solo visible cuando la calculadora está cerrada */}
+                {!calculadoraAbierta && (
+                  <button className="btn-toggle-calculadora" onClick={toggleCalculadora}>
+                    Calcular crédito <span className="icono">▼</span>
+                  </button>
+                )}
 
-      {/* Sección "SIMULA TU CRÉDITO" */}
-      {/* {calculadora && (
-        <div className="calculadora-container">
-          <h2 className="calculadora-titulo">SIMULA TU CRÉDITO</h2>
-          <form className="calculadora-form">
-            <div className="form-group">
-              <label>Valor del inmueble:</label>
-              <input type="number" placeholder="Ingresa el valor del inmueble" />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Calcular en:</label>
-                <div className="radio-group">
-                  <label>
-                    <input type="radio" name="calcular" value="años" />
-                    Años
-                  </label>
-                  <label>
-                    <input type="radio" name="calcular" value="meses" />
-                    Meses
-                  </label>
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Número de Años/Meses:</label>
-                <input type="number" placeholder="Número" />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Seleccionar ciudad:</label>
-              <input type="text" placeholder="Empieza a escribir..." />
-            </div>
-            <button
-              type="button" // Cambiado para evitar recargar la página
-              className="btn-calcular"
-              onClick={handleResultados}
-            >
-              Calcular
-            </button>
-          </form>
-        </div>
-      )} */}
-
-      {/* Resultados */}
-      {/* {mostrarResultados && (
-        <div className="resultados-container">
-          <div className="resultados">
-            <h3 className="resultados-titulo">RESULTADOS</h3>
-            <div className="resultados-card">
-              <p>
-                <strong>Leasing habitacional:</strong> $185,000,000
-              </p>
-              <p>
-                <strong>Crédito hipotecario:</strong> $185,000,000
-              </p>
-              <p>
-                <strong>Gastos notariales:</strong> $185,000
-              </p>
-              <p>
-                <strong>Pagos mensuales:</strong> $12,475
-              </p>
-            </div>
-          </div>
-          <div className="gastos">
-            <h3 className="resultados-titulo">GASTOS PROMEDIOS</h3>
-            <div className="resultados-card">
-              <p>
-                <strong>Gastos notariales:</strong> $28,000,000
-              </p>
-              <p>
-                <strong>Impuestos:</strong> $12,475
-              </p>
-              <p>
-                <strong>Total de registro:</strong> $28,000,000
-              </p>
-            </div>
-          </div>
-          <p className="resultados-nota">
-            Los resultados de esta calculadora son aproximados y no generan
-            compromisos para la inmobiliaria.
-          </p>
-          <button className="btn-ocultar" onClick={handleOcultarTodo}>
-            Ocultar Calculadora
-          </button>
-        </div>
-      )} */}
-
-<div className="calculadora-container">
-      {/* Botón inicial: solo visible cuando la calculadora está cerrada */}
-      {!calculadoraAbierta && (
-        <button className="btn-toggle-calculadora" onClick={toggleCalculadora}>
-          Calcular crédito <span className="icono">▼</span>
-        </button>
-      )}
-
-      {/* Contenido de la calculadora */}
-      {calculadoraAbierta && (
-        <div className="contenido-calculadora">
-          {/* Título de la calculadora */}
+                {/* Contenido de la calculadora */}
+                {calculadoraAbierta && (
+                  <div className="contenido-calculadora">
           
-          {/* Formulario siempre visible */}
-
-          <div className='formulario-p'>
-          <h2 className="titulo-calculadora">SIMULA TU CRÉDITO</h2>
-          <form className="formulario-calculadora">
-            <div className="form-group">
-              <label>Valor del inmueble:</label>
-              <input type="number" placeholder="Ingresa el valor del inmueble" />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Calcular en:</label>
-                <div className="radio-group">
-                  <label>
-                    <input type="radio" name="calcular" value="años" />
-                    Años
-                  </label>
-                  <label>
-                    <input type="radio" name="calcular" value="meses" />
-                    Meses
-                  </label>
-                </div>
-
+                  {/* Formulario siempre visible */}
+                  <div className='formulario-p'>
+                  <h2 className="titulo-calculadora">SIMULA TU CRÉDITO</h2>
+                  <form className="formulario-calculadora">
+                    <div className="form-group">
+                      <label>Valor del inmueble:</label>
+                      <input type="number" placeholder="Ingresa el valor del inmueble" />
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label>Calcular en:</label>
+                        <label> <EJ/></label>
+                      </div>
+                      <div className="form-group">
+                        <label>Número de Años/Meses:</label>
+                        <input type="number" placeholder="Número" />
+                      </div>
+                    </div>
+                      <p className="nota-calculadora">
+                        ⚠️ El valor en años debe ser entre 5 y 25 años; el valor en meses debe ser 
+                        mayor de 60 meses.
+                      </p>
+                    <div className="form-group">
+                      <label>Seleccionar ciudad:</label>
+                      <select id="city-select" className="city-select">
+                        <option value="">Seleccione una ciudad</option>
+                        <option value="bogota">Bogotá</option>
+                        <option value="medellin">Medellín</option>
+                        <option value="cali">Cali</option>
+                        <option value="barranquilla">Barranquilla</option>
+                        <option value="cartagena">Cartagena</option>
+                        <option value="bucaramanga">Bucaramanga</option>
+                        <option value="pereira">Pereira</option>
+                        <option value="manizales">Manizales</option>
+                        <option value="ibague">Ibagué</option>
+                        <option value="santamarta">Santa Marta</option>
+                      </select>
+                    </div>
+                    <button type="button" className="btn-calcular" onClick={handleCalcular}>
+                      Calcular
+                    </button>
+                </form>
               </div>
-              <div className="form-group">
-                <label>Número de Años/Meses:</label>
-                <input type="number" placeholder="Número" />
-              </div>
-
-            </div>
-            <p className="nota-calculadora">
-                  ⚠️ El valor en años debe ser entre 5 y 25 años; el valor en meses debe ser <br />
-                  mayor de 60 meses.
-                </p>
-            <div className="form-group">
-              <label>Seleccionar ciudad:</label>
-              <input type="text" placeholder="Empieza a escribir..." />
-            </div>
-            <button type="button" className="btn-calcular" onClick={handleCalcular}>
-              Calcular
-            </button>
-          </form>
-          </div>
-
 
           {/* Resultados: visibles después de calcular -------------------------------------------------------------------------------------------*/}
           {mostrarResultados && (
-  <div className="resultados-container">
-    {/* Botón "X" para cerrar */}
-    <button className="cerrar-btn" onClick={cerrarResultados}>✕</button>
+          <div className="resultados-container">
+            {/* Botón "X" para cerrar */}
+            <button className="cerrar-btn" onClick={cerrarResultados}>✕</button>
 
-    {/* Primer grupo de resultados */}
-    <div className="grupo-resultados">
-      <h3 className="titulo-resultado">RESULTADOS</h3>
-      <div className="carrusel-container">
-        <div className="carrusel-wrapper">
-          <div className="columna-resultado">
-            <h4>Leasing habitacional</h4>
-            <p><strong className="valor-principal">$185.000.000</strong></p>
-            <p>Gastos notariales: <strong>$185.000</strong></p>
-            <p>Cada mes pagarías:</p>
-            <ul>
-              <li>Tasa fija: <strong>0.8%</strong></li>
-              <li>Seguro de vida e ITP: <strong>$12.475</strong></li>
-              <li>Seguro de incendios: <strong>$12.475</strong></li>
-            </ul>
-          </div>
-          <div className="columna-resultado">
-            <h4>Crédito hipotecario</h4>
-            <p><strong className="valor-principal">$185.000.000</strong></p>
-            <p>Gastos notariales: <strong>$185.000</strong></p>
-            <p>Cada mes pagarías:</p>
-            <ul>
-              <li>Tasa fija: <strong>0.8%</strong></li>
-              <li>Seguro de vida e ITP: <strong>$12.475</strong></li>
-              <li>Seguro de incendios: <strong>$12.475</strong></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
+            {/* Primer grupo de resultados */}
+            <div className="grupo-resultados">
+              <h3 className="titulo-resultado">RESULTADOS</h3>
+              <div className="carrusel-container">
+                <div className="carrusel-wrapper">
+                  <div className="columna-resultado">
+                    <h4>Leasing habitacional</h4>
+                    <p><strong className="valor-principal">$185.000.000</strong></p>
+                    <p>Gastos notariales: <strong>$185.000</strong></p>
+                    <p>Cada mes pagarías:</p>
+                    <ul>
+                      <li>Tasa fija: <strong>0.8%</strong></li>
+                      <li>Seguro de vida e ITP: <strong>$12.475</strong></li>
+                      <li>Seguro de incendios: <strong>$12.475</strong></li>
+                    </ul>
+                  </div>
+                  <div className="columna-resultado">
+                    <h4>Crédito hipotecario</h4>
+                    <p><strong className="valor-principal">$185.000.000</strong></p>
+                    <p>Gastos notariales: <strong>$185.000</strong></p>
+                    <p>Cada mes pagarías:</p>
+                    <ul>
+                      <li>Tasa fija: <strong>0.8%</strong></li>
+                      <li>Seguro de vida e ITP: <strong>$12.475</strong></li>
+                      <li>Seguro de incendios: <strong>$12.475</strong></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    {/* Segundo grupo de resultados */}
-    <div className="grupo-resultados">
-      <h3 className="titulo-resultado">GASTOS PROMEDIOS</h3>
-      <div className="carrusel-container">
-        <div className="carrusel-wrapper">
-          <div className="columna-resultado">
-            <h4>Gastos notariales</h4>
-            <p>Pago total comprador:</p>
-            <p><strong className="valor-principal">$28.000.000</strong></p>
-            <ul>
-              <li>Gastos notaría: <strong>$12.475</strong></li>
-              <li>IVA: <strong>$12.475</strong></li>
-              <li>Retención en la fuente: <strong>$12.475</strong></li>
-              <li>Copias: <strong>$12.475</strong></li>
-            </ul>
-            <p className="nota-vendedor">
-              El vendedor asume el 1% de la retención y un monto similar de IVA y gastos notariales para un total de $409.250.
-            </p>
-          </div>
-          <div className="columna-resultado">
-            <h4>Gastos de registro</h4>
-            <p>Total gasto de registro:</p>
-            <p><strong className="valor-principal">$28.000.000</strong></p>
-            <ul>
-              <li>Impuestos de beneficencia: <strong>0.8%</strong></li>
-              <li>Certificado de libertad: <strong>$12.475</strong></li>
-              <li>Impuesto de registro: <strong>$12.475</strong></li>
-            </ul>
-            <p className="nota-vendedor">
-              ¿Quién asume los impuestos de registro? El vendedor paga si es persona natural. Si el vendedor es persona jurídica, el comprador asume dicho monto.
-            </p>
-          </div>
+            {/* Segundo grupo de resultados */}
+            <div className="grupo-resultados">
+              <h3 className="titulo-resultado">GASTOS PROMEDIOS</h3>
+              <div className="carrusel-container">
+                <div className="carrusel-wrapper">
+                  <div className="columna-resultado">
+                    <h4>Gastos notariales</h4>
+                    <p>Pago total comprador:</p>
+                    <p><strong className="valor-principal">$28.000.000</strong></p>
+                    <ul>
+                      <li>Gastos notaría: <strong>$12.475</strong></li>
+                      <li>IVA: <strong>$12.475</strong></li>
+                      <li>Retención en la fuente: <strong>$12.475</strong></li>
+                      <li>Copias: <strong>$12.475</strong></li>
+                    </ul>
+                    <p className="nota-vendedor">
+                      El vendedor asume el 1% de la retención y un monto similar de IVA y gastos notariales para un total de $409.250.
+                    </p>
+                  </div>
+                  <div className="columna-resultado">
+                    <h4>Gastos de registro</h4>
+                    <p>Total gasto de registro:</p>
+                    <p><strong className="valor-principal">$28.000.000</strong></p>
+                    <ul>
+                      <li>Impuestos de beneficencia: <strong>0.8%</strong></li>
+                      <li>Certificado de libertad: <strong>$12.475</strong></li>
+                      <li>Impuesto de registro: <strong>$12.475</strong></li>
+                    </ul>
+                    <p className="nota-vendedor">
+                      ¿Quién asume los impuestos de registro? El vendedor paga si es persona natural. Si el vendedor es persona jurídica, el comprador asume dicho monto.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
 )}
-
-
-
+        <div className="nota-final text-center">
+          <p className="text-center nota-texto">
+            ⚠️ Los resultados de esta calculadora son aproximados y no generan compromiso a Ivermax Inmobiliaria
+          </p>
+        </div>
 
           {/* Botón para cerrar la calculadora */}
           <button className="btn-cerrar" onClick={toggleCalculadora}>
             Ocultar calculadora ▲
           </button>
 
-        </div>
+      </div>
       )}
     </div>
   </div>
 </div>
-
-          
-
 
           {/* Tercera sub-sección de la sección 2 */}
           <div className='sub-2-3-1'>
@@ -994,73 +841,62 @@ const Plantilla = () => {
               
               </div>
               <div>
-      
-      <table className="tabla-gastos">
-        <tbody>
-          <tr>
-            <td>Gastos notariales</td>
-            <td className="valor"><strong>$185.000</strong></td>
-          </tr>
-          <tr>
-            <td>Copias</td>
-            <td className="valor"><strong>$100.000</strong></td>
-          </tr>
-          <tr>
-            <td>IVA</td>
-            <td className="valor"><strong>$185.000</strong></td>
-          </tr>
-          <tr>
-            <td>Retención en la fuente</td>
-            <td className="valor"><strong>$85.000</strong></td>
-          </tr>
-          <tr>
-            <td>Impuestos de registro</td>
-            <td className="valor"><strong>$85.000</strong></td>
-          </tr>
-          <tr>
-            <td>Impuestos de beneficencia</td>
-            <td className="valor"><strong>$85.000</strong></td>
-          </tr>
-          <tr className="total-row">
-            <td><strong>Valor total de titulación</strong></td>
-            <td className="valor total"><strong>$5.000.000</strong></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-            </div>
-            <div class="sub-sub-3-2">
-  <div className="important-notice">
-    <div className='importantes'>
-    <p><strong>Importante</strong></p>
-    <p>Estos gastos son una estimación y todos los valores son aproximados</p>
-    </div>
-  
-  </div>
-  <p className="note">*Los valores pueden variar de acuerdo al departamento por atribución de cada Asamblea Departamental.</p>
-  <p className="note">
-    *El valor de las copias corresponde a un promedio de comportamiento del mercado y depende de la cantidad de hojas de la escritura, lo que está sujeto a la cantidad de linderos, anotaciones, aclaraciones, y demás observaciones y parágrafos incluidos en la venta.
-  </p>
-</div>
-
-
-          </div> 
-
-        </div>
-
+              <table className="tabla-gastos">
+                <tbody>
+                  <tr>
+                    <td>Gastos notariales</td>
+                    <td className="valor"><strong>$185.000</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Copias</td>
+                    <td className="valor"><strong>$100.000</strong></td>
+                  </tr>
+                  <tr>
+                    <td>IVA</td>
+                    <td className="valor"><strong>$185.000</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Retención en la fuente</td>
+                    <td className="valor"><strong>$85.000</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Impuestos de registro</td>
+                    <td className="valor"><strong>$85.000</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Impuestos de beneficencia</td>
+                    <td className="valor"><strong>$85.000</strong></td>
+                  </tr>
+                  <tr className="total-row">
+                    <td><strong>Valor total de titulación</strong></td>
+                    <td className="valor total"><strong>$5.000.000</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
       </div>
-
-      <div className='container  mb-5 pb-5 pt-2 mt-5 '>
-        <h2 className='text-center'>PROYECTOS QUE <strong>TE PUEDEN INTERESAR</strong></h2>
-        <div class="centered-line-plantilla-b mt-3 ">
+      <div class="sub-sub-3-2">
+        <div className="important-notice">
+          <div className='importantes'>
+          <p><strong>Importante</strong></p>
+          <p>Estos gastos son una estimación y todos los valores son aproximados</p>
+          </div>
         
         </div>
-        <CatalogoProductos showOnlyFour={true} />
+        <p className="note">*Los valores pueden variar de acuerdo al departamento por atribución de cada Asamblea Departamental.</p>
+        <p className="note">
+          *El valor de las copias corresponde a un promedio de comportamiento del mercado y depende de la cantidad de hojas de la escritura, lo que está sujeto a la cantidad de linderos, anotaciones, aclaraciones, y demás observaciones y parágrafos incluidos en la venta.
+        </p>
       </div>
+    </div> 
+  </div>
+</div>
 
-
-
+<div className='container  mb-5 pb-5 pt-2 mt-5 '>
+  <h2 className='text-center'>PROYECTOS QUE <strong>TE PUEDEN INTERESAR</strong></h2>
+    <div class="centered-line-plantilla-b mt-3 "></div>
+        <CatalogoProductos showOnlyFour={true} />
+</div>
 
 {/* Modal de ampliación */}
 <Modal show={modalVisible} onHide={handleCloseModal} centered size="lg">
@@ -1094,7 +930,6 @@ const Plantilla = () => {
     )}
   </Modal.Body>
 </Modal>
-
     </>
   );
 };
