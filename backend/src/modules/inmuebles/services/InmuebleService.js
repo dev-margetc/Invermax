@@ -17,9 +17,6 @@ const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig")
 
 const insertarInmueble = async (datosInmueble) => {
     try {
-
-        //Verifica que un proyecto que no es nuevo tampoco sea proyecto 
-
         const { idTipoInmueble, estadoInmueble, modalidadInmueble, administracion } = datosInmueble.inmueble;
 
         // Buscar el tipo de inmueble por ID
@@ -32,8 +29,11 @@ const insertarInmueble = async (datosInmueble) => {
         // traer el perfil de customer
         let customer = await CustomerService.getAllCustomers({idCustomer: datosInmueble.inmueble.idCustomer});
         let perfil = customer[0].perfil;
+
         // Verificar que el tipo de customer si pueda crear este tipo de inmuebles
-        await TipoInmueblePerfilService.verificarPerfil(perfil.idPerfil, tipoInmueble.idTipoInmueble)
+        await TipoInmueblePerfilService.verificarPerfil(perfil.idPerfil, tipoInmueble.idTipoInmueble);
+
+        // Verificar que el usuario si pueda crear un inmueble dado su plan
 
         // Verificar si el tipo es "proyecto" y es valido
         if (tipoInmueble.tipoInmueble === 'proyecto' && estadoInmueble !== 'nuevo') {
