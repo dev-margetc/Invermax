@@ -11,14 +11,12 @@ const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
 const zonaInmuebleService = require("./ZonasInmueblesService");
 const InteresadoRepo = require("../repositories/InteresadoRepository");
+const TipoInmueblePerfilService = require("../services/TipoInmueblePerfilService");
 const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
 
 
 const insertarInmueble = async (datosInmueble) => {
     try {
-
-        //Verifica que un proyecto que no es nuevo tampoco sea proyecto 
-
         const { idTipoInmueble, estadoInmueble, modalidadInmueble, administracion } = datosInmueble.inmueble;
 
         // Buscar el tipo de inmueble por ID
@@ -27,6 +25,15 @@ const insertarInmueble = async (datosInmueble) => {
         if (!tipoInmueble) {
            throw new ErrorNegocio("Tipo de inmueble no encontrado");
         }
+
+        // traer el perfil de customer
+        let customer = await CustomerService.getAllCustomers({idCustomer: datosInmueble.inmueble.idCustomer});
+        let perfil = customer[0].perfil;
+
+        // Verificar que el tipo de customer si pueda crear este tipo de inmuebles
+        await TipoInmueblePerfilService.verificarPerfil(perfil.idPerfil, tipoInmueble.idTipoInmueble);
+
+        // Verificar que el usuario si pueda crear un inmueble dado su plan
 
         // Verificar si el tipo es "proyecto" y es valido
         if (tipoInmueble.tipoInmueble === 'proyecto' && estadoInmueble !== 'nuevo') {
@@ -43,10 +50,11 @@ const insertarInmueble = async (datosInmueble) => {
         datosInmueble.inmueble.estadoPublicacionInmueble = "borrador";
 
         /*Si es valido se crea el inmueble con los detalles*/
-        msg = await inmuebleRepository.insertarInmuebleDetalles(datosInmueble.inmueble, tipoInmueble.tipoInmueble === 'proyecto');
+        let msg = await inmuebleRepository.insertarInmuebleDetalles(datosInmueble.inmueble, tipoInmueble.tipoInmueble === 'proyecto'); 
         return msg;
 
     } catch (error) {
+        console.log(error);
         throw error;
     }
 }
@@ -79,11 +87,25 @@ const actualizarInmuebleDetalles = async (datos, params) => {
     const { idInmueble } = params
     const listaDetalles = inmueble.detalles;
     const zonas = inmueble.zonas;
+    const {estadoPublicacionInmueble} = inmueble;
 
     // crear transaccion
     const transaction = await sequelize.transaction(); // Iniciar la transacción
-    try {
-        
+    try {   
+        // Si se trata de cambiar el estado a publicado
+        if(estadoPublicacionInmueble == "publicado"){
+
+            // Verificar que el estado del customer sea activo (validar con modulo usuarios)
+            let customer = await CustomerService.getAllCustomers({idCustomer:datos.idCustomer});
+            let estadoCustomer = customer[0].dataValues.estadoCustomer;
+           
+            if(estadoCustomer == "inactivo"|| estadoCustomer == "nuevo"){
+                throw new ErrorNegocio("Este estado no le permite publicar inmuebles");
+            }
+            
+            // Verificar que pueda colocar mas inmuebles en este estado (validar con modulo suscripciones)
+        }
+
         //Si hay un nuevo tipo y este es arriendo se valida que arriendo no sea null
         if(inmueble.modalidadInmueble== "arriendo" && !inmueble.administracion){
             throw new ErrorNegocio("La modalidad de arriendo requiere que se especifique si la administración está incluida");     

@@ -13,9 +13,14 @@ const Customer = require("../entities/Customer");
 /* Metodos de consulta*/
 
 //Obtener todos los usuarios
-const getAllUsuarios = async () => {
-    const usuarios = await UsuariosRepo.getAllUsuarios();
-    return usuarios;
+const getAllUsuarios = async (condiciones = null) => {
+    if (condiciones) {
+        const usuarios = await UsuariosRepo.getAllUsuarios(condiciones);
+        return usuarios;
+    }else{
+        return await UsuariosRepo.getAllUsuarios();
+    }
+
 }
 
 // Obtener un usuario con el UID (unique ID)
@@ -79,7 +84,7 @@ const insertBasicUser = async (uid, correo) => {
         if (!uid || !correo) {
             throw new ErrorNegocio("Hacen falta datos");
         }
-        // Insertar el usuario
+        /* Insertar el usuario */
 
         // Colocar los datos de usuario
         datosUsuario.tipoUsuario = "customer";
@@ -87,20 +92,6 @@ const insertBasicUser = async (uid, correo) => {
         datosUsuario.uidFirebase = uid;
 
         usuario = await UsuariosRepo.insertarUsuario(datosUsuario, transaction);
-
-        // Insertar el customer
-
-        // Colocar el id del usuario recien creado
-
-        datosCustomer.idUsuario = usuario.idUsuario;
-        datosCustomer.nombreCustomer = "NOMBRE CUSTOMER";
-        datosCustomer.correoNotiCustomer = correo;
-        datosCustomer.telefonoNotiCustomer = "NUMERO NOTIFICACION"
-        datosCustomer.telefonoFijoCustomer = "TELEFONO FIJO";
-        datosCustomer.perfilCustomer = "constructora";
-        datosCustomer.estadoCustomer = "nuevo";
-
-        customer = await CustomerRepo.insertarCustomer(datosCustomer, transaction);
 
         transaction.commit();
         return "Usuario customer registrado";

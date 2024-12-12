@@ -4,9 +4,12 @@ const Customer = require("../entities/Customer");
 const sequelize = require("../../../conf/database");
 
 
-// Trae todos los usuarios
-const getAllUsuarios = async () => {
-    const users = await Usuario.findAll({});
+// Trae todos los usuarios con condiciones
+const getAllUsuarios = async (condiciones = null) => {
+    const filtro = { ...condiciones || {} } // Combinar condiciones extra
+    const users = await Usuario.findAll({
+        where: filtro
+    });
     return users;
 
 }

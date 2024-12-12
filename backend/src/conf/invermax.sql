@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 20-11-2024 a las 23:52:09
+-- Tiempo de generación: 12-12-2024 a las 19:14:48
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -43,8 +43,24 @@ CREATE TABLE `blogs` (
 
 CREATE TABLE `caracteristicas` (
   `id_caracteristica` int(11) NOT NULL,
-  `nombre_caracteristica` varchar(25) NOT NULL
+  `nombre_caracteristica` varchar(50) NOT NULL,
+  `descripcion` varchar(200) NOT NULL COMMENT 'Descripción mas detallada en caso de ocuparse',
+  `clave` varchar(25) NOT NULL COMMENT 'Valor único que permite buscar en la BD y permitirá no basarse en el nombre para consultas',
+  `obligatoria` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0-- No es obligatoria\r\n1-- Obligatoria'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Caracteristicas de los planes';
+
+--
+-- Volcado de datos para la tabla `caracteristicas`
+--
+
+INSERT INTO `caracteristicas` (`id_caracteristica`, `nombre_caracteristica`, `descripcion`, `clave`, `obligatoria`) VALUES
+(1, 'inmuebles creados', 'Cantidad de inmuebles o proyectos que se pueden crear y publicar', 'inmuebles_creados', 1),
+(2, 'cantidad de fotos por tipo de inmueble', 'Cantidad de fotos que pueden ser subidas por tipo de inmueble.', 'fotos_inmueble', 1),
+(3, 'cantidad de videos por tipo de inmueble', 'Cantidad de videos que pueden ser subidos por tipo de inmueble', 'videos_inmueble', 1),
+(4, 'Inmuebles en alta demanda', 'Cantidad de inmuebles que se puede colocar un inmueble \"en ascenso\"', 'inmuebles_ascenso', 0),
+(5, 'inmuebles destacados', 'Cantidad de inmuebles que se pueden tener como destacados', 'inmuebles_destacados', 0),
+(6, 'acceso y participación a ferias inmobiliarias', 'Incluye el acceso y participación a ferias inmobiliarias', 'acceso_ferias', 0),
+(7, 'Apoyo marketing', 'Incluye todo el apoyo en marketing de Invermax', 'apoyo_marketing', 0);
 
 -- --------------------------------------------------------
 
@@ -57,6 +73,35 @@ CREATE TABLE `caracteristicas_planes` (
   `id_caracteristica` int(11) NOT NULL,
   `valor_caracteristica` varchar(25) NOT NULL COMMENT 'Define el valor de la caracteristica asociada en el plan asociado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `caracteristicas_planes`
+--
+
+INSERT INTO `caracteristicas_planes` (`id_plan`, `id_caracteristica`, `valor_caracteristica`) VALUES
+(1, 1, '1'),
+(1, 2, '10'),
+(2, 1, '1'),
+(2, 2, '10'),
+(2, 7, '1'),
+(3, 1, '2'),
+(3, 2, '10'),
+(3, 7, '1'),
+(4, 1, '3'),
+(4, 2, '10'),
+(4, 5, '2'),
+(4, 6, '1'),
+(4, 7, '1'),
+(5, 2, '10'),
+(5, 4, '1'),
+(5, 5, '3'),
+(5, 6, '1'),
+(5, 7, '1'),
+(6, 1, '5'),
+(6, 2, '10'),
+(6, 4, '2'),
+(6, 5, '4'),
+(6, 6, '1');
 
 -- --------------------------------------------------------
 
@@ -1213,26 +1258,31 @@ CREATE TABLE `customers` (
   `telefono_notificaciones` varchar(30) NOT NULL,
   `telefono_fijo` varchar(30) DEFAULT NULL,
   `codigo_customer` varchar(30) DEFAULT NULL COMMENT 'Codigo unico de una inmobiliaria/tipo de customer. No es requerido',
-  `perfil` varchar(25) NOT NULL COMMENT 'Tipo de customer. Pueden ser constructora,inmobiliaria,agente inmobiliario,propietario',
   `numero_comercial` varchar(25) DEFAULT NULL,
   `estado_customer` varchar(25) NOT NULL DEFAULT 'inactivo' COMMENT 'Estados posibles: "activo", "inactivo", "nuevo"',
-  `id_usuario` int(11) NOT NULL
+  `id_usuario` int(11) NOT NULL,
+  `id_perfil` int(11) NOT NULL COMMENT 'id del perfil asociado a este customer'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene a los usuarios tipo inmobiliaria';
 
 --
 -- Volcado de datos para la tabla `customers`
 --
 
-INSERT INTO `customers` (`id_customer`, `nombre_customer`, `logo_customer`, `correo_notificaciones`, `telefono_notificaciones`, `telefono_fijo`, `codigo_customer`, `perfil`, `numero_comercial`, `estado_customer`, `id_usuario`) VALUES
-(1, 'test', 'customer-1-1731458609363-433345049.png', 'test@notify', '12123123', '23234234', '400004', 'constructora', '34343434', 'activo', 1),
-(2, '', NULL, '', '', NULL, NULL, '', NULL, 'activo', 2),
-(3, 'nuevo customer', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, 'inmobiliaria', NULL, 'inactivo', 18),
-(4, 'inmobiliaria paquito', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, 'propietario', '63421232', 'inactivo', 19),
-(5, 'actualizado', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', '4040040404', 'inmobiliaria', '63421232', '0', 18),
-(8, 'inmobiliaria prueba', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, 'inmobiliaria', '63421232', '0', 23),
-(9, 'inmobiliaria ácp', NULL, 'notif@hotmail.com', '4458458 ext 511', '56566554', NULL, 'inmobiliaria', '6343221232', 'inactivo', 25),
-(10, 'Propietario pato', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, 'propietario', '63421232', 'inactivo', 26),
-(12, 'inmobiliaria GM', 'customer-12-1731897252282-196158804.png', 'kevingmez.98@gmail.com', 'NUMERO NOTIFICACION', 'TELEFONO FIJO', NULL, 'inmobiliaria', '9494999393', 'inactivo', 28);
+INSERT INTO `customers` (`id_customer`, `nombre_customer`, `logo_customer`, `correo_notificaciones`, `telefono_notificaciones`, `telefono_fijo`, `codigo_customer`, `numero_comercial`, `estado_customer`, `id_usuario`, `id_perfil`) VALUES
+(1, 'test', 'customer-1-1731458609363-433345049.png', 'test@notify', '12123123', '23234234', '400004', '34343434', 'activo', 1, 1),
+(2, '', NULL, '', '', NULL, NULL, NULL, 'activo', 2, 1),
+(3, 'nuevo customer', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, NULL, 'inactivo', 18, 2),
+(4, 'inmobiliaria paquito', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, '63421232', 'inactivo', 19, 1),
+(5, 'actualizado', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', '4040040404', '63421232', '0', 18, 1),
+(8, 'inmobiliaria prueba', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, '63421232', '0', 23, 1),
+(9, 'inmobiliaria ácp', NULL, 'notif@hotmail.com', '4458458 ext 511', '56566554', NULL, '6343221232', 'activo', 25, 2),
+(10, 'Propietario pato', NULL, 'noti@hotmail.com', '4458458 ext 511', '56566554', NULL, '63421232', 'inactivo', 26, 1),
+(12, 'inmobiliaria GM', 'customer-12-1731897252282-196158804.png', 'kevingmez.98@gmail.com', '50399', 'TELEFONO FIJO', NULL, '9494999393', 'activo', 28, 1),
+(21, 'NOMBRE CUSTOMER', NULL, 'prueba@htomail.com', 'NUMERO NOTIFICACION', 'TELEFONO FIJO', NULL, NULL, 'nuevo', 29, 1),
+(22, 'NOMBRE CUSTOMER', NULL, 'PablitoClavo@gmail.com', 'NUMERO NOTIFICACION', 'TELEFONO FIJO', NULL, NULL, 'inactivo', 30, 1),
+(23, 'NOMBRE CUSTOMER', NULL, 'nuevo@gmail.com', 'NUMERO NOTIFICACION', 'TELEFONO FIJO', NULL, NULL, 'activo', 31, 1),
+(24, 'NOMBRE CUSTOMER', NULL, 'PruebaVal@fmail.com', 'NUMERO NOTIFICACION', 'TELEFONO FIJO', NULL, NULL, 'nuevo', 32, 1),
+(25, 'NOMBRE CUSTOMER', NULL, 'Prapa@gmail.com', 'NUMERO NOTIFICACION', 'TELEFONO FIJO', NULL, NULL, 'nuevo', 33, 3);
 
 --
 -- Disparadores `customers`
@@ -1363,7 +1413,38 @@ INSERT INTO `detalles_inmuebles` (`id_detalle`, `valor_inmueble`, `area`, `ifram
 (61, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 168, 10),
 (63, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 168, 10),
 (64, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 168, 10),
-(65, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 170, NULL);
+(65, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 170, NULL),
+(67, 1500000.00, 150, 'URLFRAME.COM', 5, 2, 'si, motos', 0, 173, 11),
+(68, 20030000.00, 155, 'URLFRAME.COM', 4, 1, 'no', 1, 173, 11),
+(69, 1500000.00, 150, 'URLFRAME.COM', 5, 2, 'si, motos', 1, 173, 11),
+(70, 1500000.00, 150, 'URLFRAME.COM', 5, 2, 'si, motos', 1, 173, 11),
+(71, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 174, NULL),
+(72, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 176, 12),
+(73, 20030000.00, 155, 'hadasdads', 4, 1, 'no', 1, 176, 12),
+(74, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 176, 12),
+(75, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 176, 12),
+(76, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 177, NULL),
+(77, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 179, 13),
+(78, 20030000.00, 155, 'hadasdads', 4, 1, 'no', 1, 179, 13),
+(79, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 179, 13),
+(80, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 179, 13),
+(81, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 181, 14),
+(82, 20030000.00, 155, 'hadasdads', 4, 1, 'no', 1, 181, 14),
+(83, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 181, 14),
+(84, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 181, 14),
+(85, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 182, 15),
+(86, 20030000.00, 155, 'hadasdads', 4, 1, 'no', 1, 182, 15),
+(87, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 182, 15),
+(88, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 182, 15),
+(89, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 183, 16),
+(90, 20030000.00, 155, 'hadasdads', 4, 1, 'no', 1, 183, 16),
+(91, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 183, 16),
+(92, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 183, 16),
+(93, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 0, 185, 17),
+(94, 20030000.00, 155, 'hadasdads', 4, 1, 'no', 1, 185, 17),
+(95, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 185, 17),
+(96, 1500000.00, 150, 'hhttpads', 5, 2, 'si, motos', 1, 185, 17),
+(97, 3050000.00, 50, 'hhttpads', 7, 5, 'no', 1, 186, NULL);
 
 -- --------------------------------------------------------
 
@@ -1469,11 +1550,49 @@ INSERT INTO `inmuebles` (`id_inmueble`, `codigo_inmueble`, `descripcion`, `estad
 (162, '2323921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 4, 23, 3),
 (164, '232233921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 10, 23, 3),
 (168, '994380099', 'Una descripcion creativa', 'nuevo', 'compra', 'Acacias 2', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 43, 5),
-(170, '2134342921', 'Una descripcion creativa', 'usado', 'arriendo', 'Acacias 3', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'publicado', '2024-11-19 22:25:44', 12, 23, 3);
+(170, '2134342921', 'Una descripcion creativa', 'usado', 'arriendo', 'Acacias 3', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 23, 3),
+(173, '9980099', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 43, 5),
+(174, '21299342921', 'Una descripcion creativa', 'usado', 'arriendo', 'TITULO', 3, 1, 'no VIS', 'maps.com', 'borrador', NULL, 12, 23, 3),
+(176, '9380099', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 43, 5),
+(177, '213499342921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 23, 3),
+(179, '9000099', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 43, 5),
+(181, '9002000099', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 43, 5),
+(182, '903434099', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 43, 5),
+(183, '90233434099', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 43, 5),
+(185, '34343434099', 'Una descripcion creativa', 'nuevo', 'compra', 'prueba', 5, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 43, 5),
+(186, '23499342921', 'Una descripcion creativa', 'usado', 'arriendo', 'probando', 3, 1, 'no VIS', 'asassddjkasdhkasjd.com', 'borrador', NULL, 12, 23, 3);
 
 --
 -- Disparadores `inmuebles`
 --
+DELIMITER $$
+CREATE TRIGGER `actualizar_estado_ascenso` AFTER UPDATE ON `inmuebles` FOR EACH ROW BEGIN
+    -- Si el estado nuevo es borrador
+    IF NEW.estado_publicacion = 'borrador' THEN
+        -- Actualizar el registro de inmueble destacados a inactivo (0) y su fecha a null
+        UPDATE inmuebles_en_ascenso
+        SET 
+        	fecha_inicio = NULL,
+         	estado_ascenso = 0
+        WHERE id_inmueble = NEW.id_inmueble;
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `actualizar_estado_destacado` AFTER UPDATE ON `inmuebles` FOR EACH ROW BEGIN
+    -- Si el estado nuevo es borrador
+    IF NEW.estado_publicacion = 'borrador' THEN
+        -- Actualizar el registro de inmueble destacados a inactivo (0) y su fecha a null
+        UPDATE inmuebles_destacados
+        SET 
+        	fecha_inicio = NULL,
+         	estado_destacado = 0
+        WHERE id_inmueble = NEW.id_inmueble;
+    END IF;
+END
+$$
+DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `actualizar_fecha_publicacion` BEFORE UPDATE ON `inmuebles` FOR EACH ROW BEGIN
     -- Si el nuevo estado es 'borrador', establecer la fecha de publicación como NULL
@@ -1495,11 +1614,18 @@ DELIMITER ;
 
 CREATE TABLE `inmuebles_destacados` (
   `id_destacado` int(11) NOT NULL,
-  `fecha_inicio` datetime NOT NULL COMMENT 'Fecha y hora de cuando se marcó como destacado la primera vez. Permite luego calcular cuantos días le quedan',
-  `estado_destacado` tinyint(1) NOT NULL COMMENT 'Cuando tiene su valor en true se hará el calculo para descontar los días del plan',
-  `id_inmueble` int(11) NOT NULL,
-  `id_suscripcion` int(11) NOT NULL COMMENT 'Suscripcion asociada al inmueble destacado para poder saber cuantos días permite su plan como maximo'
+  `fecha_inicio` datetime DEFAULT NULL COMMENT 'Fecha y hora de cuando se marcó como destacado la primera vez. Permite luego calcular cuantos días le quedan',
+  `estado_destacado` tinyint(1) NOT NULL COMMENT 'Cuando tiene su valor en activo se hará el calculo para descontar los días del plan. 0 inactivo, 1 activo',
+  `id_inmueble` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `inmuebles_destacados`
+--
+
+INSERT INTO `inmuebles_destacados` (`id_destacado`, `fecha_inicio`, `estado_destacado`, `id_inmueble`) VALUES
+(1, NULL, 0, 176),
+(2, '2024-11-26 22:25:00', 1, 49);
 
 -- --------------------------------------------------------
 
@@ -1509,11 +1635,17 @@ CREATE TABLE `inmuebles_destacados` (
 
 CREATE TABLE `inmuebles_en_ascenso` (
   `id_ascenso` int(11) NOT NULL,
-  `fecha_inicio` int(11) NOT NULL COMMENT 'Fecha de inicio del inmueble como "en ascenso"',
+  `fecha_inicio` datetime DEFAULT NULL COMMENT 'Fecha de inicio del inmueble como "en ascenso"',
   `estado_ascenso` tinyint(1) NOT NULL COMMENT 'Verdadero si está en ascenso falso si no. Se usa para descontar las horas del plan',
-  `id_inmueble` int(11) NOT NULL,
-  `id_suscripcion` int(11) NOT NULL COMMENT 'Suscripción asociada al inmueble en ascenso para saber cuanto tiempo le queda segun el plan'
+  `id_inmueble` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `inmuebles_en_ascenso`
+--
+
+INSERT INTO `inmuebles_en_ascenso` (`id_ascenso`, `fecha_inicio`, `estado_ascenso`, `id_inmueble`) VALUES
+(1, NULL, 0, 174);
 
 -- --------------------------------------------------------
 
@@ -1552,15 +1684,90 @@ INSERT INTO `interesados` (`id_interesado`, `nombre`, `telefono`, `correo`, `ubi
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `perfiles_customer`
+--
+
+CREATE TABLE `perfiles_customer` (
+  `id_perfil` int(11) NOT NULL,
+  `perfil` varchar(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Perfiles de los diferentes customer';
+
+--
+-- Volcado de datos para la tabla `perfiles_customer`
+--
+
+INSERT INTO `perfiles_customer` (`id_perfil`, `perfil`) VALUES
+(1, 'constructora'),
+(2, 'inmobiliaria'),
+(3, 'agente inmobiliario'),
+(4, 'propietario');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `planes`
 --
 
 CREATE TABLE `planes` (
   `id_plan` int(11) NOT NULL,
   `tipo_plan` varchar(50) NOT NULL COMMENT 'Nombre del plan',
-  `precio` decimal(10,2) NOT NULL,
-  `duracion` int(11) NOT NULL COMMENT 'Duracion en meses'
+  `estado_plan` tinyint(1) NOT NULL COMMENT '0 inactivo, 1 activo',
+  `id_perfil` int(11) NOT NULL COMMENT 'id del perfil customer asociado a este plan'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `planes`
+--
+
+INSERT INTO `planes` (`id_plan`, `tipo_plan`, `estado_plan`, `id_perfil`) VALUES
+(1, 'Plan gratuito', 1, 1),
+(2, 'Plan 1', 1, 1),
+(3, 'Plan 2', 1, 1),
+(4, 'Plan 3', 1, 1),
+(5, 'Plan 4', 1, 1),
+(6, 'Plan 5', 1, 1),
+(7, 'Plan gratuito', 1, 2),
+(8, 'Plan 1', 1, 2),
+(9, 'Plan 2', 1, 2),
+(10, 'Plan 3', 1, 2),
+(11, 'Plan gratuito', 1, 3),
+(12, 'Plan 1', 1, 3),
+(13, 'Plan 2', 1, 3),
+(14, 'Plan gratuito', 1, 4),
+(15, 'Plan 1', 1, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `precios_planes`
+--
+
+CREATE TABLE `precios_planes` (
+  `id_precio_plan` int(11) NOT NULL,
+  `precio` decimal(10,2) NOT NULL,
+  `duracion` int(11) DEFAULT NULL COMMENT 'Duracion en meses',
+  `estado_precio` tinyint(1) NOT NULL COMMENT '0 inactivo, 1 activo',
+  `id_plan` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Guarda detalles de precio y duracion de los planes';
+
+--
+-- Volcado de datos para la tabla `precios_planes`
+--
+
+INSERT INTO `precios_planes` (`id_precio_plan`, `precio`, `duracion`, `estado_precio`, `id_plan`) VALUES
+(1, 0.00, NULL, 1, 1),
+(2, 300000.00, 1, 1, 2),
+(3, 600000.00, 1, 1, 3),
+(4, 900000.00, 1, 1, 4),
+(5, 1200000.00, 1, 1, 4),
+(6, 1500000.00, 1, 1, 6),
+(7, 0.00, NULL, 1, 7),
+(8, 150000.00, 1, 1, 8),
+(9, 300000.00, 1, 1, 9),
+(10, 450000.00, 1, 1, 10),
+(11, 0.00, NULL, 1, 11),
+(12, 150000.00, 1, 1, 12),
+(13, 300000.00, 1, 1, 13);
 
 -- --------------------------------------------------------
 
@@ -1586,7 +1793,26 @@ INSERT INTO `proyectos` (`id_proyecto`, `fecha_entrega`, `id_inmueble`) VALUES
 (7, '2027-11-05', 141),
 (8, '2027-11-05', 146),
 (9, '2027-11-05', 148),
-(10, '2027-11-05', 168);
+(10, '2027-11-05', 168),
+(11, '2027-11-05', 173),
+(12, '2027-11-05', 176),
+(13, '2027-11-05', 179),
+(14, '2027-11-05', 181),
+(15, '2027-11-05', 182),
+(16, '2027-11-05', 183),
+(17, '2027-11-05', 185);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `saldos_caracteristicas`
+--
+
+CREATE TABLE `saldos_caracteristicas` (
+  `id_suscripcion` int(11) NOT NULL,
+  `id_caracteristica` int(11) NOT NULL,
+  `capacidad_disponible` decimal(10,2) DEFAULT NULL COMMENT 'Muestra qué tanto de la caracteristica le queda a la suscripción'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='"cuanto" de una característica le queda a una suscripción';
 
 -- --------------------------------------------------------
 
@@ -1596,10 +1822,15 @@ INSERT INTO `proyectos` (`id_proyecto`, `fecha_entrega`, `id_inmueble`) VALUES
 
 CREATE TABLE `suscripciones` (
   `id_suscripcion` int(11) NOT NULL,
-  `fecha_inicio` int(11) NOT NULL,
-  `fecha_fin` int(11) NOT NULL,
-  `id_plan` int(11) NOT NULL,
-  `id_customer` int(11) NOT NULL COMMENT 'Referencia al suscriptor del plan'
+  `fecha_inicio` datetime NOT NULL,
+  `fecha_fin` datetime DEFAULT NULL,
+  `medio_pago` varchar(25) DEFAULT NULL,
+  `id_transaccion` varchar(50) DEFAULT NULL,
+  `fecha_pago` datetime DEFAULT NULL,
+  `monto_pagado` decimal(10,2) DEFAULT NULL,
+  `estado` varchar(25) NOT NULL COMMENT 'POSIBLES ESTADOS= "activa", "inactiva", "pendiente"',
+  `id_customer` int(11) NOT NULL COMMENT 'Referencia al suscriptor del plan',
+  `id_precio_plan` int(11) NOT NULL COMMENT 'Referencia al precio y duración del plan'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1627,13 +1858,33 @@ INSERT INTO `tipos_inmueble` (`id_tipo_inmueble`, `tipo_inmueble`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `tipo_inmueble_perfil`
+--
+
+CREATE TABLE `tipo_inmueble_perfil` (
+  `id_tipo_inmueble` int(11) NOT NULL,
+  `id_perfil` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Define tipos de inmueble que pueden ser creados por perfiles';
+
+--
+-- Volcado de datos para la tabla `tipo_inmueble_perfil`
+--
+
+INSERT INTO `tipo_inmueble_perfil` (`id_tipo_inmueble`, `id_perfil`) VALUES
+(3, 4),
+(5, 1),
+(5, 2);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `usuarios`
 --
 
 CREATE TABLE `usuarios` (
   `id_usuario` int(11) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `tipo_usuario` varchar(25) NOT NULL COMMENT 'Estos pueden ser\r\n''usuario'',''customer'',''admin''',
+  `tipo_usuario` varchar(25) NOT NULL COMMENT 'Estos pueden ser,''customer'',''admin''',
   `UID_firebase` varchar(50) DEFAULT NULL COMMENT 'Unique ID que da firebase'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -1650,7 +1901,12 @@ INSERT INTO `usuarios` (`id_usuario`, `email`, `tipo_usuario`, `UID_firebase`) V
 (23, 'correo_test@gmail.com', 'customer', NULL),
 (25, 'corret@gmail.com', 'customer', NULL),
 (26, 'correo_test@gmail.com', 'customer', NULL),
-(28, 'kevingmez.98@gmail.com', 'customer', 'DjvTmw4kWeeO2XNjkriTLHoEEbU2');
+(28, 'kevingmez.98@gmail.com', 'customer', 'DjvTmw4kWeeO2XNjkriTLHoEEbU2'),
+(29, 'prueba@htomail.com', 'customer', '220200202'),
+(30, 'PablitoClavo@gmail.com', 'customer', 'Kkjjaii99'),
+(31, 'nuevo@gmail.com', 'customer', '300302kULlk'),
+(32, 'PruebaVal@fmail.com', 'customer', '300PpkslLK'),
+(33, 'Prapa@gmail.com', 'customer', '34000PppallSS');
 
 -- --------------------------------------------------------
 
@@ -1765,7 +2021,11 @@ INSERT INTO `zonas_inmuebles` (`id_inmueble`, `id_zona`) VALUES
 (75, 1),
 (75, 2),
 (75, 3),
-(75, 5);
+(75, 5),
+(173, 2),
+(173, 4),
+(173, 5),
+(174, 5);
 
 -- --------------------------------------------------------
 
@@ -1800,7 +2060,8 @@ ALTER TABLE `blogs`
 -- Indices de la tabla `caracteristicas`
 --
 ALTER TABLE `caracteristicas`
-  ADD PRIMARY KEY (`id_caracteristica`);
+  ADD PRIMARY KEY (`id_caracteristica`),
+  ADD UNIQUE KEY `clave` (`clave`);
 
 --
 -- Indices de la tabla `caracteristicas_planes`
@@ -1824,7 +2085,8 @@ ALTER TABLE `customers`
   ADD PRIMARY KEY (`id_customer`),
   ADD UNIQUE KEY `codigo_inmobiliaria` (`codigo_customer`),
   ADD KEY `id_inmobiliaria` (`id_customer`),
-  ADD KEY `id_usuario` (`id_usuario`);
+  ADD KEY `id_usuario` (`id_usuario`),
+  ADD KEY `id_perfil` (`id_perfil`);
 
 --
 -- Indices de la tabla `departamentos`
@@ -1863,16 +2125,14 @@ ALTER TABLE `inmuebles`
 --
 ALTER TABLE `inmuebles_destacados`
   ADD PRIMARY KEY (`id_destacado`),
-  ADD KEY `id_inmueble` (`id_inmueble`),
-  ADD KEY `id_suscripcion` (`id_suscripcion`);
+  ADD KEY `id_inmueble` (`id_inmueble`);
 
 --
 -- Indices de la tabla `inmuebles_en_ascenso`
 --
 ALTER TABLE `inmuebles_en_ascenso`
   ADD PRIMARY KEY (`id_ascenso`),
-  ADD KEY `id_inmueble` (`id_inmueble`),
-  ADD KEY `id_suscripcion` (`id_suscripcion`);
+  ADD KEY `id_inmueble` (`id_inmueble`);
 
 --
 -- Indices de la tabla `interesados`
@@ -1882,10 +2142,24 @@ ALTER TABLE `interesados`
   ADD KEY `id_inmueble` (`id_inmueble`);
 
 --
+-- Indices de la tabla `perfiles_customer`
+--
+ALTER TABLE `perfiles_customer`
+  ADD PRIMARY KEY (`id_perfil`);
+
+--
 -- Indices de la tabla `planes`
 --
 ALTER TABLE `planes`
-  ADD PRIMARY KEY (`id_plan`);
+  ADD PRIMARY KEY (`id_plan`),
+  ADD KEY `id_perfil_customer` (`id_perfil`);
+
+--
+-- Indices de la tabla `precios_planes`
+--
+ALTER TABLE `precios_planes`
+  ADD PRIMARY KEY (`id_precio_plan`),
+  ADD KEY `id_plan` (`id_plan`);
 
 --
 -- Indices de la tabla `proyectos`
@@ -1895,18 +2169,34 @@ ALTER TABLE `proyectos`
   ADD KEY `id_inmueble` (`id_inmueble`);
 
 --
+-- Indices de la tabla `saldos_caracteristicas`
+--
+ALTER TABLE `saldos_caracteristicas`
+  ADD PRIMARY KEY (`id_suscripcion`,`id_caracteristica`),
+  ADD KEY `id_suscripción` (`id_suscripcion`),
+  ADD KEY `id_caracteristica` (`id_caracteristica`);
+
+--
 -- Indices de la tabla `suscripciones`
 --
 ALTER TABLE `suscripciones`
   ADD PRIMARY KEY (`id_suscripcion`),
-  ADD KEY `id_plan` (`id_plan`),
-  ADD KEY `id_customer` (`id_customer`);
+  ADD KEY `id_customer` (`id_customer`),
+  ADD KEY `id_precio_plan` (`id_precio_plan`);
 
 --
 -- Indices de la tabla `tipos_inmueble`
 --
 ALTER TABLE `tipos_inmueble`
   ADD PRIMARY KEY (`id_tipo_inmueble`);
+
+--
+-- Indices de la tabla `tipo_inmueble_perfil`
+--
+ALTER TABLE `tipo_inmueble_perfil`
+  ADD PRIMARY KEY (`id_tipo_inmueble`,`id_perfil`),
+  ADD KEY `id_tipo_inmueble` (`id_tipo_inmueble`),
+  ADD KEY `id_perfil` (`id_perfil`);
 
 --
 -- Indices de la tabla `usuarios`
@@ -1950,7 +2240,7 @@ ALTER TABLE `blogs`
 -- AUTO_INCREMENT de la tabla `caracteristicas`
 --
 ALTER TABLE `caracteristicas`
-  MODIFY `id_caracteristica` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_caracteristica` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `ciudades`
@@ -1962,7 +2252,7 @@ ALTER TABLE `ciudades`
 -- AUTO_INCREMENT de la tabla `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id_customer` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_customer` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `departamentos`
@@ -1974,7 +2264,7 @@ ALTER TABLE `departamentos`
 -- AUTO_INCREMENT de la tabla `detalles_inmuebles`
 --
 ALTER TABLE `detalles_inmuebles`
-  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT de la tabla `fotos`
@@ -1986,19 +2276,19 @@ ALTER TABLE `fotos`
 -- AUTO_INCREMENT de la tabla `inmuebles`
 --
 ALTER TABLE `inmuebles`
-  MODIFY `id_inmueble` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
+  MODIFY `id_inmueble` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
 
 --
 -- AUTO_INCREMENT de la tabla `inmuebles_destacados`
 --
 ALTER TABLE `inmuebles_destacados`
-  MODIFY `id_destacado` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_destacado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `inmuebles_en_ascenso`
 --
 ALTER TABLE `inmuebles_en_ascenso`
-  MODIFY `id_ascenso` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_ascenso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `interesados`
@@ -2007,22 +2297,34 @@ ALTER TABLE `interesados`
   MODIFY `id_interesado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
+-- AUTO_INCREMENT de la tabla `perfiles_customer`
+--
+ALTER TABLE `perfiles_customer`
+  MODIFY `id_perfil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT de la tabla `planes`
 --
 ALTER TABLE `planes`
-  MODIFY `id_plan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_plan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT de la tabla `precios_planes`
+--
+ALTER TABLE `precios_planes`
+  MODIFY `id_precio_plan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `proyectos`
 --
 ALTER TABLE `proyectos`
-  MODIFY `id_proyecto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_proyecto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `suscripciones`
 --
 ALTER TABLE `suscripciones`
-  MODIFY `id_suscripcion` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_suscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT de la tabla `tipos_inmueble`
@@ -2034,7 +2336,7 @@ ALTER TABLE `tipos_inmueble`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT de la tabla `videos`
@@ -2075,7 +2377,8 @@ ALTER TABLE `ciudades`
 -- Filtros para la tabla `customers`
 --
 ALTER TABLE `customers`
-  ADD CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `customers_ibfk_2` FOREIGN KEY (`id_perfil`) REFERENCES `perfiles_customer` (`id_perfil`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `detalles_inmuebles`
@@ -2103,14 +2406,12 @@ ALTER TABLE `inmuebles`
 -- Filtros para la tabla `inmuebles_destacados`
 --
 ALTER TABLE `inmuebles_destacados`
-  ADD CONSTRAINT `inmuebles_destacados_ibfk_1` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `inmuebles_destacados_ibfk_2` FOREIGN KEY (`id_suscripcion`) REFERENCES `suscripciones` (`id_suscripcion`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `inmuebles_destacados_ibfk_1` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `inmuebles_en_ascenso`
 --
 ALTER TABLE `inmuebles_en_ascenso`
-  ADD CONSTRAINT `inmuebles_en_ascenso_ibfk_1` FOREIGN KEY (`id_suscripcion`) REFERENCES `suscripciones` (`id_suscripcion`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `inmuebles_en_ascenso_ibfk_2` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
@@ -2120,17 +2421,43 @@ ALTER TABLE `interesados`
   ADD CONSTRAINT `interesados_ibfk_1` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `planes`
+--
+ALTER TABLE `planes`
+  ADD CONSTRAINT `planes_ibfk_1` FOREIGN KEY (`id_perfil`) REFERENCES `perfiles_customer` (`id_perfil`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `precios_planes`
+--
+ALTER TABLE `precios_planes`
+  ADD CONSTRAINT `precios_planes_ibfk_1` FOREIGN KEY (`id_plan`) REFERENCES `planes` (`id_plan`) ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `proyectos`
 --
 ALTER TABLE `proyectos`
   ADD CONSTRAINT `proyectos_ibfk_1` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `saldos_caracteristicas`
+--
+ALTER TABLE `saldos_caracteristicas`
+  ADD CONSTRAINT `saldos_caracteristicas_ibfk_1` FOREIGN KEY (`id_caracteristica`) REFERENCES `caracteristicas` (`id_caracteristica`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `saldos_caracteristicas_ibfk_2` FOREIGN KEY (`id_suscripcion`) REFERENCES `suscripciones` (`id_suscripcion`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `suscripciones`
 --
 ALTER TABLE `suscripciones`
   ADD CONSTRAINT `suscripciones_ibfk_1` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id_customer`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  ADD CONSTRAINT `suscripciones_ibfk_2` FOREIGN KEY (`id_plan`) REFERENCES `planes` (`id_plan`) ON DELETE NO ACTION ON UPDATE CASCADE;
+  ADD CONSTRAINT `suscripciones_ibfk_2` FOREIGN KEY (`id_precio_plan`) REFERENCES `precios_planes` (`id_precio_plan`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `tipo_inmueble_perfil`
+--
+ALTER TABLE `tipo_inmueble_perfil`
+  ADD CONSTRAINT `tipo_inmueble_perfil_ibfk_1` FOREIGN KEY (`id_perfil`) REFERENCES `perfiles_customer` (`id_perfil`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tipo_inmueble_perfil_ibfk_2` FOREIGN KEY (`id_tipo_inmueble`) REFERENCES `tipos_inmueble` (`id_tipo_inmueble`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `videos`
