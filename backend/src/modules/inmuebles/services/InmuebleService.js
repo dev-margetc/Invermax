@@ -6,6 +6,7 @@ const sequelize = require("../../../conf/database");
 
 const CustomerService = require("../../usuarios/services/CustomerService");
 const FiltrosInmuebleService = require("./FiltrosInmuebleService");
+const CaracteristicaService = require("../../suscripciones/services/CaracteristicasService");
 
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
@@ -34,7 +35,8 @@ const insertarInmueble = async (datosInmueble) => {
         await TipoInmueblePerfilService.verificarPerfil(perfil.idPerfil, tipoInmueble.idTipoInmueble);
 
         // Verificar que el usuario si pueda crear un inmueble dado su plan
-
+        await CaracteristicaService.verificarInmueblesCreacion(datosInmueble.inmueble.idCustomer);
+        
         // Verificar si el tipo es "proyecto" y es valido
         if (tipoInmueble.tipoInmueble === 'proyecto' && estadoInmueble !== 'nuevo') {
             throw new ErrorNegocio("Los inmuebles de tipo 'proyecto' deben ser nuevos.");

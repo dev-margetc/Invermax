@@ -1,20 +1,22 @@
 /*Se aplica la lógica de negocio a los datos traidos por el repositorio. 
 Tambien se encarga de interactuar con otros servicios*/
-const {deleteMultimediaServidor} = require("../../../middleware/uploadConfig");
+const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const DetalleInmueble = require("../entities/DetalleInmueble");
+const CaracteristicaService = require("../../suscripciones/services/CaracteristicasService");
 const detalleRepo = require("../repositories/DetalleInmuebleRepository");
 const sequelize = require("../../../conf/database");
 const fs = require('fs');
 
-const insertarMultimediaDetalle = async (detalleId, rutaFoto, tipoArchivo) => {
+// Subir algun tipo de multimedia
+const insertarMultimediaDetalle = async (detalleId, rutaFoto, tipoArchivo, idCustomer) => {
     try {
 
-        if(!rutaFoto){
+        if (!rutaFoto) {
             throw new ErrorNegocio("Ruta no encontrada");
         }
 
-        if(!tipoArchivo){
+        if (!tipoArchivo) {
             throw new ErrorNegocio("Tipo de archivo no especificado");
         }
         // Verificar que exista el id del detalle
@@ -27,6 +29,8 @@ const insertarMultimediaDetalle = async (detalleId, rutaFoto, tipoArchivo) => {
         /*Si es valido se crea la foto o video*/
         msg = "";
         if (tipoArchivo === 'foto') {
+            // Verificar que el plan le permita subir fotos
+            await CaracteristicaService.verificarFotoDetalle(idCustomer, detalleId);
             msg = await detalleRepo.insertarFoto(detalleId, rutaFoto);
         } else if (tipoArchivo === 'video') {
             msg = await detalleRepo.insertarVideo(detalleId, rutaFoto);

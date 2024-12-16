@@ -27,8 +27,6 @@ const insertarDestacado = async (req, res) => {
         }
         
     } catch (err) {
-        
-        console.log(err);
         errorHandler.handleControllerError(res, err, "suscripciones");
     }
 };

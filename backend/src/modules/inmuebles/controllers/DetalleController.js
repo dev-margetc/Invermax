@@ -30,7 +30,7 @@ const insertMultimedia = async (req, res) => {
           Si el usuario es admin se permite el ver los datos*/
         const idCustomer = await FiltrosInmuebleService.traerCustomerInmueble(idDetalle, null);
         if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
-            msg = await detalleService.insertarMultimediaDetalle(idDetalle, nombreFoto, tipoArchivo);
+            msg = await detalleService.insertarMultimediaDetalle(idDetalle, nombreFoto, tipoArchivo, idCustomer);
             return res.status(200).json({ message: msg }); // respuesta aquí
 
         } else {

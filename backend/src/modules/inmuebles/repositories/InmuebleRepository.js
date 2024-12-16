@@ -138,8 +138,8 @@ const getPublicados = async () => {
   }
 }
 
-// Traer los inmuebles de un usuario
-const getInmueblesUsuario = async (idUsuario) => {
+// Traer los inmuebles de un customer
+const getInmueblesUsuario = async (idCustomer) => {
   const inmuebles = Inmueble.findAll({
     attributes: [
       "idInmueble", // Para renombrar se coloca a la izquierda el nombre que está en la BD
@@ -148,7 +148,7 @@ const getInmueblesUsuario = async (idUsuario) => {
       "estadoPublicacionInmueble"
     ],
     where: {
-      idCustomer: idUsuario
+      idCustomer: idCustomer
     }
   });
 

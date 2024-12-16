@@ -48,6 +48,19 @@ const traerDestacados = async (condiciones = null, whereInmueble = null, atribut
     }
 }
 
+// Generar el codigo para el destacado
+function generarCodigoPeriodo(fechaInicioSuscripcion, idSuscripcion) {
+    const fechaActual = new Date(); // Fecha actual
+    const inicioSuscripcion = new Date(fechaInicioSuscripcion); // Fecha de inicio de la suscripción
+    
+    const mesesTranscurridos = 
+        (fechaActual.getFullYear() - inicioSuscripcion.getFullYear()) * 12 +
+        fechaActual.getMonth() - inicioSuscripcion.getMonth() + 1; // +1 porque el primer mes cuenta como 1
+
+    // Retorna el código (idSuscripcion-mes)
+    return `${idSuscripcion}-${mesesTranscurridos}`;
+}
+
 
 
 /* Metodos INSERT */
@@ -67,8 +80,6 @@ const insertarDestacado = async (datos) => {
 
 //Metodo actualizacion
 const modificarDestacado = async (datos, idDestacado) => {
-    console.log(datos);
-    console.log(idDestacado);
     try {
         InmuebleDestacado.update(datos,{
             where: {
@@ -84,5 +95,6 @@ const modificarDestacado = async (datos, idDestacado) => {
 module.exports = {
     traerDestacados,
     insertarDestacado,
-    modificarDestacado
+    modificarDestacado,
+    generarCodigoPeriodo
 }

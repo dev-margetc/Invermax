@@ -43,7 +43,6 @@ const crearSuscripcionPagada = async (infoSuscripcion) => {
             // Si hay una pendiente, la nueva comienza después de su fechaFin
             fechaInicio = new Date(ultimaPendiente.fechaFinSuscripcion);
         } else if (suscripcionActiva) {
-
             // Si la suscripcion activa tiene fechaFin null es porque es gratuita
             if (suscripcionActiva.fechaFinSuscripcion == null) {
                 // Cancelar la gratuita
@@ -51,13 +50,18 @@ const crearSuscripcionPagada = async (infoSuscripcion) => {
                 datosModGratuita.estadoSuscripcion = "inactiva";
                 datosModGratuita.fechaFinSuscripcion = new Date();
 
-                let datosGratuita = {};
-                datosGratuita.idSuscripcion = suscripcionActiva.idSuscripcion;
-                await suscripcionRepository.updateSuscripciones({ datosGratuita, datosGratuita });
+                let filtroGratuita = {};
+                filtroGratuita.idSuscripcion = suscripcionActiva.idSuscripcion;
+                await suscripcionRepository.updateSuscripciones(datosModGratuita, filtroGratuita);
                 // Activar la nueva
-                infoSuscripcion.estadoSuscripcion = "pendiente";
-                // Si hay una pendiente, la nueva comienza después de su fechaFin
+                infoSuscripcion.estadoSuscripcion = "activa";
+                // La nueva tendrá la fecha actual
                 fechaInicio = new Date();
+
+                // Al ser activa se modificará el estado del customer a activo si el estado actual no es nuevo
+                if (infoSuscripcion.customer.estadoCustomer != "nuevo") {
+                    await customerRepo.actualizarCustomer({ estadoCustomer: "activo" }, infoSuscripcion.idCustomer);
+                }
             } else {
                 infoSuscripcion.estadoSuscripcion = "pendiente";
                 // Si hay una activa, la nueva comienza luego de su fechaFin
@@ -65,7 +69,6 @@ const crearSuscripcionPagada = async (infoSuscripcion) => {
             }
 
         } else {
-
             infoSuscripcion.estadoSuscripcion = "activa";
             // Si no hay pendientes ni activas se generará con la fecha de inicio hoy
             fechaInicio = new Date();
@@ -138,7 +141,7 @@ const crearSuscripcionGratuita = async (infoSuscripcion) => {
             }
         }
 
-        if(!gratuito){
+        if (!gratuito) {
             throw new ErrorNegocio("El plan no es gratuito");
         }
 
