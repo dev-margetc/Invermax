@@ -27,7 +27,7 @@ const InmuebleAscenso = sequelize.define('InmuebleAscenso', {
     },
     idInmueble: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'Inmueble', //Nombre modelo
             key: 'idInmueble', // KEY del modelo

@@ -26,7 +26,7 @@ const getSuscripcionesPlan = async (condiciones = null) => {
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
     const suscripciones = await Suscripcion.findAll({
         attributes: {
-            exclude: ['idPrecioPlan', 'id_precio_plan', 'idCustomer', 'id_customer']
+            exclude: ['idPrecioPlan', 'id_precio_plan','id_customer']
         },
         include: [
             {

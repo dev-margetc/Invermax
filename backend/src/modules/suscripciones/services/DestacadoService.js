@@ -8,7 +8,7 @@ const InmuebleRepo = require("../../inmuebles/repositories/InmuebleRepository");
 const suscripcionRepo = require("../repositories/SuscripcionRepository");
 const destacadoRepo = require("../repositories/DestacadoRepository");
 
-const {construirCondiciones} =require("../../../utils/utils");
+const { construirCondiciones } = require("../../../utils/utils");
 
 /* Metodos GET */
 
@@ -17,7 +17,16 @@ const getDestacadoInmueble = async (idInmueble = null, codigoPeriodo = null) => 
     try {
         // Construir condiciones a partir de idInmueble y/o codigoPeriodo
         const condiciones = construirCondiciones({ idInmueble, codigoPeriodo });
-        return await destacadoRepo.traerDestacados(condiciones);
+        // Obtener los destacados que cumplen las condiciones
+        const destacados = await destacadoRepo.traerDestacados(condiciones);
+
+        // Calcular minutos restantes para cada destacado
+        const destacadosConTiempo = destacados.map(destacado => {
+            const minutosRestantes = calcularMinutosRestantes(destacado);
+            return { ...destacado, minutosRestantes };
+        });
+
+        return destacadosConTiempo;
     } catch (err) {
         console.log(err);
         throw err;
@@ -29,8 +38,8 @@ const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, info
     try {
         // Construir parametros de consulta de destacados e inmuebles
         const whereDestacado = construirCondiciones({ estadoDestacado: estado });
-        
-        const whereInmueble = construirCondiciones({idCustomer: idCustomer});
+
+        const whereInmueble = construirCondiciones({ idCustomer: idCustomer });
         let atributosInmueble = {};
 
         if (infoInmueble) {
@@ -40,7 +49,14 @@ const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, info
         }
 
         let destacados = await destacadoRepo.traerDestacados(whereDestacado, whereInmueble, atributosInmueble);
-        return destacados;
+        
+         // Calcular minutos restantes para cada destacado
+         const destacadosConTiempo = destacados.map(destacado => {
+            const minutosRestantes = calcularMinutosRestantes(destacado);
+            return { ...destacado, minutosRestantes };
+        });
+
+        return destacadosConTiempo;
     } catch (err) {
         console.log(err);
         throw err;
@@ -233,8 +249,15 @@ const desactivarDestacadosVencidos = async () => {
 
     // Obtener todas las suscripciones inactivas de una sola vez
     const idSuscripciones = destacadosActivos.map(destacado => destacado.codigoPeriodo.split('-')[0]); // Obtener la parte de idSuscripcion
+    if (idSuscripciones.length == 0) {
+        console.log("no hay destacados activos");
+        return true;
+    }
     let suscripciones = await suscripcionRepo.getSuscripciones({ idSuscripcion: idSuscripciones, estado: "inactiva" });
-
+    if (suscripciones.length == 0) {
+        console.log("no hay suscripciones relacionadas a destacados activas con estado de inactivas ");
+        return true;
+    }
     // Crear un mapa de suscripciones para un acceso rápido
     let suscripcionesMap = suscripciones.reduce((acc, suscripcion) => {
         acc[suscripcion.idSuscripcion] = suscripcion;

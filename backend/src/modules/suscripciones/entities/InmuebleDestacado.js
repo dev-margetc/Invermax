@@ -45,7 +45,7 @@ const InmuebleDestacado = sequelize.define('InmuebleDestacado', {
     },
     idInmueble: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'Inmueble', //Nombre modelo
             key: 'idInmueble', // KEY del modelo

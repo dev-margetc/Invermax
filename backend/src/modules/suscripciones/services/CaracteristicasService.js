@@ -39,7 +39,7 @@ const verificarInmueblesCreacion = async (idCustomer) => {
         if (inmueblesCustomer.length >= cantidadMaxima) {
 
             // Si es mayor o igual lanzar un error, si no, no pasa nada
-            throw new ErrorNegocio("Tu plan no permite crear mas de " + cantidadMaxima + " inmuebles. Actualmente tiene "
+            throw new ErrorNegocio("Has alcanzado el limite de " + cantidadMaxima + " inmuebles. Actualmente tiene "
                 + inmueblesCustomer.length
             );
         }
@@ -71,8 +71,6 @@ const verificarFotoDetalle = async (idCustomer, idDetalle) => {
         /* Traer la cantidad de fotos que tiene el detalle */
         let cantidadFotosActual = await detalleRepo.fotosDetalle(idDetalle);
 
-        console.log(cantidadFotosActual.length);
-
         /* Verificar que la cantidad actual no sea mayor o igual */
         if (cantidadFotosActual.length >= cantidadMaxima) {
             // Si es mayor o igual lanzar un error, si no, no pasa nada
@@ -88,24 +86,35 @@ const verificarFotoDetalle = async (idCustomer, idDetalle) => {
 
 // Verifica que se le puedan asignar mas videos a un detalle o tipo de inmueble
 const verificarVideoDetalle = async (idCustomer, idDetalle) => {
+    try {
+        /* Traer la suscripcion activa del customer */
+        let condiciones = { idCustomer: idCustomer, estado: "activa" };
+        let suscripcionesActivas = await suscripcionRepo.getSuscripcionesPlan(condiciones);
 
-    /* Traer la suscripcion activa del customer */
-    let condiciones = { idCustomer: idCustomer, estado: "activa" };
-    let suscripcionesActivas = await suscripcionRepo.getSuscripcionesFechaFin(condiciones);
+        if (suscripcionesActivas.length <= 0) {
+            throw new ErrorNegocio("El usuario no tiene suscripciones que le permitan realizar esta acción");
+        }
 
-    /* Traer el plan asociado a la suscripcion activa*/
-    let precioPlanActivo = suscripcionesActivas[0].precioPlan;
-    let idPlan = precioPlanActivo.plan.idPlan;
+        /* Traer el plan asociado a la suscripcion activa*/
+        let precioPlanActivo = suscripcionesActivas[0].precioPlan;
+        let idPlan = precioPlanActivo.plan.idPlan;
 
-    /* Traer la cantidad de inmuebles destacados que puede crear segun su plan activo*/
-    let cantidadMaxima = await getValorCaracteristica(idPlan, "inmuebles_destacados");
+        /* Traer la cantidad de videos que puede crear segun su plan activo*/
+        let cantidadMaxima = await getValorCaracteristica(idPlan, "videos_tipo_inmueble");
+        /* Traer la cantidad de videos que tiene el detalle */
+        let cantidadVideosActual = await detalleRepo.fotosDetalle(idDetalle);
 
-    /* Traer la cantidad de videos que tiene el detalle */
-
-    /* Verificar que la cantidad no sea mayor o igual */
-
-    // Si es mayor o igual lanzar un error, si no, no pasa nada
-
+        /* Verificar que la cantidad actual no sea mayor o igual */
+        if (cantidadVideosActual.length >= cantidadMaxima) {
+            // Si es mayor o igual lanzar un error, si no, no pasa nada
+            throw new ErrorNegocio("Tu plan no permite subir mas de " + cantidadMaxima + " videos por tipo de inmueble. Actualmente tiene "
+                + cantidadVideosActual.length
+            );
+        }
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
 }
 
 // Verifica si se puede colocar un inmueble como destacado
@@ -153,17 +162,18 @@ const verificarInmuebleAscenso = async (idCustomer) => {
 
 
 // Verifica la caracteristica que tiene un usuario para colocar un iFrame en un inmueble
-const verificarUsoIFrame = async (idPlan, claveCaracteristica) => {
-
+const verificarUsoIFrame = async (idCustomer) => {
     /* Traer la suscripcion activa del customer */
     let condiciones = { idCustomer: idCustomer, estado: "activa" };
     let suscripcionesActivas = await suscripcionRepo.getSuscripcionesPlan(condiciones);
+    /* Traer el plan con sus caracteristicas*/
+    let precioPlanActivo = suscripcionesActivas[0].precioPlan;
+    let idPlan = precioPlanActivo.plan.idPlan;
     if (suscripcionesActivas.length <= 0) {
         throw new ErrorNegocio("El usuario no tiene suscripciones que le permitan realizar esta acción");
     }
     /* Traer el valor de iFrame que puede usar segun su plan activo*/
     let valor = await getValorCaracteristica(idPlan, "uso_iframe");
-
     if (!valor || valor == 0) {
         throw new ErrorNegocio("El plan no le permite hacer uso de la caracteristica de IFrame");
     }
@@ -229,5 +239,8 @@ const reiniciarCapacidadSaldo = async (claveCaracteristica) => {
 module.exports = {
     verificarInmueblesCreacion,
     verificarFotoDetalle,
-    verificarInmuebleDestacado
+    verificarVideoDetalle,
+    verificarInmuebleDestacado,
+    verificarUsoIFrame,
+    getValorCaracteristica
 }

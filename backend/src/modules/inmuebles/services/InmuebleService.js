@@ -3,6 +3,7 @@ Tambien se encarga de interactuar con otros servicios*/
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const TipoInmueble = require("../entities/TipoInmueble");
 const sequelize = require("../../../conf/database");
+const { construirCondiciones } = require("../../../utils/utils");
 
 const CustomerService = require("../../usuarios/services/CustomerService");
 const FiltrosInmuebleService = require("./FiltrosInmuebleService");
@@ -12,7 +13,9 @@ const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
 const zonaInmuebleService = require("./ZonasInmueblesService");
 const InteresadoRepo = require("../repositories/InteresadoRepository");
+const destacadoRepo = require("../../suscripciones/repositories/DestacadoRepository");
 const TipoInmueblePerfilService = require("../services/TipoInmueblePerfilService");
+const suscripcionRepo = require("../../suscripciones/repositories/SuscripcionRepository");
 const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
 
 
@@ -24,11 +27,11 @@ const insertarInmueble = async (datosInmueble) => {
         const tipoInmueble = await TipoInmueble.findByPk(idTipoInmueble);
 
         if (!tipoInmueble) {
-           throw new ErrorNegocio("Tipo de inmueble no encontrado");
+            throw new ErrorNegocio("Tipo de inmueble no encontrado");
         }
 
         // traer el perfil de customer
-        let customer = await CustomerService.getAllCustomers({idCustomer: datosInmueble.inmueble.idCustomer});
+        let customer = await CustomerService.getAllCustomers({ idCustomer: datosInmueble.inmueble.idCustomer });
         let perfil = customer[0].perfil;
 
         // Verificar que el tipo de customer si pueda crear este tipo de inmuebles
@@ -36,7 +39,11 @@ const insertarInmueble = async (datosInmueble) => {
 
         // Verificar que el usuario si pueda crear un inmueble dado su plan
         await CaracteristicaService.verificarInmueblesCreacion(datosInmueble.inmueble.idCustomer);
-        
+
+        /* Verificar si el usuario puede insertar iFrame*/
+        if (datosInmueble.inmueble.frameMaps) {
+            await CaracteristicaService.verificarUsoIFrame(datosInmueble.inmueble.idCustomer);
+        }
         // Verificar si el tipo es "proyecto" y es valido
         if (tipoInmueble.tipoInmueble === 'proyecto' && estadoInmueble !== 'nuevo') {
             throw new ErrorNegocio("Los inmuebles de tipo 'proyecto' deben ser nuevos.");
@@ -52,7 +59,7 @@ const insertarInmueble = async (datosInmueble) => {
         datosInmueble.inmueble.estadoPublicacionInmueble = "borrador";
 
         /*Si es valido se crea el inmueble con los detalles*/
-        let msg = await inmuebleRepository.insertarInmuebleDetalles(datosInmueble.inmueble, tipoInmueble.tipoInmueble === 'proyecto'); 
+        let msg = await inmuebleRepository.insertarInmuebleDetalles(datosInmueble.inmueble, tipoInmueble.tipoInmueble === 'proyecto');
         return msg;
 
     } catch (error) {
@@ -62,22 +69,22 @@ const insertarInmueble = async (datosInmueble) => {
 }
 
 // Traer los interesados de un inmueble
-const traerInteresados= async (datos) =>{
-    const {idInmueble} = datos;
-    if(idInmueble){
+const traerInteresados = async (datos) => {
+    const { idInmueble } = datos;
+    if (idInmueble) {
         return InteresadoRepo.getInteresadosInmueble(idInmueble);
-    }else{
+    } else {
         throw new ErrorNegocio("Inmueble no colocado");
     }
 
 }
 
 // Traer los tipos de inmueble
-const getAllTipos= async () =>{
-    try{
+const getAllTipos = async () => {
+    try {
         const tipos = TipoInmueble.findAll();
         return tipos;
-    }catch(error){
+    } catch (error) {
         throw error;
     }
 }
@@ -89,33 +96,64 @@ const actualizarInmuebleDetalles = async (datos, params) => {
     const { idInmueble } = params
     const listaDetalles = inmueble.detalles;
     const zonas = inmueble.zonas;
-    const {estadoPublicacionInmueble} = inmueble;
+    const { estadoPublicacionInmueble } = inmueble;
 
     // crear transaccion
     const transaction = await sequelize.transaction(); // Iniciar la transacción
-    try {   
+    try {
+        let customer = await CustomerService.getAllCustomers({ idCustomer: datos.idCustomer });
         // Si se trata de cambiar el estado a publicado
-        if(estadoPublicacionInmueble == "publicado"){
+        if (estadoPublicacionInmueble == "publicado") {
 
             // Verificar que el estado del customer sea activo (validar con modulo usuarios)
-            let customer = await CustomerService.getAllCustomers({idCustomer:datos.idCustomer});
             let estadoCustomer = customer[0].dataValues.estadoCustomer;
-           
-            if(estadoCustomer == "inactivo"|| estadoCustomer == "nuevo"){
+
+            if (estadoCustomer == "inactivo" || estadoCustomer == "nuevo") {
                 throw new ErrorNegocio("Este estado no le permite publicar inmuebles");
             }
-            
-            // Verificar que pueda colocar mas inmuebles en este estado (validar con modulo suscripciones)
-        }
+            /* Verificar que el usuario no tenga mas inmuebles de los debidos*/
+             
+             /* Traer la suscripcion activa  del customer y el precioPlan asociado*/
+            let condicionesSuscripcion = { idCustomer: datos.idCustomer, estado: "activa" };
+            let suscripcionesActivas = await suscripcionRepo.getSuscripcionesPlan(condicionesSuscripcion);
+    
+            if (suscripcionesActivas.length <= 0) {
+                throw new ErrorNegocio("El usuario no tiene suscripciones que le permitan realizar esta acción");
+            }
+    
+            /* Traer el plan asociado a la suscripcion activa*/
+            let precioPlanActivo = suscripcionesActivas[0].precioPlan;
+            let idPlan = precioPlanActivo.plan.idPlan;
+    
+            /* Traer la cantidad de inmuebles que puede crear segun su plan activo*/
+            let cantidadMaxima = await CaracteristicaService.getValorCaracteristica(idPlan, "inmuebles_creados");
+    
+            /* Contar la cantidad de inmuebles que tiene el customer */
+            let inmueblesCustomer = await inmuebleRepository.getInmueblesUsuario(datos.idCustomer);
+    
+            /* Verificar que la cantidad actual no sea mayor */
+            if (inmueblesCustomer.length > cantidadMaxima) {
+    
+                // Si es mayor lanzar un error, si no, no pasa nada
+                throw new ErrorNegocio("Has alcanzado el limite de " + cantidadMaxima + " inmuebles. Actualmente tiene "
+                    + inmueblesCustomer.length + ". Borra los sobrantes antes de poder hacer esto."
+                );
+            }
+      }
 
         //Si hay un nuevo tipo y este es arriendo se valida que arriendo no sea null
-        if(inmueble.modalidadInmueble== "arriendo" && !inmueble.administracion){
-            throw new ErrorNegocio("La modalidad de arriendo requiere que se especifique si la administración está incluida");     
+        if (inmueble.modalidadInmueble == "arriendo" && !inmueble.administracion) {
+            throw new ErrorNegocio("La modalidad de arriendo requiere que se especifique si la administración está incluida");
         }
-        
+
+        /* Verificar si el usuario puede insertar iFrame*/
+        if (inmueble.frameMaps) {
+            await CaracteristicaService.verificarUsoIFrame(customer[0].idCustomer);
+        }
+
         // actualizar el inmueble
         await inmuebleRepository.actualizarInmueble(inmueble, idInmueble, transaction);
-      
+
         // Si hay zonas se actualizan
         if (zonas) {
             await zonaInmuebleService.actualizarZonasInmuebles(zonas, idInmueble, transaction);
@@ -129,15 +167,31 @@ const actualizarInmuebleDetalles = async (datos, params) => {
         await transaction.commit();
         return "Actualizado";
     } catch (error) {
+        console.log(error);
         await transaction.rollback();
-throw error
+        throw error
     }
 }
 
 const eliminarInmueble = async (params) => {
-    const { idInmueble } = params;
-
+    const { idInmueble, customer } = params;
     try {
+
+        /* 1. Verificar si el inmueble está activo como inmueble destacado*/
+
+        /* 1.1 Generar el codigo con la suscripcion */
+        const condicionesSuscripcion = construirCondiciones({ idCustomer:customer, estadoSuscripcion: "activa" });
+        const suscripcionesActiva = await suscripcionRepo.getSuscripcionesFechaFin(condicionesSuscripcion);
+        let fechaInicio = suscripcionesActiva[0].fechaInicioSuscripcion;
+        let idSuscripcion = suscripcionesActiva[0].idSuscripcion;
+        const codigo = destacadoRepo.generarCodigoPeriodo(fechaInicio, idSuscripcion);
+        /* 1.2. Verificar si el inmueble tiene ese codigo*/
+        const condicionesDestacado = construirCondiciones({ idInmueble, codigoPeriodo:codigo });
+        const destacado = await destacadoRepo.traerDestacados(condicionesDestacado);
+        if(destacado.length>0){
+            throw new ErrorNegocio("No se puede eliminar este inmueble pues lo ha seleccionado como destacado. Comuniquese con soporte para eliminarlo. ")
+        }
+        /**2. Traer los detalles y fotos */
         //  Traer detalles (para sus ID)
         const detalles = await DetalleService.obtenerDetallesPorInmueble(idInmueble);
 
@@ -160,22 +214,23 @@ const eliminarInmueble = async (params) => {
         // URL fotos por video
         const urlsVideo = videosPorDetalle.flatMap(videos => videos.map(video => video.urlVideo));
 
+        /**3. Ejecutar borrado de inmuebles y fotos */
         // Borrar inmueble, proyectos, detalles y fotos por cascade
         await inmuebleRepository.borrarInmueble(idInmueble);
 
         // Borrar archivos de fotos de detalles
 
         await Promise.all(
-            urlsFoto.map(url => deleteMultimediaServidor("fotos", url,"inmuebles"))
+            urlsFoto.map(url => deleteMultimediaServidor("fotos", url, "inmuebles"))
         );
 
         // Borrar archivos de videos de detalles
         await Promise.all(
-            urlsVideo.map(url => deleteMultimediaServidor("videos", url,"inmuebles"))
+            urlsVideo.map(url => deleteMultimediaServidor("videos", url, "inmuebles"))
         );
         return "Inmueble borrado correctamente. ";
     } catch (error) {
-       throw error;
+        throw error;
     }
 
 }
@@ -187,9 +242,9 @@ const isUsuarioDueño = async (idUsuario, idInmueble) => {
     datos.idUsuario = idUsuario;
     datos.idInmueble = idInmueble;
     const customer = await CustomerService.getAllCustomers(datos); // Traer customer 
-    
+
     // Si no se encuentra el customer
-    if(!customer || !customer[0]){
+    if (!customer || !customer[0]) {
         return false;
     }
 

@@ -170,13 +170,16 @@ const eliminarInmueble = async (req, res) => {
     try {
         const token = await traerToken(req);
         const { idInmueble } = req.params;
+        let data = {};
 
         // Traer dueño del inmueble
         const idCustomer = await filtroInmueble.traerCustomerInmueble(null, idInmueble);
 
+        data.idInmueble = idInmueble;
+        data.customer = idCustomer;
         // Validar que sea el dueño
         if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
-            msg = await inmuebleService.eliminarInmueble(req.params);
+            msg = await inmuebleService.eliminarInmueble(data);
             res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
         } else {
             throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el solicitado.")

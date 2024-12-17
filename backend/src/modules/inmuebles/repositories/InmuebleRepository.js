@@ -95,7 +95,7 @@ const getPublicados = async () => {
   try {
 
     const inmuebles = await VistaPublicados.findAll({
-      attributes:{exclude: ['idTipoInmueble', 'cod_ciudad', 'id_inmueble']},
+      attributes: { exclude: ['idTipoInmueble', 'cod_ciudad', 'id_inmueble'] },
       include: [
         {
           model: Inmueble, // Relacion con el modelo inmueble
@@ -164,14 +164,14 @@ const getInmueblesCodigo = async (codigo) => {
       include: [
         ...traerAtributosAvanzados(), // Atributos avanzados agregados manualmente
       ],
-      exclude: ['id_customer', 'idCustomer', 'codigoCiudad','cod_ciudad', 'idTipoInmueble','id_tipo_inmueble']
+      exclude: ['id_customer', 'idCustomer', 'codigoCiudad', 'cod_ciudad', 'idTipoInmueble', 'id_tipo_inmueble']
     },
     include: [ // Incluir detalles por medio de inmueble
       // Incluir zonas
       {
         model: Customer,
         as: "customer",
-        attributes: ['idCustomer','nombreCustomer', 'logoCustomer']
+        attributes: ['idCustomer', 'nombreCustomer', 'logoCustomer']
       },
       {
         model: TipoInmueble,
@@ -195,7 +195,7 @@ const getInmueblesCodigo = async (codigo) => {
         model: DetalleInmueble,
         as: "detalles",
         attributes: {
-          exclude:["idInmueble","idProyecto","id_inmueble"]
+          exclude: ["idInmueble", "idProyecto", "id_inmueble"]
         },
         include: [{
           model: Foto,
@@ -226,15 +226,15 @@ const getInmuebleByID = async (id) => {
       include: [
         ...traerAtributosAvanzados(), // Atributos avanzados agregados manualmente
       ],
-      exclude: ['id_customer', 'idCustomer', 'codigoCiudad','cod_ciudad', 'idTipoInmueble','id_tipo_inmueble']
+      exclude: ['id_customer', 'idCustomer', 'codigoCiudad', 'cod_ciudad', 'idTipoInmueble', 'id_tipo_inmueble']
     },
-   
+
     include: [ // Incluir detalles por medio de inmueble
       // Incluir zonas
       {
         model: Customer,
         as: "customer",
-        attributes: ['idCustomer','nombreCustomer', 'logoCustomer']
+        attributes: ['idCustomer', 'nombreCustomer', 'logoCustomer']
       },
       {
         model: TipoInmueble,
@@ -258,7 +258,7 @@ const getInmuebleByID = async (id) => {
         model: DetalleInmueble,
         as: "detalles",
         attributes: {
-          exclude:["idInmueble","idProyecto","id_inmueble"]
+          exclude: ["idInmueble", "idProyecto", "id_inmueble"]
         },
         include: [{
           model: Foto,
@@ -282,16 +282,23 @@ const getInmuebleByID = async (id) => {
 
 
 // Actualizar inmueble
-const actualizarInmueble = async (datos, idInmueble, transaccion) => {
+const actualizarInmueble = async (datos, idInmueble, transaccion = null) => {
   try {
-    transaccion = await sequelize.transaction(); // Iniciar la transacción
+    let nuevaTransaccion = false; // Bandera para saber si crearemos una transacción
 
+    if (!transaccion) {
+      transaccion = await sequelize.transaction();
+      nuevaTransaccion = true; // Marcamos que es una transacción nueva
+    }
     await Inmueble.update(datos, {
       where: { idInmueble },
       fields: ['codigoInmueble', 'estadoInmueble', 'modalidadInmueble', 'tituloInmueble', 'estrato', 'administracion',
         'tipoVivienda', 'codigoCiudad', 'idTipoInmueble', 'frameMaps', 'descripcionInmueble', 'estadoPublicacionInmueble'], // Campos permitidos para actualizar
       transaccion
     });
+    if (nuevaTransaccion) {
+      await transaccion.commit();
+    }
 
   } catch (error) {
     throw error; // Lanzar error para que sea capturado en el controlador

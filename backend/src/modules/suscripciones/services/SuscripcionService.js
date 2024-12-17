@@ -6,6 +6,9 @@ const suscripcionRepository = require("../repositories/SuscripcionRepository");
 const customerRepo = require("../../usuarios/repositories/CustomerRepository");
 const planRepo = require("../repositories/PlanRepository");
 const { Sequelize } = require("sequelize");
+const caracteristicaService = require("../services/CaracteristicasService");
+const inmuebleRepo = require("../../inmuebles/repositories/InmuebleRepository");
+const { construirCondiciones } = require("../../../utils/utils");
 const PrecioPlan = require("../entities/PrecioPlan");
 
 /* Metodos POST */
@@ -205,16 +208,7 @@ const crearSuscripcionGratuita = async (infoSuscripcion) => {
 // De no especificarse customer los trae todos y si no se especifica estado los trae todos
 const getSuscripcionesCustomer = async (idCustomer = null, estado = null) => {
     try {
-        let cond = {};
-        // Si el idCustomer es null se traen todas
-        if (idCustomer) {
-            cond.idCustomer = idCustomer;
-        }
-
-        if (estado) {
-            cond.estadoSuscripcion = estado;
-        }
-
+        let cond = construirCondiciones({ idCustomer, estadoSuscripcion: estado });
         let suscripcionesActivas = await suscripcionRepository.getSuscripcionesPlan(cond);
 
         return suscripcionesActivas
@@ -245,12 +239,12 @@ const actualizarEstadoSuscripciones = async () => {
 
         // FechaInicio debe ser igual o menor que la actual (que sea menor implica que ya pasó la fecha)
         condicionesActivar.fechaInicioSuscripcion = { [Sequelize.Op.lte]: fechaActual };
-        const suscripcionesPendientes = await suscripcionRepository.getSuscripciones(condicionesActivar);
+        const suscripcionesPendientes = await suscripcionRepository.getSuscripcionesPlan(condicionesActivar);
 
         // Actualizar las suscripciones pendientes
         let datosActivar = { estadoSuscripcion: 'activa' }; //Campo que se actualizará de la suscripción
         if (suscripcionesPendientes.length > 0) {
-            await suscripcionRepository.updateSuscripciones(datosActivar, condicionesActivar, t);
+           await suscripcionRepository.updateSuscripciones(datosActivar, condicionesActivar, t);
         } else {
             console.log("No hay suscripciones pendientes que activar. " + fechaActual);
         }
@@ -263,7 +257,7 @@ const actualizarEstadoSuscripciones = async () => {
 
         // FechaFin debe ser igual o menor que la actual (que sea menor implica que ya pasó la fecha)
         condicionesDesactivar.fechaFinSuscripcion = { [Sequelize.Op.lte]: fechaActual };
-        const suscripcionesActivas = await suscripcionRepository.getSuscripciones(condicionesDesactivar)
+        const suscripcionesActivas = await suscripcionRepository.getSuscripcionesPlan(condicionesDesactivar)
 
         // Actualizar las suscripciones activas
         let datosDesactivar = { estadoSuscripcion: 'inactiva' }; //Campo que se actualizará de la suscripción
@@ -296,15 +290,33 @@ const actualizarEstadoSuscripciones = async () => {
         // ( Su estado antes de esto sería activo)
         for (const idCustomer of customerDesactivados) {
             if (!customerConCambio.includes(idCustomer)) { // Usar solo aquellos id que no estén en la lista conCambio
-                console.log("actualizando " + idCustomer);
                 let dataDesactivarCustomer = {};
                 dataDesactivarCustomer.estadoCustomer = "inactivo";
                 await customerRepo.actualizarCustomer(dataDesactivarCustomer, idCustomer, t);
             }
         }
-
-        //throw new ErrorNegocio("problem?");
         await t.commit();
+
+        // 4.3. Actualizar estado de los inmuebles si un usuario tiene menos cantidad por su suscripcion
+        for (const idCustomer of customerConCambio) {
+
+            // Obtener la suscripción anterior (desactivada)
+            const suscripcionesViejas = suscripcionesActivas.filter(s => s.idCustomer == idCustomer);
+            const suscripcionVieja = suscripcionesViejas[0]; // Tomar la primera, si existe
+            // Obtener la nueva suscripción (activada)
+            const suscripcionesNuevas = suscripcionesPendientes.filter(s => s.idCustomer === idCustomer);
+            const suscripcionNueva = suscripcionesNuevas[0]; // Tomar la primera, si existe
+
+            // Verificar que existan ambas suscripciones (anterior y nueva)
+            const idPlanAntiguo = suscripcionVieja ? suscripcionVieja.precioPlan.plan.idPlan : null;
+            const idPlanNuevo = suscripcionNueva ? suscripcionNueva.precioPlan.plan.idPlan : null;
+            if (idPlanAntiguo && idPlanNuevo) {
+                // Llamar a la función que actualiza el estado de los inmuebles
+                await actualizarEstadoInmuebles(idCustomer, idPlanAntiguo, idPlanNuevo, "borrador");
+            } else {
+                console.log(`No se encontraron planes válidos para el customer ${idCustomer}`);
+            }
+        }
 
     } catch (err) {
         console.log(err);
@@ -314,7 +326,42 @@ const actualizarEstadoSuscripciones = async () => {
     }
 }
 
+// Metodo que coloca en un estado los inmuebles de un usuario si su sucripcion cambia
+const actualizarEstadoInmuebles = async (idCustomer, idPlanAntiguo, idPlanNuevo, estado) => {
+    try {
+        // 1. Verificar si el plan ha cambiado
+        if (idPlanAntiguo === idPlanNuevo) return;
 
+        // 2. Obtener los límites de inmuebles creados en ambos planes
+        const valorAntiguo = await caracteristicaService.getValorCaracteristica(idPlanAntiguo, "inmuebles_creados");
+        const valorNuevo = await caracteristicaService.getValorCaracteristica(idPlanNuevo, "inmuebles_creados");
+
+        // Si algún valor no existe, asumir como 0
+        const limiteAntiguo = valorAntiguo || 0;
+        const limiteNuevo = valorNuevo || 0;
+
+        // 3. Si el límite antiguo es mayor al nuevo, calcular la diferencia
+
+        if (limiteAntiguo > limiteNuevo) {
+            const diferencia = limiteAntiguo - limiteNuevo;
+
+            console.log(`Actualizando ${diferencia} inmuebles a estado '${estado}' para el usuario ${idCustomer}`);
+
+            // 4. Obtener los inmuebles activos del usuario
+            const inmuebles = await inmuebleRepo.getInmueblesUsuario(idCustomer);
+
+            // 5. Seleccionar los "sobrantes" y actualizarlos al nuevo estado
+            const inmueblesSobrantes = inmuebles.slice(0, diferencia); // Tomar solo la cantidad necesaria
+            for (const inmuebleData of inmueblesSobrantes) {
+                const inmueble = inmuebleData.get({ plain: true });
+                await inmuebleRepo.actualizarInmueble({ estadoPublicacionInmueble: estado }, inmueble.idInmueble);
+            }
+        }
+    } catch (error) {
+        console.error(`Error al actualizar inmuebles para el usuario ${idCustomer}:`, error);
+        throw error; // Relanzar el error para manejarlo en otro lugar si es necesario
+    }
+}
 module.exports = {
     crearSuscripcionPagada,
     crearSuscripcionGratuita,
