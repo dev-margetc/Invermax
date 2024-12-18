@@ -12,7 +12,32 @@ const getDepartamentosConCiudades = async (req, res) => {
     }
 };
 
+// Obtener todos los departamentos con sus ciudades dado el nombre (o parte de el) de la ciudad
+const getDepartamentosCiudadNombre = async (req, res) => {
+    try {
+        const results = await ciudadService.getCiudadesNombre(req.params);
+        res.status(200).json(results); //Se retornan los departamentos
+    } catch (err) {
+        errorHandler.handleControllerError(res, err, "inmuebles");
+    }
+};
+
+
+// Obtener todos los departamentos con sus ciudades dado el id del departamento
+const getCiudadesIDDepartamento = async (req, res) => {
+    try {
+        const results = await ciudadService.getDepartamentosID(req.params);
+        res.status(200).json(results); //Se retornan los departamentos
+    } catch (err) {
+        console.log(err);
+        errorHandler.handleControllerError(res, err, "inmuebles");
+    }
+};
+
+
 
 module.exports = {
-    getDepartamentosConCiudades
+    getDepartamentosConCiudades,
+    getCiudadesIDDepartamento,
+    getDepartamentosCiudadNombre
 };

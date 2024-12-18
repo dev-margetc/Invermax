@@ -48,6 +48,18 @@ const traerInmueblesAscenso = async (condiciones = null, whereInmueble = null, a
     }
 }
 
+// Generar el codigo para el ascendido
+function generarCodigoPeriodo(fechaInicioSuscripcion, idSuscripcion) {
+    const fechaActual = new Date(); // Fecha actual
+    const inicioSuscripcion = new Date(fechaInicioSuscripcion); // Fecha de inicio de la suscripción
+    
+    const mesesTranscurridos = 
+        (fechaActual.getFullYear() - inicioSuscripcion.getFullYear()) * 12 +
+        fechaActual.getMonth() - inicioSuscripcion.getMonth() + 1; // +1 porque el primer mes cuenta como 1
+
+    // Retorna el código (idSuscripcion-mes)
+    return `${idSuscripcion}-${mesesTranscurridos}`;
+}
 
 
 /* Metodos INSERT */
@@ -67,8 +79,6 @@ const insertarInmuebleAscenso = async (datos) => {
 
 //Metodo actualizacion
 const modificarAscenso = async (datos, idInmuebleAscenso) => {
-    console.log(datos);
-    console.log(idInmuebleAscenso);
     try {
         InmuebleAscenso.update(datos,{
             where: {
@@ -84,5 +94,6 @@ const modificarAscenso = async (datos, idInmuebleAscenso) => {
 module.exports = {
     traerInmueblesAscenso,
     insertarInmuebleAscenso,
+    generarCodigoPeriodo,
     modificarAscenso
 }

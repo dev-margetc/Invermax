@@ -2,7 +2,9 @@
 
 const Departamento = require('../entities/Departamento');
 const Ciudad = require('../entities/Ciudad');
+const { Op } = require("sequelize");
 
+// Traer todos los departamentos con sus respectivas ciudades
 const getDepartamentosConCiudades = async (req, res) => {
       const departamentos = await Departamento.findAll({
         include: [{ // Incluye las ciudades asociadas
@@ -16,6 +18,41 @@ const getDepartamentosConCiudades = async (req, res) => {
       return (departamentos);
   };
 
+  // Traer las ciudades que tengan una similitud en el nombre, trae su departamento anidado
+  const getDepartamentoNombreCiudad = async (nombre) => {
+    const departamentos = await Departamento.findAll({
+      include: [{ // Incluye las ciudades asociadas
+        model: Ciudad,
+        as: 'ciudades', // Se usa el alias definido en la relacion
+        attributes: ['codCiudad', 'nombreCiudad', 'idDepartamento'], // Solo devuelve estos campos
+        where:{
+          nombreCiudad: {[Op.like]: `%${nombre}%`}
+        }
+    }] 
+      
+    });
+
+    return (departamentos);
+};
+
+  // Traer las ciudades de un departamento dado el ID del departamento
+  const getCiudadesconIDDepartamento = async (idDepartamento) => {
+    const departamentos = await Departamento.findAll({
+      include: [{ // Incluye las ciudades asociadas
+        model: Ciudad,
+        as: 'ciudades', // Se usa el alias definido en la relacion
+        attributes: ['codCiudad', 'nombreCiudad', 'idDepartamento'], // Solo devuelve estos campos
+    }],
+    where:{
+      idDepartamento: idDepartamento
+    } 
+      
+    });
+
+    return (departamentos);
+};
   module.exports = {
     getDepartamentosConCiudades,
+    getDepartamentoNombreCiudad,
+    getCiudadesconIDDepartamento
 }

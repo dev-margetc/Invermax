@@ -12,8 +12,15 @@ const interesadoController = require("../controllers/InteresadoController");
 const zonasController = require("../controllers/ZonasController");
 
 
+
+// Definir una ruta para obtener todos los departamentos con sus ciudades dado el nombre
+router.get('/departamentos/ciudades/:nombreCiudad', ciudadController.getDepartamentosCiudadNombre);
+ 
 // Definir una ruta para obtener todos los departamentos con sus ciudades
 router.get('/departamentos/ciudades', ciudadController.getDepartamentosConCiudades);
+
+// Definir una ruta para obtener todos los departamentos con sus ciudades dado el id del departamento
+router.get('/departamentos/:idDepartamento/ciudades', ciudadController.getCiudadesIDDepartamento);
 
 /* Ruta para traer inmuebles publicados con el filtro avanzado, incluye: 
     categoria, modalidad, ciudad, monto maximo, habitaciones, baños, parqueadero, amoblado y zonas

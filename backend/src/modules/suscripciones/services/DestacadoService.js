@@ -17,15 +17,12 @@ const getDestacadoInmueble = async (idInmueble = null, codigoPeriodo = null) => 
     try {
         // Construir condiciones a partir de idInmueble y/o codigoPeriodo
         const condiciones = construirCondiciones({ idInmueble, codigoPeriodo });
-        // Obtener los destacados que cumplen las condiciones
-        const destacados = await destacadoRepo.traerDestacados(condiciones);
-
-        // Calcular minutos restantes para cada destacado
+        let destacados = await destacadoRepo.traerDestacados(condiciones);
         const destacadosConTiempo = destacados.map(destacado => {
+            const plano = destacado.get({ plain: true }); // Convertir el objeto a formato plano
             const minutosRestantes = calcularMinutosRestantes(destacado);
-            return { ...destacado, minutosRestantes };
+            return { ...plano, minutosRestantes }; // Crear un nuevo objeto con el campo adicional
         });
-
         return destacadosConTiempo;
     } catch (err) {
         console.log(err);
@@ -49,11 +46,10 @@ const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, info
         }
 
         let destacados = await destacadoRepo.traerDestacados(whereDestacado, whereInmueble, atributosInmueble);
-        
-         // Calcular minutos restantes para cada destacado
-         const destacadosConTiempo = destacados.map(destacado => {
+        const destacadosConTiempo = destacados.map(destacado => {
+            const plano = destacado.get({ plain: true }); // Convertir el objeto a formato plano
             const minutosRestantes = calcularMinutosRestantes(destacado);
-            return { ...destacado, minutosRestantes };
+            return { ...plano, minutosRestantes }; // Crear un nuevo objeto con el campo adicional
         });
 
         return destacadosConTiempo;
@@ -90,8 +86,12 @@ const manejarRegistroDestacado = async (idInmueble) => {
             // Traer la suscripcion activa para generar el codigo
             let condiciones = { idCustomer: customerData.idCustomer, estado: "activa" };
             let suscripcionesActivas = await suscripcionRepo.getSuscripcionesPlan(condiciones);
+            if (suscripcionesActivas.length == 0) {
+                throw new ErrorNegocio("No cuenta con una suscripcion activa.");
+            }
             let codigo = destacadoRepo.generarCodigoPeriodo(suscripcionesActivas[0].fechaInicioSuscripcion, suscripcionesActivas[0].idSuscripcion)
-            let destacado = await getDestacadoInmueble(idInmueble, codigo);
+            const condicionesDestacado = construirCondiciones({ idInmueble, codigoPeriodo:codigo });
+            let destacado = await destacadoRepo.traerDestacados(condicionesDestacado);
 
             // Si existe cambiar el estado por el inverso al que tiene
             if (destacado && destacado.length > 0) {
@@ -234,8 +234,9 @@ const reiniciarDestacadosPorMes = async () => {
         const [idSus, nuevoMes] = codigo.split('-').map(Number);
         // Si el mes del periodo del destacado es menor que el mes actual de la suscripcion, desactivar el destacado
         if (mesPeriodo < nuevoMes) {
+            let acumulado = calcularMinutosTranscurridos(destacado);
             console.log(`Desactivando destacado ${destacado.idDestacado} (mes anterior)`);
-            await destacadoRepo.modificarDestacado({ estadoDestacado: 0, fechaInicio: null },
+            await destacadoRepo.modificarDestacado({ estadoDestacado: 0, fechaInicio: null, tiempoAcumulado: acumulado },
                 destacado.idDestacado);
         }
     }
@@ -271,24 +272,29 @@ const desactivarDestacadosVencidos = async () => {
         // Verificar si la suscripción está en el mapa de inactivas
         if (suscripcionesMap[idSuscripcion]) {
             console.log(`Desactivando destacado ${destacado.idDestacado} (suscripción inactiva).`);
-
+            let acumulado = calcularMinutosTranscurridos(destacado);
             // Actualizar destacado
             await destacadoRepo.modificarDestacado({
                 fechaInicio: null,
-                estadoDestacado: 0
+                estadoDestacado: 0,
+                tiempoAcumulado: acumulado
             }, destacado.idDestacado);
         }
     }
 }
 
 /* Calcular minutos acumulados de un inmueble en destacado
- teniendo en cuenta la fecha de inicio y el acumulado de un destacado */
+ teniendo en cuenta la fecha de inicio y la fecha actual de un destacado */
 function calcularMinutosTranscurridos(destacado) {
     let ahora = new Date();
-
+    let minutosTranscurridos;
     let fechaInicio = destacado.fechaInicio;
+    if (fechaInicio != null) {
+        minutosTranscurridos = Math.floor((ahora - fechaInicio) / (1000 * 60));
+    } else {
+        minutosTranscurridos = 0;
+    }
 
-    let minutosTranscurridos = Math.floor((ahora - fechaInicio) / (1000 * 60));
 
     return minutosTranscurridos;
 }

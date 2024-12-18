@@ -5,7 +5,7 @@ Tambien se encarga de interactuar con otros servicios
 */
 
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
-const customerRepo = require("../../usuarios/repositories/CustomerRepository");
+const ascensoRepo = require("../repositories/AscensoRepository");
 const detalleRepo = require("../../inmuebles/repositories/DetalleInmuebleRepository");
 const destacadoRepo = require("../repositories/DestacadoRepository");
 const inmueblesRepo = require("../../inmuebles/repositories/InmuebleRepository");
@@ -157,7 +157,37 @@ const verificarInmuebleDestacado = async (idCustomer) => {
 // Verifica si se puede colocar un inmueble como destacado
 const verificarInmuebleAscenso = async (idCustomer) => {
 
+    try {
+        /* Traer la suscripcion activa del customer */
+        let condiciones = { idCustomer: idCustomer, estado: "activa" };
+        let suscripcionesActivas = await suscripcionRepo.getSuscripcionesPlan(condiciones);
+        if (suscripcionesActivas.length <= 0) {
+            throw new ErrorNegocio("El usuario no tiene suscripciones que le permitan realizar esta acción");
+        }
+        /* Traer el plan con sus caracteristicas*/
+        let precioPlanActivo = suscripcionesActivas[0].precioPlan;
+        let idPlan = precioPlanActivo.plan.idPlan;
 
+        /* Traer la cantidad de inmuebles en ascenso que puede crear segun su plan activo*/
+        let cantidadMaxima = await getValorCaracteristica(idPlan, "inmuebles_ascenso");
+
+        // Generar el código para la búsqueda teniendo en cuenta el id de suscripcion
+        let codigo = ascensoRepo.generarCodigoPeriodo(suscripcionesActivas[0].fechaInicioSuscripcion, suscripcionesActivas[0].idSuscripcion)
+
+
+        /* Trae la cantidad de inmuebles que ha subido con el código del mes actual y la suscripcion activa*/
+        let ascensosMes = await ascensoRepo.traerInmueblesAscenso({ codigoPeriodo: codigo });
+        /* Verificar que la cantidad actual no sea mayor o igual */
+        if (ascensosMes.length >= cantidadMaxima) {
+            // Si es mayor o igual lanzar un error, si no, no pasa nada
+            throw new ErrorNegocio("Tu plan no permite colocar mas de " + cantidadMaxima + " inmuebles en ascenso. Actualmente tiene "
+                + destacadosMes.length
+            );
+        }
+        return true;
+    } catch (err) {
+        throw err;
+    }
 }
 
 
@@ -202,45 +232,12 @@ const getValorCaracteristica = async (idPlan, claveCaracteristica) => {
 
 }
 
-
-/* Metodos PUT*/
-
-// Reducir la cantidad de capacidad en un saldo 
-const reducirCapacidadSaldo = async (idCustomer, claveCaracteristica, cantidadReducir) => {
-
-    /* Traer la suscripcion activa del customer */
-    let condiciones = { idCustomer: idCustomer, estado: "activa" };
-    let suscripcionesActiva = await suscripcionRepo.getSuscripcionesFechaFin(cond);
-
-    /* Buscar la caracteristica con su clave */
-
-    /* Actualizar la cantidad de la capacidad*/
-
-}
-
-// Reiniciar capacidades de una caracteristica para todas las suscripciones activas
-const reiniciarCapacidadSaldo = async (claveCaracteristica) => {
-
-    /* Traer la suscripcion activa del customer */
-    let condiciones = { estado: "activa" };
-    let suscripcionesActivas = await suscripcionRepo.getSuscripcionesFechaFin(cond);
-
-    /* Buscar la caracteristica con su clave */
-
-
-    /* Traer el plan y el valor de la caracteristica*/
-
-
-    /* Actualizar la cantidad de la capacidad a la de la caracteristica*/
-
-}
-
-
 module.exports = {
     verificarInmueblesCreacion,
     verificarFotoDetalle,
     verificarVideoDetalle,
     verificarInmuebleDestacado,
+    verificarInmuebleAscenso,
     verificarUsoIFrame,
     getValorCaracteristica
 }
