@@ -13,7 +13,7 @@ const sequelize = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
-        logging: console.log, // Cambiar a `console.log` si se quieren ver las consultas SQL en consola, si no false
+        logging: process.env.NODE_ENV === 'development', // Logs solo en desarrollo
         define: {
             // Opciones globales
             freezeTableName: true, // Esto desactiva la pluralización
