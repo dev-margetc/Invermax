@@ -34,7 +34,16 @@ const getDepartamentosConCiudades = async (req, res) => {
 
     return (departamentos);
 };
+  // Traer las ciudades que tengan una similitud en el nombre
+  const getCiudadNombre = async (nombre) => {
+    const ciudades = await Ciudad.findAll({
+      where:{
+        nombreCiudad:{[Op.like]:  `%${nombre}%`}
+      }
+    });
 
+    return (ciudades);
+};
   // Traer las ciudades de un departamento dado el ID del departamento
   const getCiudadesconIDDepartamento = async (idDepartamento) => {
     const departamentos = await Departamento.findAll({
@@ -54,5 +63,6 @@ const getDepartamentosConCiudades = async (req, res) => {
   module.exports = {
     getDepartamentosConCiudades,
     getDepartamentoNombreCiudad,
-    getCiudadesconIDDepartamento
+    getCiudadesconIDDepartamento,
+    getCiudadNombre
 }

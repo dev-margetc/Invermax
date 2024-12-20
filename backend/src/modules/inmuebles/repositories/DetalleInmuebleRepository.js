@@ -51,12 +51,32 @@ const insertarVideo = async (idDetalle, rutaVideo) => {
 // Actualizar detalle
 const actualizarDetalle = async (datos, idDetalle, idInmueble, transaccion) => {
     try {
-        await DetalleInmueble.update(datos, { where: { idDetalle: idDetalle, idInmueble: idInmueble }, 
-            fields: [ 'valorInmueble','area','frameRecorrido','cantidadHabitaciones',
-                      'cantidadBaños','parqueadero','amoblado'], // Campos permitidos para actualizar
-     transaccion });
+        // Bandera para saber si la transaccion se crea acá
+        let t = false;
+
+        // Si no existe la transaccion la crea
+        if (!transaccion) {
+            t = true;
+            transaccion = await sequelize.transaction(); // Iniciar la transacción
+        }
+        console.log(idInmueble);
+        console.log(idDetalle);
+        console.log(datos);
+        await DetalleInmueble.update(datos, {
+            where: { idDetalle: idDetalle, idInmueble: idInmueble },
+            fields: ['valorInmueble', 'area', 'frameRecorrido', 'cantidadHabitaciones',
+                'cantidadBaños', 'parqueadero', 'amoblado'], // Campos permitidos para actualizar
+            transaccion
+        });
+        if (t) {
+            console.log("trans");
+           await transaccion.commit();
+        }
         return "Detalle actualizado"
     } catch (error) {
+        if(t){
+           await transaccion.rollback();
+        }
         throw error;
     }
 }
@@ -123,7 +143,7 @@ const getInfoVideo = async (idVideo, idDetalle) => {
 }
 
 // Detalles de un inmueble
-const detallesPorInmueble = async (idInmueble)=>{
+const detallesPorInmueble = async (idInmueble) => {
     try {
         const detalles = await DetalleInmueble.findAll({
             where: {
@@ -138,7 +158,7 @@ const detallesPorInmueble = async (idInmueble)=>{
 }
 
 // Eliminar un detalle de inmueble
-const eliminarDetalle = async (idDetalle)=>{
+const eliminarDetalle = async (idDetalle) => {
     try {
         await DetalleInmueble.destroy({ where: { idDetalle } });
         return "Detalle eliminado correctamente.";
@@ -148,7 +168,7 @@ const eliminarDetalle = async (idDetalle)=>{
 }
 
 // Eliminar una foto de la bd
-const eliminarFoto = async (idFoto, idDetalle, transaccion)=>{
+const eliminarFoto = async (idFoto, idDetalle, transaccion) => {
     try {
         await Foto.destroy({ where: { idDetalleInmueble: idDetalle, idFoto: idFoto }, transaccion });
         return "Foto eliminada correctamente.";
@@ -158,9 +178,9 @@ const eliminarFoto = async (idFoto, idDetalle, transaccion)=>{
 }
 
 // Eliminar un video de la bd
-const eliminarVideo = async (idVideo, idDetalle, transaccion)=>{
+const eliminarVideo = async (idVideo, idDetalle, transaccion) => {
     try {
-        await Video.destroy({ where: { idDetalleInmueble: idDetalle, idVideo: idVideo },transaccion });
+        await Video.destroy({ where: { idDetalleInmueble: idDetalle, idVideo: idVideo }, transaccion });
         return "Video eliminado correctamente.";
     } catch (error) {
         throw error;

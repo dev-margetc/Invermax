@@ -92,7 +92,7 @@ const Inmueble = sequelize.define('Inmueble', {
     },
     frameMaps: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         field: 'iframe_maps'
     },
     descripcionInmueble: {

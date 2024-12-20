@@ -8,7 +8,7 @@ const { construirCondiciones } = require("../../../utils/utils");
 const CustomerService = require("../../usuarios/services/CustomerService");
 const FiltrosInmuebleService = require("./FiltrosInmuebleService");
 const CaracteristicaService = require("../../suscripciones/services/CaracteristicasService");
-
+const caracteristicaRepo = require("../../suscripciones/repositories/CaracteristicaRepository");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
 const DetalleService = require("./DetalleService");
 const zonaInmuebleService = require("./ZonasInmueblesService");
@@ -94,10 +94,9 @@ const getAllTipos = async () => {
 const actualizarInmuebleDetalles = async (datos, params) => {
     const { inmueble } = datos;
     const { idInmueble } = params
-    const listaDetalles = inmueble.detalles;
+    const listaDetalles = datos.detalles;
     const zonas = inmueble.zonas;
     const { estadoPublicacionInmueble } = inmueble;
-
     // crear transaccion
     const transaction = await sequelize.transaction(); // Iniciar la transacción
     try {
@@ -112,34 +111,22 @@ const actualizarInmuebleDetalles = async (datos, params) => {
                 throw new ErrorNegocio("Este estado no le permite publicar inmuebles");
             }
             /* Verificar que el usuario no tenga mas inmuebles de los debidos*/
-             
-             /* Traer la suscripcion activa  del customer y el precioPlan asociado*/
-            let condicionesSuscripcion = { idCustomer: datos.idCustomer, estado: "activa" };
-            let suscripcionesActivas = await suscripcionRepo.getSuscripcionesPlan(condicionesSuscripcion);
-    
-            if (suscripcionesActivas.length <= 0) {
-                throw new ErrorNegocio("El usuario no tiene suscripciones que le permitan realizar esta acción");
-            }
-    
-            /* Traer el plan asociado a la suscripcion activa*/
-            let precioPlanActivo = suscripcionesActivas[0].precioPlan;
-            let idPlan = precioPlanActivo.plan.idPlan;
-    
-            /* Traer la cantidad de inmuebles que puede crear segun su plan activo*/
-            let cantidadMaxima = await CaracteristicaService.getValorCaracteristica(idPlan, "inmuebles_creados");
-    
+
+            /* Traer la cantidad de inmuebles que puede crear segun su suscripcion activa*/
+            let cantidadMaxima = await caracteristicaRepo.obtenerCaracteristicaDisponible(datos.idCustomer, "inmuebles_creados");
+
             /* Contar la cantidad de inmuebles que tiene el customer */
             let inmueblesCustomer = await inmuebleRepository.getInmueblesUsuario(datos.idCustomer);
-    
+
             /* Verificar que la cantidad actual no sea mayor */
             if (inmueblesCustomer.length > cantidadMaxima) {
-    
+
                 // Si es mayor lanzar un error, si no, no pasa nada
                 throw new ErrorNegocio("Has alcanzado el limite de " + cantidadMaxima + " inmuebles. Actualmente tiene "
                     + inmueblesCustomer.length + ". Borra los sobrantes antes de poder hacer esto."
                 );
             }
-      }
+        }
 
         //Si hay un nuevo tipo y este es arriendo se valida que arriendo no sea null
         if (inmueble.modalidadInmueble == "arriendo" && !inmueble.administracion) {
@@ -158,9 +145,14 @@ const actualizarInmuebleDetalles = async (datos, params) => {
         if (zonas) {
             await zonaInmuebleService.actualizarZonasInmuebles(zonas, idInmueble, transaction);
         }
-
         // Actualizar detalles si hay
         if (listaDetalles) {
+            // Validar si alguno de los detalles tiene el campo iframe
+            const tieneIframe = listaDetalles.some(detalle => detalle.frameRecorrido);
+            /* Verificar si el usuario puede insertar iFrame*/
+            if (tieneIframe) {
+                await CaracteristicaService.verificarUsoIFrame(customer[0].idCustomer);
+            }
             await DetalleService.actualizarDetallesInmueble(listaDetalles, idInmueble, transaction);
         }
 
@@ -180,15 +172,15 @@ const eliminarInmueble = async (params) => {
         /* 1. Verificar si el inmueble está activo como inmueble destacado*/
 
         /* 1.1 Generar el codigo con la suscripcion */
-        const condicionesSuscripcion = construirCondiciones({ idCustomer:customer, estadoSuscripcion: "activa" });
+        const condicionesSuscripcion = construirCondiciones({ idCustomer: customer, estadoSuscripcion: "activa" });
         const suscripcionesActiva = await suscripcionRepo.getSuscripcionesFechaFin(condicionesSuscripcion);
         let fechaInicio = suscripcionesActiva[0].fechaInicioSuscripcion;
         let idSuscripcion = suscripcionesActiva[0].idSuscripcion;
         const codigo = destacadoRepo.generarCodigoPeriodo(fechaInicio, idSuscripcion);
         /* 1.2. Verificar si el inmueble tiene ese codigo*/
-        const condicionesDestacado = construirCondiciones({ idInmueble, codigoPeriodo:codigo });
+        const condicionesDestacado = construirCondiciones({ idInmueble, codigoPeriodo: codigo });
         const destacado = await destacadoRepo.traerDestacados(condicionesDestacado);
-        if(destacado.length>0){
+        if (destacado.length > 0) {
             throw new ErrorNegocio("No se puede eliminar este inmueble pues lo ha seleccionado como destacado. Comuniquese con soporte para eliminarlo. ")
         }
         /**2. Traer los detalles y fotos */

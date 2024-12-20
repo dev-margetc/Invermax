@@ -5,6 +5,7 @@ const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const DetalleInmueble = require("../entities/DetalleInmueble");
 const CaracteristicaService = require("../../suscripciones/services/CaracteristicasService");
 const detalleRepo = require("../repositories/DetalleInmuebleRepository");
+const inmuebleRepo = require("../repositories/InmuebleRepository");
 const sequelize = require("../../../conf/database");
 const fs = require('fs');
 
@@ -57,7 +58,7 @@ const actualizarDetallesInmueble = async (listaDetalles, idInmueble, transaction
     try {
         // Itera sobre cada detalle en listaDetalles
         await Promise.all(listaDetalles.map(async (detalle) => {
-            console.log(detalle);
+
             const { idDetalle, ...nuevosDatos } = detalle;
 
             if (idDetalle) {
@@ -67,7 +68,15 @@ const actualizarDetallesInmueble = async (listaDetalles, idInmueble, transaction
 
                 // Crea un nuevo detalle si no existe idDetalle
                 nuevosDatos.idInmueble = idInmueble;
-                await detalleRepo.insertDetalle(nuevosDatos, idDetalle, transaction);
+
+                /*Agregar el id del proyecto si este es de ese tipo */
+                let inmueble = await inmuebleRepo.getInmuebleByID(idInmueble);
+                if(inmueble[0].proyecto){
+                    nuevosDatos.idProyecto = inmueble[0].proyecto.idProyecto;
+                    // Solo lo crea si es de tipo proyecto
+                    await detalleRepo.insertDetalle(nuevosDatos, idDetalle, transaction);
+                }
+               
             }
         }));
 

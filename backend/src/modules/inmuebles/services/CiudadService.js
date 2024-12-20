@@ -8,10 +8,22 @@ const getDepartamentosConCiudades= async ()=>{
     return departamentos;
 }
 
-const getCiudadesNombre= async (params)=>{ 
+// Trae los departamentos y ciudades cuyo nombre de ciudad contenga ciertas letras
+const getDepartamentoCiudadesNombre= async (params)=>{ 
     const {nombreCiudad} = params;
     if(nombreCiudad){
         return await ciudadRepository.getDepartamentoNombreCiudad(nombreCiudad);
+    }else{
+        console.log("Nombre no proporcionado para la busqueda de ciudades");
+    }
+  
+}
+
+// Trae solo ciudades cuyo nombre contenga ciertas letras
+const getCiudadesNombre= async (params)=>{ 
+    const {nombreCiudad} = params;
+    if(nombreCiudad){
+        return await ciudadRepository.getCiudadNombre(nombreCiudad);
     }else{
         console.log("Nombre no proporcionado para la busqueda de ciudades");
     }
@@ -34,5 +46,6 @@ const getDepartamentosID= async (params)=>{
 module.exports = {
     getDepartamentosConCiudades,
     getCiudadesNombre,
+    getDepartamentoCiudadesNombre,
     getDepartamentosID
 }

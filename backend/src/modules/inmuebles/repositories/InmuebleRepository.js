@@ -147,6 +147,12 @@ const getInmueblesUsuario = async (idCustomer) => {
       "tituloInmueble",
       "estadoPublicacionInmueble"
     ],
+    include:[
+      {
+        model: DetalleInmueble,
+        as: "detalles"
+      }
+    ],
     where: {
       idCustomer: idCustomer
     }
