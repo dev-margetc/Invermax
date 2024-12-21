@@ -11,7 +11,7 @@ import Blog from './pages/Blog';
 import Plantillas from './components/Plantillas';
 import Post from './pages/Post';
 import OtrosServicios from './pages/OtrosServicios';
-import './style/app.css';
+import './style/App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';

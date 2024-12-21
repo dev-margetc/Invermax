@@ -64,24 +64,24 @@ const traerAtributosAvanzados = (isFiltro = false) => {
 
   const attributes = [
     // Valor minimo y maximo de inmuebles
-    [sequelize.literal('(SELECT MIN(valor_Inmueble) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMinimoDetalles'],
-    [sequelize.literal('(SELECT MAX(valor_Inmueble) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMaximoDetalles'],
+    [sequelize.literal('(SELECT MIN(valor_Inmueble) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMinimoDetalles'],
+    [sequelize.literal('(SELECT MAX(valor_Inmueble) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMaximoDetalles'],
 
     // Obtener una foto del primer detalle
-    [sequelize.literal('(SELECT url_foto FROM Fotos WHERE Fotos.id_detalle_inmueble IN (SELECT id_detalle FROM Detalles_Inmuebles WHERE Detalles_Inmuebles.id_inmueble = inmueble.id_Inmueble) LIMIT 1)'), 'fotoPrincipal'],
+    [sequelize.literal('(SELECT url_foto FROM Fotos WHERE Fotos.id_detalle_inmueble IN (SELECT id_detalle FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_Inmueble) LIMIT 1)'), 'fotoPrincipal'],
 
   ];
 
   if (isFiltro) {
     attributes.push(
       // Valor minimo de área
-      [sequelize.literal('(SELECT MIN(area) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'areaMinima'],
+      [sequelize.literal('(SELECT MIN(area) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'areaMinima'],
 
       // Valor minimo de baños
-      [sequelize.literal('(SELECT MIN(cantidad_baños) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinBaños'],
+      [sequelize.literal('(SELECT MIN(cantidad_baños) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinBaños'],
 
       // Valor minimo de habitaciones
-      [sequelize.literal('(SELECT MIN(cantidad_habitaciones) FROM Detalles_Inmuebles WHERE detalles_Inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinHabitaciones'],
+      [sequelize.literal('(SELECT MIN(cantidad_habitaciones) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinHabitaciones'],
     );
   }
 

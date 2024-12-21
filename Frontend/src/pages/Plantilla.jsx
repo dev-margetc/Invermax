@@ -12,7 +12,7 @@ import VideoIcon from '../assets/icons/video.svg';
 import MapIcon from '../assets/icons/map.svg';
 import VrIcon from '../assets/icons/vr.svg';
 import ExpandIcon from '../assets/icons/expand.svg'; // Ícono de ampliar
-import ParqueaderoIcon from '../assets/icons/Parqueadero.svg';
+import ParqueaderoIcon from '../assets/icons/parqueadero.svg';
 import RecepcionIcon from '../assets/icons/recepcion.svg';
 import LavadoIcon from '../assets/icons/lavado.svg';
 import GimnasioIcon from '../assets/icons/gimnasio.svg';
