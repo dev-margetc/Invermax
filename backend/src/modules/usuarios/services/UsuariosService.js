@@ -94,7 +94,7 @@ const insertBasicUser = async (uid, correo) => {
         usuario = await UsuariosRepo.insertarUsuario(datosUsuario, transaction);
 
         transaction.commit();
-        return "Usuario customer registrado";
+        return usuario;
 
     } catch (error) {
         console.log(error);

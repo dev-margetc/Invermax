@@ -1,3 +1,4 @@
 backend/src/conf/.env
 node_modules/
+Frontend/.env
 

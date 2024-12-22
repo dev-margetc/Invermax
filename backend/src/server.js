@@ -33,7 +33,7 @@ app.use(express.json());
 
 // Permitir solicitudes desde el frontend (http://localhost:3001)
 app.use(cors({
-    origin: "http://localhost:3001", // Reemplazar con el origen del frontend
+    origin: process.env.URL_FRONTEND, // Reemplazar con el origen del frontend
     methods: ["GET", "POST", "PUT", "DELETE"], // Métodos HTTP permitidos
     credentials: true, // enviar cookies o autenticación
 }));

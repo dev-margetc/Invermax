@@ -1,6 +1,7 @@
 //Manejar las solicitudes HTTP. Llama al servicio correspondiente. Este maneja las solicitudes GET
 const errorHandler = require('../../../utils/ErrorHandler');
 const UsuarioService = require('../services/UsuariosService');
+const CustomerService = require('../services/CustomerService');
 const admin = require('firebase-admin');
 const { traerToken } = require('../../../conf/firebaseAuth');
 const jwt = require('jsonwebtoken');
@@ -35,25 +36,35 @@ const autenticarUsuario = async (req, res) => {
         // Buscar el usuario por UID
         let user = await UsuarioService.getUserByUID(uid);
 
+        // Código a enviar, por defecto el 200 de login exitoso
+        let codigo = 200;
         if (!user) {
             // Si no se encuentra por UID se busca por correo
             user = await UsuarioService.getUserByEmail(correo);
             if (user) {
-                // El correo estaría asociado a otro usuario
-                throw new ErrorNegocio("El correo ya se encuentra asociado a otra cuenta. Contacte soporte.", null, 400);
-                
+                // El correo estaría asociado a otro usuario. Enviar excepcion 
+                throw new ErrorNegocio("El correo ya se encuentra asociado a otra cuenta. Contacte soporte.", "AUTH_ERROR", 400);
+
             } else {
                 // Si no existe el usuario nuevo ni con correo o UID  en la BD del sistema crearlo            
-               user = await UsuarioService.insertBasicUser(uid, correo);
+                user = await UsuarioService.insertBasicUser(uid, correo);
+                // Retornar una respuesta de éxito, creacion, enviar código 201 de creación de usuario
+                codigo = 201;
             }
 
         }
         // Crear un JWT personalizado para la sesión del usuario
         const jwtPayload = { uid, email: correo, tipoUsuario: user.tipoUsuario, idUsuario: user.idUsuario, jti: uuidv4() };
         const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '1h', }); // Expiración e identificador
-
+        
+        /* Verificar que el customer asociado exista*/
+        let customerAsociado = await CustomerService.getAllCustomers({ idUsuario: user.idUsuario });
+        // Si no existe enviar código 201
+        if (customerAsociado.length == 0 || customerAsociado[0].idUsuario != user.idUsuario) {
+            codigo = 201;
+        }
         // Responde con el JWT generado
-        res.json({ token: jwtToken });
+        res.status(codigo).json({ token: jwtToken, message: "Usuario autenticado exitosamente" });
     } catch (error) {
         console.error(error);
         errorHandler.handleControllerError(res, error, "usuarios");
