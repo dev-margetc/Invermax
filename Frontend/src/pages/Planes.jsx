@@ -211,7 +211,7 @@ const Planes = () => {
 
       {/* Pestañas */}
 
-      <TablaPlanes planesPorPerfil={planes} />
+      <TablaPlanes planesPorPerfil={planesPorPerfil} />
     </div>    
    </>
   );
