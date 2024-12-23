@@ -51,12 +51,56 @@ const getAllPlanes = async (condiciones = null, condicionesPrecio = null) => {
         throw err;
     }
 }
-
+// Traer planes agrupados por tipo de perfil, se pueden agregar condiciones al tipo, al plan y al precio
+const getPlanesTipoPerfil = async (condicionesTipo = null, condicionesPlan = null, condicionesPrecio = null) => {
+    const filtroTipo = { ...condicionesTipo || {} } // Combinar condiciones extra
+    const filtroPlan = { ...condicionesPlan || {} } // Combinar condiciones extra
+    const filtroPrecio = { ...condicionesPrecio || {} } // Combinar condiciones extra
+    
+    try {
+        const perfiles = Perfil.findAll({
+            where: filtroTipo,
+            include: [
+                {
+                    model: Plan,
+                    as: 'planes',
+                    where: filtroPlan,
+                    include: [
+                        {
+                            model: CaracteristicaPlan, // Relacion con el modelo de caracteristicaPlan
+                            as: 'caracteristicasPlanes', // Nombre definido en la asociacion
+                            attributes: {
+                                exclude: ['idPlan', 'id_plan', 'idCaracteristica', 'id_caracteristica']
+                            },
+                            include: [
+                                {
+                                    model: Caracteristica, // Relacion entre CaracteristicaPlan y Caracteristica
+                                    as: 'caracteristica' // Nombre definido en la asociacion
+                                }
+                            ]
+                        },
+                        {
+                            model: PrecioPlan,
+                            as: 'precios',
+                            where: filtroPrecio,
+                            attributes: {
+                                exclude: ['idPlan', 'id_plan']
+                            },
+                        }
+                    ]
+                }
+            ]
+        })
+        return perfiles;
+    } catch (err) {
+        throw err;
+    }
+}
 // Verificar que el id de un precioPlan si corresponda
-const verificarPrecioPlan= async (idPlan, idPrecioPlan) =>{
-    try{
+const verificarPrecioPlan = async (idPlan, idPrecioPlan) => {
+    try {
         let precioPlanCorrespondiente = await PrecioPlan.findOne({
-            where:{
+            where: {
                 idPlan: idPlan,
                 idPrecioPlan: idPrecioPlan
             }
@@ -64,25 +108,25 @@ const verificarPrecioPlan= async (idPlan, idPrecioPlan) =>{
         if (!precioPlanCorrespondiente) {
             throw new ErrorNegocio('No existe una asociación entre este pago y este plan.');
         }
-    }catch(err){
+    } catch (err) {
         throw err;
     }
 }
 
 // Verificar que un precioPlan esté activo y el plan correspondiente tambien
-const isActivoPlanPrecio= async (idPlan, idPrecioPlan) =>{
-    try{
+const isActivoPlanPrecio = async (idPlan, idPrecioPlan) => {
+    try {
         let precioPlan = await PrecioPlan.findOne({
-            where:{
+            where: {
                 idPlan: idPlan,
                 idPrecioPlan: idPrecioPlan,
                 estadoPrecio: 1 // Activo
             },
-            include:[
+            include: [
                 {
                     model: Plan,
-                    as:"plan",
-                    where:{
+                    as: "plan",
+                    where: {
                         estadoPlan: 1 // Plan activo
                     }
                 }
@@ -92,7 +136,7 @@ const isActivoPlanPrecio= async (idPlan, idPrecioPlan) =>{
             throw new ErrorNegocio('El plan o el precio ingresado no está activo.');
         }
         return precioPlan;
-    }catch(err){
+    } catch (err) {
         throw err;
     }
 }
@@ -100,5 +144,6 @@ const isActivoPlanPrecio= async (idPlan, idPrecioPlan) =>{
 module.exports = {
     getAllPlanes,
     verificarPrecioPlan,
+    getPlanesTipoPerfil,
     isActivoPlanPrecio
 }

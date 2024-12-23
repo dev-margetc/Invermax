@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { auth } from "../../services/Firebase";
+import { auth } from "../../services/Firebase/Firebase";
 import { signOut } from "firebase/auth";
 
 const LogoutButton = () => {

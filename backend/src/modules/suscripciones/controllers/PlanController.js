@@ -29,17 +29,13 @@ const getPlanesActivos = async (req, res) => {
     }
 };
 
-// Traer planes activos dado un tipo de customer
-const getPlanesActivosTipoCustomer = async (req, res) => {
+// Traer planes activos dado un tipo de perfil agrupados por tipo de perfil
+const getPlanesActivosTipoPerfil = async (req, res) => {
     try {
-        let condicionPlan = {};
-        let condicionPrecio = {};
-        let {idPerfil} = req.params; 
-        condicionPlan.estadoPlan = 1;
-        condicionPlan.idPerfil = idPerfil;
-        condicionPrecio.estadoPrecio = 1;
-        let planes = await PlanService.getAllPlanes(condicionPlan, condicionPrecio);
-        res.status(201).json(planes); //Se retorna la respuesta
+        let {idPerfil} = req.params;
+        console.log(idPerfil);  
+        let tipos = await PlanService.getPlanesActivosTipoPerfil(idPerfil);
+        res.status(200).json(tipos); //Se retorna la respuesta
     } catch (err) {
         console.log(err); 
         errorHandler.handleControllerError(res, err, "usuarios");
@@ -60,7 +56,7 @@ const validarPrecioPago= async (req, res) => {
 module.exports = {
     getAllPlanes,
     getPlanesActivos,
-    getPlanesActivosTipoCustomer,
+    getPlanesActivosTipoPerfil,
     validarPrecioPago
 }
   
