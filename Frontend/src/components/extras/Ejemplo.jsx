@@ -58,7 +58,7 @@ const Ejemplo = ({ selectedOptions = [], setSelectedOptions, onSelectionChange }
       <div className="select-box" onClick={handleDropdownToggle}>
         <div className="selected-options">
           {Array.isArray(selectedOptions) && selectedOptions.length === 0 && (
-            <span className="placeholder">Seleccionar...</span>
+            <span className="placeholder-m">Seleccionar...</span>
           )}
           {Array.isArray(selectedOptions) &&
             selectedOptions.map((option) => (

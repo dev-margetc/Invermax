@@ -17,6 +17,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Planes from './pages/Planes';
 import TablaPlanes from './components/TablaPlanes';
+import Inmobiliaria from './pages/Inmobiliaria';
+import Canasta from './pages/Canasta';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -31,7 +33,6 @@ function App() {
       <div className='fondo-principal'>
       <Routes>
         <Route path="/" element={<Home />} />    
-        {/* Agrega más rutas aquí si tienes otros componentes de página */}
         <Route path="/filter" element={<Filter />} /> 
         <Route path="/compra" element={<Plantilla />} /> 
         <Route path="/usado" element={<PlantillaCompraUsada />} /> 
@@ -41,7 +42,9 @@ function App() {
         <Route path="/post" element={<Post />} />
         <Route path="/otrosServicios" element={<OtrosServicios />} />
         <Route path="/planes" element={<Planes />} />
-        <Route path="/tabla" element={<TablaPlanes />} />
+        <Route path="/Inmobiliaria" element={<Inmobiliaria />} />
+        <Route path="/Canasta" element={<Canasta />} />
+      
       </Routes>
       </div>
 

@@ -10,6 +10,7 @@ const Planes = () => {
       {
         "titulo": "Plan Constructora Básico",
         "proyectos": "1 proyecto",
+        "descripcion": "Ideal para constructoras que inician su promoción digital. Incluye herramientas básicas para la publicación de proyectos.",
         "caracteristicas": [
           "Publicación de proyecto",
           "Fotos 360",
@@ -19,6 +20,7 @@ const Planes = () => {
       {
         "titulo": "Plan Constructora Pro",
         "proyectos": "3 proyectos",
+        "descripcion": "Diseñado para constructoras que buscan mayor alcance y análisis de mercado.",
         "caracteristicas": [
           "Publicación de proyecto",
           "Fotos 360",
@@ -29,6 +31,7 @@ const Planes = () => {
       {
         "titulo": "Plan Constructora Avanzado",
         "proyectos": "5 proyectos",
+        "descripcion": "Optimizado para constructoras que desean posicionarse en motores de búsqueda.",
         "caracteristicas": [
           "Publicación de proyecto",
           "Recorrido 3D",
@@ -39,6 +42,7 @@ const Planes = () => {
       {
         "titulo": "Plan Constructora Premium",
         "proyectos": "10 proyectos",
+        "descripcion": "La solución completa para constructoras con necesidades avanzadas de promoción.",
         "caracteristicas": [
           "Publicación de proyecto",
           "Fotos 360",
@@ -51,6 +55,7 @@ const Planes = () => {
       {
         "titulo": "Plan Inmobiliaria Básico",
         "proyectos": "2 proyectos",
+        "descripcion": "Perfecto para pequeñas inmobiliarias con necesidades básicas de marketing.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos estándar",
@@ -60,6 +65,7 @@ const Planes = () => {
       {
         "titulo": "Plan Inmobiliaria Pro",
         "proyectos": "5 proyectos",
+        "descripcion": "Un plan que mejora la promoción con fotos 360 y análisis de clientes.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos 360",
@@ -69,6 +75,7 @@ const Planes = () => {
       {
         "titulo": "Plan Inmobiliaria Avanzado",
         "proyectos": "8 proyectos",
+        "descripcion": "Para inmobiliarias que buscan recorridos interactivos y análisis detallados.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos 360",
@@ -79,6 +86,7 @@ const Planes = () => {
       {
         "titulo": "Plan Inmobiliaria Premium",
         "proyectos": "12 proyectos",
+        "descripcion": "Incluye integración con CRM y las mejores herramientas de marketing.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Campaña de marketing avanzada",
@@ -87,10 +95,12 @@ const Planes = () => {
         ]
       }
     ],
+    // Sección "Agente inmobiliario"
     "Agente inmobiliario": [
       {
         "titulo": "Plan Agente Básico",
         "proyectos": "1 propiedad",
+        "descripcion": "Para agentes individuales que quieren empezar a promocionar propiedades.",
         "caracteristicas": [
           "Publicación de propiedad",
           "Fotos estándar",
@@ -100,6 +110,7 @@ const Planes = () => {
       {
         "titulo": "Plan Agente Pro",
         "proyectos": "3 propiedades",
+        "descripcion": "Incluye herramientas para campañas personalizadas.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos 360",
@@ -109,6 +120,7 @@ const Planes = () => {
       {
         "titulo": "Plan Agente Avanzado",
         "proyectos": "5 propiedades",
+        "descripcion": "Añade recorridos 3D y asesorías de marketing.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos 360",
@@ -119,6 +131,7 @@ const Planes = () => {
       {
         "titulo": "Plan Agente Premium",
         "proyectos": "10 propiedades",
+        "descripcion": "La opción más completa para agentes con alta demanda.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos y videos profesionales",
@@ -127,10 +140,12 @@ const Planes = () => {
         ]
       }
     ],
+    // Sección "Propietario"
     "Propietario": [
       {
         "titulo": "Plan Propietario Básico",
         "proyectos": "1 propiedad",
+        "descripcion": "Ideal para propietarios que buscan promocionar una propiedad de manera sencilla.",
         "caracteristicas": [
           "Publicación de propiedad",
           "Fotos estándar"
@@ -139,6 +154,7 @@ const Planes = () => {
       {
         "titulo": "Plan Propietario Pro",
         "proyectos": "3 propiedades",
+        "descripcion": "Incluye opciones para aumentar la visibilidad en redes sociales.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos 360",
@@ -148,6 +164,7 @@ const Planes = () => {
       {
         "titulo": "Plan Propietario Avanzado",
         "proyectos": "5 propiedades",
+        "descripcion": "Añade campañas de marketing para mayor impacto.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos 360",
@@ -157,6 +174,7 @@ const Planes = () => {
       {
         "titulo": "Plan Propietario Premium",
         "proyectos": "10 propiedades",
+        "descripcion": "El plan más completo con fotos profesionales y recorridos 3D.",
         "caracteristicas": [
           "Publicación de propiedades",
           "Fotos profesionales",
@@ -165,7 +183,8 @@ const Planes = () => {
         ]
       }
     ]
-  }
+  };
+  
   
 
   return (

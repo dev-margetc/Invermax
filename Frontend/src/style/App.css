@@ -15,9 +15,9 @@
   right: -26px !important;
 }
 
-.App {
+/* .App {
   text-align: center;
-}
+} */
 
 .App-logo {
   height: 40vmin;
@@ -324,7 +324,7 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
   border-radius: 0px 0px 8px 8px; /* Bordes redondeados */
   position: relative; /* Permitir posicionamiento relativo */
-  z-index: 1000; /* Alto valor para que esté sobre otros elementos */
+  z-index: 9; /* Alto valor para que esté sobre otros elementos */
 }
 
 
@@ -1136,7 +1136,7 @@ font-size: 18px;
     background-color: white;
     box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
     padding: 0px;
-    z-index: 10;
+    z-index: 1200;
     transform: translateX(100%);
     transition: transform 0.3s ease;
     
@@ -1144,6 +1144,7 @@ font-size: 18px;
 
   .navbar-menu.mobile-menu {
     transform: translateX(0);
+
   }
 
   .navbar-menu a {

@@ -71,10 +71,13 @@ const Navbar = () => {
           </div>
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
-              Otros trámites{" "}
+            <Link to="/otrosServicios" className="highlight">
+            Otros trámites{" "}
               <span>
                 <img src="/img/icons/Frame6.svg" alt="" loading="lazy" />
               </span>
+            </Link>
+
             </button>
             {submenuOpenOtrosTramites && (
               <div className="submenu-content">
@@ -100,13 +103,16 @@ const Navbar = () => {
             />
             <span className="ingresar-text">Ingresar</span>
           </a>
+          <Link to="/planes" className="highlight">
           <a
             className="btn btn-danger ms-2 btn-publicar"
             style={{ padding: "5px 10px" }}
-            href="#"
+            href="/planes"
           >
             Publicar
-          </a>
+            </a>
+            </Link>
+        
           <button className="menu-toggle d-lg-none" onClick={toggleMenu}>
             {isOpen ? <span>&#10005;</span> : <i className="fas fa-bars"></i>}
           </button>
@@ -146,12 +152,22 @@ const Navbar = () => {
             )}
           </div>
           <div className="submenu">
-            <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
-              Otros trámites{" "}
+            {/* <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
+            <Link to="/otrosServicios" className="highlight text-dark">
+            Otros trámites{" "}
               <span>
                 <img src="/img/icons/Frame6.svg" alt="" loading="lazy" />
               </span>
-            </button>
+            </Link>
+            </button> */}
+
+            <Link to="/otrosServicios" className="highlight text-dark" onClick={toggleSubmenuOtrosTramites}>
+                  Otros servicios               
+              <span>
+                <img src="/img/icons/Frame6.svg" alt="" loading="lazy" />
+              </span>
+            </Link>
+            
             {submenuOpenOtrosTramites && (
               <div className="submenu-content">
                 <a href="#" className="highlight">

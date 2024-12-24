@@ -1013,3 +1013,500 @@
   top: 0;
   margin-left: 5px;
 }
+
+
+/* -------------------------------------------------- */
+
+.fondo-edificios{
+  height: 100px;
+  background-image: url('/public/img/edificios-filtro.png');
+}
+/* Header */
+.inmobiliaria-header {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  text-align: center;
+  padding: 0px 10%;
+  gap: 10px;
+  margin-top: -35px;
+
+}
+.inmobiliaria-logo{
+  background-color: white;
+  padding: 60px 20px;
+  border-radius: 10px;
+  /* width: 305px;
+  height: 180px; */
+}
+.inmobiliaria-logo img {
+  max-width: 195px;
+  
+}
+
+.inmobiliaria-titulo{
+  
+  align-items: center;
+}
+
+.inmobiliaria-titulo h1{
+  font-size: 48px;
+  font-weight: 700;
+  text-align: left;
+  padding-top: 10px;
+}
+
+.inmobiliaria-linea-roja {
+  width: 50px; /* Ajusta el ancho de la línea */
+  height: 4px; /* Ajusta el grosor de la línea */
+  background-color: red;
+  margin: 0px; /* Centra la línea debajo del texto */
+  text-align: left;
+  border-radius: 2px; /* Bordes redondeados opcionales */
+}
+
+
+@media (max-width: 768px) {
+
+  .inmobiliaria-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    text-align: center;
+   
+  }
+
+  .inmobiliaria-logo{
+    background-color: white;
+    padding: 30px 10px;
+    width: 161px;
+    margin-left: 25%;
+    /* width: 305px;
+    height: 180px; */
+  }
+  .inmobiliaria-logo img {
+    max-width: 107px;
+    
+  }
+
+  .inmobiliaria-titulo h1{
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    padding-top: 10px;
+  }
+  
+  .inmobiliaria-linea-roja {
+    width: 50px; /* Ajusta el ancho de la línea */
+    height: 4px; /* Ajusta el grosor de la línea */
+    background-color: red;
+    margin: 0px auto; /* Centra la línea debajo del texto */
+    border-radius: 2px; /* Bordes redondeados opcionales */
+  }
+}
+/* Filter Section */
+.inmobiliaria-filter-section {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.inmobiliaria-filter-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Espacio entre las líneas y el contenido central */
+  margin: 20px 0; /* Espaciado vertical */
+}
+
+.line {
+  flex: 1; /* Hace que las líneas ocupen el espacio disponible */
+  height: 1px; /* Grosor de la línea */
+  background-color: #000000; /* Color de la línea */
+  margin: 0px 10px;
+}
+
+.filter-content {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Espacio entre el texto y el select */
+}
+
+.filter-content label {
+  font-size: 14px;
+  color: #333; /* Color del texto */
+}
+
+.filter-content select {
+  background-color: #f5f5f5;
+  padding: 5px 20px;
+  font-size: 14px;
+  border: 1px solid #000000;
+  border-radius: 5px; /* Bordes redondeados */
+  outline: none;
+  text-align: left;
+  width: 200px;
+}
+
+/* CANASTA----------------------------------------- */
+
+.confirmar-compra {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px 20px 20px 20px;
+  margin-top: -30px;
+  color: #333;
+}
+
+.title-canasta {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.plan-container-1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px 10px 0px 10px;
+  margin-bottom: 20px;
+}
+
+.plan-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.plan-info {
+  border-right: solid black 1px;
+  margin-right: 10px;
+  padding-right: 10px;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features li {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  margin-left: 3px;
+}
+
+.features img{
+  margin-right: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 1.5rem;
+  margin: 20px 0;
+}
+
+.plans {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.plan-option {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  background-color: #fff;
+  cursor: pointer;
+  max-height: 193px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.plan-option:hover {
+  background-color: #f5f5f5;
+}
+
+.plan-option.selected {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+}
+
+
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 10px; 
+  margin-bottom: 20px;
+}
+
+.payment-methods > div {
+  flex: 1 1 33%; /* Tres elementos por fila en pantallas más grandes */
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Para pantallas de móviles */
+@media (max-width: 768px) {
+  .payment-methods > div {
+    flex: 1 1 100%; /* Los elementos ocupan todo el ancho en pantallas pequeñas */
+  }
+
+  .plan-option {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    background-color: #fff;
+    cursor: pointer;
+    max-height: 193px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  
+}
+
+
+.payment-option {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  background-color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.payment-option.selected {
+  color: white;
+  font-weight: bold;
+}
+.contenedor-btn-pay{
+display: flex;
+justify-content: center;
+}
+
+.pay-button {
+  display: block;
+  width: 173px;
+  padding: 10px;
+  text-align: center;
+  background-color: black;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pay-button:hover {
+  background-color: #333;
+}
+
+.quitar-plan-btn{
+  background-color: none;
+  background-color: #00000000;
+  border: none;
+  color: red;
+  width: 100px;
+  /* margin-left: 75%; */
+  padding-right: 0cqh10px;
+}
+
+.btn-img{
+  display: flex;
+ justify-content: right;
+}
+
+.btn-no-selected{
+  background-color: #000;
+  padding: 10px;
+  color: #f7f7f7;
+  border-radius: 5px;
+}
+
+.btn-no-selected:hover{
+  background-color: red;
+}
+
+.selected-btn{
+  background-color: white;
+  color: #000;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.price-no-selected{
+  color: #0EB69A;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.movilMovimiento-1{
+  display: none;
+  grid-template-columns: 1fr;
+  text-align: left;
+  padding-left: 10px;
+}
+
+.movilMovimiento{
+  display: none;
+  grid-template-columns: 1fr 1fr;
+}
+
+
+
+
+@media (max-width: 768px) {
+  .plan-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  .plan-info {
+    border-right: none;
+  }
+
+  .plans {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espaciado entre los div */
+  }
+
+  .movilMovimiento-1{
+    display: grid;
+    grid-template-columns: 1fr;
+    text-align: left;
+    padding-left: 10px;
+  }
+  
+  .movilMovimiento{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    
+  }
+
+  .normal{
+    display: none;
+  }
+
+  .selected-btn{
+    max-width:170px;
+    max-height: auto;
+  }
+
+
+}
+
+
+.payment-methods {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.payment-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #fff;
+  border-radius: 8px;
+  width: 120px;
+  padding: 10px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.payment-option:hover {
+  border-color: #999;
+}
+
+.payment-option.selected {
+  border-color: #ff0000;
+}
+
+.payment-image {
+  width: 60px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.circle {
+  margin-top: 10px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+.payment-option.selected .circle {
+  border-color: #ff0000;
+  background-color: #ff0000;
+}
+
+.checkmark {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.pay-button {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.pay-button:hover {
+  background-color: #333;
+}
+
+
+.empty-state {
+  display: flex; /* Habilita Flexbox */
+  flex-direction: column; /* Coloca los elementos uno debajo del otro */
+  justify-content: center; /* Centra los elementos verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente */
+  height: 100%; /* Asegúrate de que ocupe toda la altura disponible */
+  text-align: center; /* Centra el texto de los elementos */
+}
+
+.empty-state h2{
+  color: #808080;
+  font-size: 40px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.empty-state p{
+  color: #808080;
+  font-size: 24px;
+}

@@ -1,11 +1,18 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import "../style/TablaPlanes.css";
 
 const TablaPlanes = ({ planesPorPerfil }) => {
   const [activeTab, setActiveTab] = useState("Constructora");
+  const navigate = useNavigate(); // Instancia de useNavigate
 
-  // Obtén los datos para la pestaña activa
+  // Obtén los planes activos según la pestaña seleccionada
   const planesActivos = planesPorPerfil[activeTab] || [];
+
+  // Función para redirigir a la página de Canasta con el plan seleccionado
+  const handleAdquirirPlan = (plan) => {
+    navigate("/canasta", { state: { selectedPlan: plan } }); // Enviar datos al componente Canasta
+  };
 
   return (
     <>
@@ -68,7 +75,12 @@ const TablaPlanes = ({ planesPorPerfil }) => {
                   ))}
                 </ul>
                 <div className="buton">
-                  <button className="tabla-boton">Adquirir plan</button>
+                  <button
+                    className="tabla-boton"
+                    onClick={() => handleAdquirirPlan(plan)} // Redirigir al seleccionar un plan
+                  >
+                    Adquirir plan
+                  </button>
                 </div>
               </div>
             ))}
