@@ -75,13 +75,10 @@ const Navbar = () => {
           </div>
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
-            <Link to="/otrosServicios" className="highlight">
-            Otros trámites{" "}
+              Otros trámites{" "}
               <span>
                 <img src="/img/icons/Frame6.svg" alt="" loading="lazy" />
               </span>
-            </Link>
-
             </button>
             {submenuOpenOtrosTramites && (
               <div className="submenu-content">
@@ -99,17 +96,6 @@ const Navbar = () => {
           </div>
         </div>
         <div className="navbar-right">
-<<<<<<< HEAD
-          <a className="nav-link menus" href="#">
-            <img
-              src="/img/icons/fa-icon-user.svg"
-              alt="icon-ingresar"
-              loading="lazy"
-            />
-            <span className="ingresar-text">Ingresar</span>
-          </a>
-          <Link to="/planes" className="highlight">
-=======
           {/* Si el token es null mostrar el boton de login y el enlace de publicar */}
           {token === null ? (
             <LoginButton />
@@ -118,16 +104,13 @@ const Navbar = () => {
             <LogoutButton />
           )
           }
->>>>>>> f12390f33d4ce9299b3365d5e8c420379978e062
           <a
             className="btn btn-danger ms-2 btn-publicar"
             style={{ padding: "5px 10px" }}
             href="/planes"
           >
             Publicar
-            </a>
-            </Link>
-        
+          </a>
           <button className="menu-toggle d-lg-none" onClick={toggleMenu}>
             {isOpen ? <span>&#10005;</span> : <i className="fas fa-bars"></i>}
           </button>
@@ -167,22 +150,12 @@ const Navbar = () => {
             )}
           </div>
           <div className="submenu">
-            {/* <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
-            <Link to="/otrosServicios" className="highlight text-dark">
-            Otros trámites{" "}
+            <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
+              Otros trámites{" "}
               <span>
                 <img src="/img/icons/Frame6.svg" alt="" loading="lazy" />
               </span>
-            </Link>
-            </button> */}
-
-            <Link to="/otrosServicios" className="highlight text-dark" onClick={toggleSubmenuOtrosTramites}>
-                  Otros servicios               
-              <span>
-                <img src="/img/icons/Frame6.svg" alt="" loading="lazy" />
-              </span>
-            </Link>
-            
+            </button>
             {submenuOpenOtrosTramites && (
               <div className="submenu-content">
                 <a href="#" className="highlight">
