@@ -57,8 +57,8 @@ router.get('/ascenso/customer/:idCustomer', AscensoController.getAscensoCustomer
 // Recibir un pago
 router.post('/suscripcion/pago', SuscripcionController.handlePago)
 
-// Generar una suscripcion para un plan gratuito
-router.post('/suscripcion/gratuita', SuscripcionController.generarSuscripcionGratuita)
+// Generar una suscripcion para un plan gratuito para el usuario que envíe la petición
+router.post('/suscripcion/gratuita', protegerRuta(['admin', 'customer']), SuscripcionController.generarSuscripcionGratuita)
 
 
 //Insertar un inmueble en destacados (o actualizarlo si ya existe)

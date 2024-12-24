@@ -12,7 +12,6 @@ const Planes = () => {
     const fetchPlanes = async () => {
       try {
         const data = await planService.getPlanesActivosPerfil();
-        console.log(data);
         setPlanes(data); // Los datos ya están formateados
       } catch (error) {
         console.error("Error al cargar los planes:", error);
@@ -230,7 +229,7 @@ const Planes = () => {
 
       {/* Pestañas */}
 
-      <TablaPlanes planesPorPerfil={planesPorPerfil} />
+      <TablaPlanes planesPorPerfil={planes} />
     </div>    
    </>
   );

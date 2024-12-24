@@ -4,6 +4,7 @@ import "../style/App3.css";
 import IconCanasta from "../assets/icons/quitar_icon.svg";
 import CheckList from "../assets/icons/CheckList.svg";
 import CanastaIcon1 from "../assets/icons/canasta-icon-1.svg";
+import planService from "../services/suscripciones/PlanService"
 
 const Canasta = () => {
   const { state } = useLocation(); // Obtener datos enviados desde TablaPlanes
@@ -15,13 +16,9 @@ const Canasta = () => {
     navigate("/planes"); // Redirige a la página de planes
   };
 
-  const plans = [
-    { id: 1, duration: "1 mes", price: "$250.000" },
-    { id: 2, duration: "3 meses", price: "$550.000" },
-    { id: 3, duration: "6 meses", price: "$850.000" },
-    { id: 4, duration: "1 año", price: "$1.200.000" },
-    { id: 5, duration: "2 años", price: "$2.500.000" },
-  ];
+  // Traer los precios de los planes
+  const plans = (selectedPlan && selectedPlan.precios) ? selectedPlan.precios : [];
+
 
   const paymentMethods = [
     { id: 1, name: "PSE", icon: "/public/img/pse1.png" },
@@ -30,10 +27,24 @@ const Canasta = () => {
     { id: 4, name: "Efectivo", icon: "/public/img/pse1.png" },
   ];
 
+  const freePaymentMethod = [
+    {
+      id: 5, name: "Gratuito", icon: ""
+    }
+  ];
+
   const handleRemovePlan = () => {
     setSelectedPlan(null); // Limpia el plan seleccionado
     setSelectedPaymentMethod(null); // Limpia el método de pago seleccionado
   };
+
+  const handlePayment = async () => {
+    // Pasar el id del precio seleccionado y el plan correspondiente
+     const response = await planService.generarSuscripcionGratuita(selectedPlan)
+   /* alert(
+      `Plan seleccionado: ${selectedPlan.titulo}, Duración: ${selectedPlan.duration}, Precio: ${selectedPlan.price}, Método de pago: ${selectedPaymentMethod?.name}`
+    )*/
+  }
 
   return (
     <>
@@ -95,6 +106,7 @@ const Canasta = () => {
             <strong>Seleccionar valor</strong>
           </h3>
           <div className="plans container mb-5">
+
             {plans.map((plan) => (
               <button
                 key={plan.id}
@@ -103,11 +115,11 @@ const Canasta = () => {
                     ...selectedPlan,
                     duration: plan.duration,
                     price: plan.price,
+                    idPrecioPlan: plan.id
                   })
                 }
-                className={`plan-option ${
-                  selectedPlan.duration === plan.duration ? "selected" : ""
-                }`}
+                className={`plan-option ${selectedPlan.duration === plan.duration ? "selected" : ""
+                  }`}
               >
                 <div className="movilMovimiento">
                   <div className="movilMovimiento-1">
@@ -115,21 +127,19 @@ const Canasta = () => {
                       <strong>{plan.duration}</strong>
                     </h4>
                     <p
-                      className={`${
-                        selectedPlan.duration === plan.duration
-                          ? ""
-                          : "price-no-selected"
-                      }`}
+                      className={`${selectedPlan.duration === plan.duration
+                        ? ""
+                        : "price-no-selected"
+                        }`}
                     >
                       {plan.price}
                     </p>
                   </div>
                   <span
-                    className={`${
-                      selectedPlan.duration === plan.duration
-                        ? "selected-btn"
-                        : "btn-no-selected"
-                    }`}
+                    className={`${selectedPlan.duration === plan.duration
+                      ? "selected-btn"
+                      : "btn-no-selected"
+                      }`}
                   >
                     {selectedPlan.duration === plan.duration
                       ? "Seleccionado"
@@ -142,20 +152,18 @@ const Canasta = () => {
                     <strong>{plan.duration}</strong>
                   </h4>
                   <p
-                    className={`${
-                      selectedPlan.duration === plan.duration
-                        ? ""
-                        : "price-no-selected"
-                    }`}
+                    className={`${selectedPlan.duration === plan.duration
+                      ? ""
+                      : "price-no-selected"
+                      }`}
                   >
                     {plan.price}
                   </p>
                   <span
-                    className={`${
-                      selectedPlan.duration === plan.duration
-                        ? "selected-btn"
-                        : "btn-no-selected"
-                    }`}
+                    className={`${selectedPlan.duration === plan.duration
+                      ? "selected-btn"
+                      : "btn-no-selected"
+                      }`}
                   >
                     {selectedPlan.duration === plan.duration
                       ? "Seleccionado"
@@ -166,47 +174,45 @@ const Canasta = () => {
             ))}
           </div>
 
-          {/* Métodos de pago: Mostrar solo si se seleccionó valor */}
+          {/* Métodos de pago: Mostrar solo si se seleccionó valor*/}
           {selectedPlan.duration && selectedPlan.price && (
             <>
               <h3 className="subtitle">
                 <strong>Seleccionar método de pago</strong>
               </h3>
               <div className="confirmar-compra">
-              <div className="payment-methods container mb-5">
-                {paymentMethods.map((method) => (
-                  <button
-                    key={method.id}
-                    onClick={() => setSelectedPaymentMethod(method)}
-                    className={`payment-option ${
-                      selectedPaymentMethod?.id === method.id ? "selected" : ""
-                    }`}
-                  >
-                    <img
-                      src={method.icon}
-                      alt={method.name}
-                      className="payment-image"
-                    />
-                    <div className="circle">
-                      {selectedPaymentMethod?.id === method.id && (
-                        <span className="checkmark">✔</span>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="contenedor-btn-pay">
-                <button
-                  className="pay-button"
-                  onClick={() =>
-                    alert(
-                      `Plan seleccionado: ${selectedPlan.titulo}, Duración: ${selectedPlan.duration}, Precio: ${selectedPlan.price}, Método de pago: ${selectedPaymentMethod?.name}`
-                    )
+                <div className="payment-methods container mb-5">
+                  {
+                    //Dependiendo del precio seleccionado tomar una lista de metodos
                   }
-                >
-                  Realizar el pago
-                </button>
-              </div>
+                  {(selectedPlan.price === "$0" ? freePaymentMethod : paymentMethods).map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setSelectedPaymentMethod(method)}
+                      className={`payment-option ${selectedPaymentMethod?.id === method.id ? "selected" : ""
+                        }`}
+                    >
+                      <img
+                        src={method.icon}
+                        alt={method.name}
+                        className="payment-image"
+                      />
+                      <div className="circle">
+                        {selectedPaymentMethod?.id === method.id && (
+                          <span className="checkmark">✔</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="contenedor-btn-pay">
+                  <button
+                    className="pay-button"
+                    onClick={handlePayment}
+                  >
+                    Realizar el pago
+                  </button>
+                </div>
               </div>
 
             </>

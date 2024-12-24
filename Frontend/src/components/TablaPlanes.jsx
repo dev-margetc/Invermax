@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import "../style/TablaPlanes.css";
 
 const TablaPlanes = ({ planesPorPerfil }) => {
   const [activeTab, setActiveTab] = useState("Constructora");
   const navigate = useNavigate(); // Instancia de useNavigate
+
+  useEffect(() => {
+    // Obtener la primera clave disponible solo cuando planesPorPerfil cambia
+    const firstPerfil = Object.keys(planesPorPerfil)[0];
+    if (firstPerfil) {
+      setActiveTab(firstPerfil); // Actualiza el estado con la primera clave disponible
+    }
+  }, [planesPorPerfil]); // Solo se ejecuta cuando planesPorPerfil cambia
 
   // Obtén los planes activos según la pestaña seleccionada
   const planesActivos = planesPorPerfil[activeTab] || [];
