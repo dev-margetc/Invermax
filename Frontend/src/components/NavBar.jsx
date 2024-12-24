@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom"; // Usa Link para manejar las rutas
-
+import LoginButton from "./auth/LoginButton";
+import LogoutButton from "./auth/LogoutButton";
 const Navbar = () => {
+  // Token de sesion
+  const token = localStorage.getItem("token");
+
   const [isOpen, setIsOpen] = useState(false);
   const [submenuOpenComprar, setSubmenuOpenComprar] = useState(false);
   const [submenuOpenOtrosTramites, setSubmenuOpenOtrosTramites] = useState(false);
@@ -38,10 +42,10 @@ const Navbar = () => {
     <header className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="navbar-header">
         <div className="navbar-logo">
-        <Link to="/" className="highlight">
-        <img src="img/logo.png" alt="Logo" className="logo" loading="lazy" /> 
-        </Link>
-          
+          <Link to="/" className="highlight">
+            <img src="img/logo.png" alt="Logo" className="logo" loading="lazy" />
+          </Link>
+
         </div>
         <div className="desktop-menu">
           <a href="#">Arriendos</a>
@@ -95,6 +99,7 @@ const Navbar = () => {
           </div>
         </div>
         <div className="navbar-right">
+<<<<<<< HEAD
           <a className="nav-link menus" href="#">
             <img
               src="/img/icons/fa-icon-user.svg"
@@ -104,6 +109,16 @@ const Navbar = () => {
             <span className="ingresar-text">Ingresar</span>
           </a>
           <Link to="/planes" className="highlight">
+=======
+          {/* Si el token es null mostrar el boton de login y el enlace de publicar */}
+          {token === null ? (
+            <LoginButton />
+          ) : (
+            // Si el token existe mostrar el boton de logout
+            <LogoutButton />
+          )
+          }
+>>>>>>> f12390f33d4ce9299b3365d5e8c420379978e062
           <a
             className="btn btn-danger ms-2 btn-publicar"
             style={{ padding: "5px 10px" }}

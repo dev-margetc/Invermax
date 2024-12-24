@@ -1,9 +1,25 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Tab, Tabs, Table, Container, Button } from "react-bootstrap";
 import "../style/App3.css"; // Archivo de estilos personalizado
 import TablaPlanes from "../components/TablaPlanes";
+import planService from "../services/suscripciones/PlanService"
 
 const Planes = () => {
+
+  const [planes, setPlanes] = useState([]);
+
+  useEffect(() => {
+    const fetchPlanes = async () => {
+      try {
+        const data = await planService.getPlanesActivosPerfil();
+        console.log(data);
+        setPlanes(data); // Los datos ya están formateados
+      } catch (error) {
+        console.error("Error al cargar los planes:", error);
+      }
+    };
+    fetchPlanes();
+  }, []);
 
   const planesPorPerfil = {
     "Constructora": [
@@ -215,7 +231,6 @@ const Planes = () => {
       {/* Pestañas */}
 
       <TablaPlanes planesPorPerfil={planesPorPerfil} />
-     
     </div>    
    </>
   );
