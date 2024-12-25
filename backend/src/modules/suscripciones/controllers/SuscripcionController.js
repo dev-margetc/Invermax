@@ -4,7 +4,6 @@ const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 
 const SuscripcionService = require('../services/SuscripcionService');
 const PlanService = require('../services/PlanService');
-const UsuarioService = require('../../usuarios/services/UsuariosService');
 const CustomerService = require('../../usuarios/services/CustomerService')
 const { traerToken } = require('../../../conf/firebaseAuth');
 
@@ -71,21 +70,33 @@ const generarSuscripcionGratuita = async (req, res) => {
         let infoSuscripcion = {};
 
         // Traer informacion del plan
-        let plan = await PlanService.getAllPlanes({ idPlan: idPlan });
+        let plan = await PlanService.getAllPlanes({ idPlan: idPlan }, { idPrecioPlan: idPrecioPlan });
+
+        // Verificar que el plan y el precio estén activos
+        await PlanService.isEstadoActivoPlanPrecio(idPlan, idPrecioPlan);
 
         // Obtener perfil del plan
-        let perfil = plan[0].dataValues.perfil;
+        if (!plan.length > 0) {
+            throw new ErrorNegocio("Plan no encontrado.")
+        }
 
+        let perfil = plan[0].dataValues.perfil;
+        // Verificar que el precio sea gratuito
+        let precio = plan[0].precios[0].precio;
+        if(precio!=0){
+            throw new ErrorNegocio("Este plan no es gratuito.");
+        }
+        
         // Traer el customer, verificar si existe, si no, se crea
         let customer = await CustomerService.generarOCrearCustomer(idUsuario, perfil.idPerfil);
 
         infoSuscripcion.customer = customer; //Acceder al customer para crear la suscripcion
         infoSuscripcion.idCustomer = customer.idCustomer; // Entregar el objeto completo para validar estado
-           
+
         // Crear la suscripcion para el customer
         infoSuscripcion.idPlan = idPlan;
         infoSuscripcion.idPrecioPlan = idPrecioPlan;
-        
+
         let msg = await SuscripcionService.crearSuscripcionGratuita(infoSuscripcion);
         res.status(201).json(msg); //Se retorna la respuesta
     } catch (err) {

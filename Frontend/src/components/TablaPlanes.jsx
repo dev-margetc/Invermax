@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import "../style/TablaPlanes.css";
 
 const TablaPlanes = ({ planesPorPerfil }) => {
-  const [activeTab, setActiveTab] = useState("Constructora");
+  const [activeTab, setActiveTab] = useState("");
   const navigate = useNavigate(); // Instancia de useNavigate
 
   useEffect(() => {
-    // Obtener la primera clave disponible solo cuando planesPorPerfil cambia
+     // Solo actualiza activeTab si planesPorPerfil no está vacío
+  if (planesPorPerfil && Object.keys(planesPorPerfil).length > 0) {
     const firstPerfil = Object.keys(planesPorPerfil)[0];
-    if (firstPerfil) {
-      setActiveTab(firstPerfil); // Actualiza el estado con la primera clave disponible
-    }
+    setActiveTab(firstPerfil); // Actualiza el estado con la primera clave disponible
+  }
   }, [planesPorPerfil]); // Solo se ejecuta cuando planesPorPerfil cambia
 
-  // Obtén los planes activos según la pestaña seleccionada
-  const planesActivos = planesPorPerfil[activeTab] || [];
+// Obtén los planes activos según la pestaña seleccionada
+const planesActivos = activeTab ? planesPorPerfil[activeTab] : [];
 
   // Función para redirigir a la página de Canasta con el plan seleccionado
   const handleAdquirirPlan = (plan) => {
@@ -26,7 +26,7 @@ const TablaPlanes = ({ planesPorPerfil }) => {
     <>
       {/* Tabs (visibles solo en PC) */}
       <div className="tabla-tabs">
-        {Object.keys(planesPorPerfil).map((perfil) => (
+        {planesPorPerfil && Object.keys(planesPorPerfil).map((perfil) => (
           <button
             key={perfil}
             className={`tabla-tab ${activeTab === perfil ? "active" : ""}`}
@@ -50,7 +50,7 @@ const TablaPlanes = ({ planesPorPerfil }) => {
             className="select-black"
             onChange={(e) => setActiveTab(e.target.value)}
           >
-            {Object.keys(planesPorPerfil).map((perfil) => (
+            {planesPorPerfil && Object.keys(planesPorPerfil).map((perfil) => (
               <option key={perfil} value={perfil}>
                 {perfil}
               </option>
