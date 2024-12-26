@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
-import items from './Productos';
+//import items from './Productos';
+import InmuebleService from '../services/inmuebles/InmuebleService';
 
 const CatalogoProductos = ({ showOnlyFour = false }) => {
+ const [items, setInmuebles] = useState([]); 
+  
+    useEffect(() => {
+      const fetchInmuebles = async () => {
+        try {
+          const data = await InmuebleService.getInmueblesPublicados();
+          setInmuebles(data);
+        } catch (error) {
+          console.error("Error al cargar los inmuebles:", error);
+        }
+      };
+      fetchInmuebles();
+    }, []);
+  
   const itemsPerPage = showOnlyFour ? 4 : 12; // Mostrar solo 4 items si 'showOnlyFour' es true
   const [currentPage, setCurrentPage] = useState(0);
   const navigate = useNavigate(); // Inicializa el hook de navegación
@@ -137,7 +152,7 @@ const CatalogoProductos = ({ showOnlyFour = false }) => {
                 </div>
               </div>
 
-              <p>Nombre vendedor / Inmobiliaria</p>
+              <p>{item.nombreCustomer||"Nombre vendedor / Inmobiliaria"}</p>
             </div>
             <button className="btn-ver-inmueble" onClick={handleNavigate}>
               Ver inmueble

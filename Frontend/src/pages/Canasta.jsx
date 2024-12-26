@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; // Importar useNavigate
 import "../style/App3.css";
 import IconCanasta from "../assets/icons/quitar_icon.svg";
-import CheckList from "../assets/icons/CheckList.svg";
+import CheckList from "../assets/icons/checkList.svg";
 import CanastaIcon1 from "../assets/icons/canasta-icon-1.svg";
 import planService from "../services/suscripciones/PlanService"
 
@@ -21,10 +21,10 @@ const Canasta = () => {
 
 
   const paymentMethods = [
-    { id: 1, name: "PSE", icon: "/public/img/pse1.png" },
-    { id: 2, name: "Tarjeta de Crédito", icon: "/public/img/pse1.png" },
-    { id: 3, name: "Transferencia Bancaria", icon: "/public/img/pse1.png" },
-    { id: 4, name: "Efectivo", icon: "/public/img/pse1.png" },
+    { id: 1, name: "PSE", icon: "/img/pse1.png" },
+    { id: 2, name: "Tarjeta de Crédito", icon: "/img/pse1.png" },
+    { id: 3, name: "Transferencia Bancaria", icon: "/img/pse1.png" },
+    { id: 4, name: "Efectivo", icon: "/img/pse1.png" },
   ];
 
   const freePaymentMethod = [

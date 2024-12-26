@@ -40,7 +40,7 @@ const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, info
         let atributosInmueble = {};
 
         if (infoInmueble) {
-            atributosInmueble = InmuebleRepo.traerAtributosAvanzados(false);
+            atributosInmueble = InmuebleRepo.traerAtributosAvanzados(true);
         } else {
             atributosInmueble = [];
         }

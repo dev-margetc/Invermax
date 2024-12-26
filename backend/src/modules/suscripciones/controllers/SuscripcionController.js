@@ -83,22 +83,22 @@ const generarSuscripcionGratuita = async (req, res) => {
         let perfil = plan[0].dataValues.perfil;
         // Verificar que el precio sea gratuito
         let precio = plan[0].precios[0].precio;
-        if(precio!=0){
+        if (precio != 0) {
             throw new ErrorNegocio("Este plan no es gratuito.");
+        } else {
+            // Traer el customer, verificar si existe, si no, se crea
+            let customer = await CustomerService.generarOCrearCustomer(idUsuario, perfil.idPerfil);
+
+            infoSuscripcion.customer = customer; //Acceder al customer para crear la suscripcion
+            infoSuscripcion.idCustomer = customer.idCustomer; // Entregar el objeto completo para validar estado
+
+            // Crear la suscripcion para el customer
+            infoSuscripcion.idPlan = idPlan;
+            infoSuscripcion.idPrecioPlan = idPrecioPlan;
+
+            let msg = await SuscripcionService.crearSuscripcionGratuita(infoSuscripcion);
+            res.status(201).json(msg); //Se retorna la respuesta
         }
-        
-        // Traer el customer, verificar si existe, si no, se crea
-        let customer = await CustomerService.generarOCrearCustomer(idUsuario, perfil.idPerfil);
-
-        infoSuscripcion.customer = customer; //Acceder al customer para crear la suscripcion
-        infoSuscripcion.idCustomer = customer.idCustomer; // Entregar el objeto completo para validar estado
-
-        // Crear la suscripcion para el customer
-        infoSuscripcion.idPlan = idPlan;
-        infoSuscripcion.idPrecioPlan = idPrecioPlan;
-
-        let msg = await SuscripcionService.crearSuscripcionGratuita(infoSuscripcion);
-        res.status(201).json(msg); //Se retorna la respuesta
     } catch (err) {
         console.log(err);
         errorHandler.handleControllerError(res, err, "suscripciones");

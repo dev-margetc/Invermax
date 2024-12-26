@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import InmuebleService from '../services/inmuebles/InmuebleService';
 
 const CarouselDestacados = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Los destacados traidos por el backend se cargan acá
+  const [destacados, setDestacados] = useState([]);
+
+  useEffect(() => {
+    const fetchInmuebles = async () => {
+      try {
+        const data = await InmuebleService.getInmueblesDestacados();
+        setDestacados(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error al cargar los inmuebles:", error);
+      }
+    };
+    fetchInmuebles();
+  }, []);
 
   const items = [
     {
@@ -72,8 +89,6 @@ const CarouselDestacados = () => {
     },
   ];
 
-  const destacados = items.filter(item => item.badge.toLowerCase() === "destacado");
-
   const updateCarousel = () => {
     const itemsPerSlide = window.innerWidth >= 768 ? 3 : 1;
     const offset = -(100 / itemsPerSlide) * currentIndex;
@@ -101,7 +116,7 @@ const CarouselDestacados = () => {
       <div className="carousel-track">
         {destacados.map((item, index) => (
           <div className="carousel-items" key={index}>
-            <div className="property-card-d"> 
+            <div className="property-card-d">
               {item.badge.toLowerCase() === "destacado" && (
                 <span className="badge-destacado">
                   Destacado
@@ -109,7 +124,7 @@ const CarouselDestacados = () => {
                 </span>
               )}
               {item.nuevo === true && (
-                <span className="badge-nuevo" style={{overflow: "hidden"}}>Nuevo</span>
+                <span className="badge-nuevo" style={{ overflow: "hidden" }}>Nuevo</span>
               )}
 
               <img className="property-img" src={item.imgSrc} alt={`Inmueble ${index + 1}`} loading="lazy" />
@@ -163,8 +178,8 @@ const CarouselDestacados = () => {
                     <span className="value">{item.baths}</span>
                   </div>
                 </div>
-                <p>Nombre vendedor / Inmobiliaria</p>
-                
+                <p>{item.nombreCustomer||"Nombre vendedor / Inmobiliaria"}</p>
+
               </div>
               <button className="btn-ver-inmueble">Ver inmueble</button>
             </div>
@@ -172,8 +187,8 @@ const CarouselDestacados = () => {
         ))}
       </div>
       <div className="carousel-controls">
-        <button className="carousel-button" onClick={prevSlide}><img src="/img/icons/frame27.svg" alt="fecla" loading="lazy"/></button>
-        <button className="carousel-button" onClick={nextSlide}><img src="/img/icons/frame26.svg" alt="flecha" loading="lazy"/></button>
+        <button className="carousel-button" onClick={prevSlide}><img src="/img/icons/frame27.svg" alt="fecla" loading="lazy" /></button>
+        <button className="carousel-button" onClick={nextSlide}><img src="/img/icons/frame26.svg" alt="flecha" loading="lazy" /></button>
       </div>
     </div>
   );

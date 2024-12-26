@@ -1,7 +1,12 @@
 // Se interactua con la base de datos haciendo uso de sequelize o personalizadas
 const sequelize = require("../../../conf/database");
+const Ciudad = require("../../inmuebles/entities/Ciudad");
+const DetalleInmueble = require("../../inmuebles/entities/DetalleInmueble");
 
 const Inmueble = require("../../inmuebles/entities/Inmueble");
+const TipoInmueble = require("../../inmuebles/entities/TipoInmueble");
+const Zona = require("../../inmuebles/entities/Zona");
+const Customer = require("../../usuarios/entities/Customer");
 
 const InmuebleAscenso = require("../entities/InmuebleAscenso");
 
@@ -14,7 +19,7 @@ const traerInmueblesAscenso = async (condiciones = null, whereInmueble = null, a
 
     // Si atributosInmueble existe, construir el filtro de atributos
     let atributos;
-    if(atributosInmueble){
+    if (atributosInmueble) {
         atributos = {
             include: [
                 ...atributosInmueble, // Atributos adicionales especificados
@@ -29,17 +34,48 @@ const traerInmueblesAscenso = async (condiciones = null, whereInmueble = null, a
             model: Inmueble,
             as: "inmueble",
             where: whereInmueble || undefined, // Solo aplica el where si existe
-            attributes: atributos ? atributos : undefined // Si no hay atributos, se deja undefined
+            attributes: atributos ? atributos : undefined, // Si no hay atributos, se deja undefined
+            //Incluir los detalles
+            include: [
+                {
+                    model: DetalleInmueble,
+                    as: "detalles",
+                    attributes: ["parqueadero", "amoblado",]
+                },
+                { // Incluir el tipo
+                    model: TipoInmueble,
+                    as: "tipoInmueble",
+                    attributes: ["tipoInmueble"]
+                },
+                // Incluir zonas
+                {
+                    model: Zona,
+                    as: "zonas",
+                    attributes: ['idZona'],
+                    through: { attributes: [] }, // Excluir los atributos de la tabla pivote
+                },
+                // Incluir el customer
+                {
+                    model: Customer,
+                    as: "customer",
+                    attributes: ['nombreCustomer']
+                },
+                {
+                    as: 'ciudad', // Se usa el alias definido en la relacion
+                    model: Ciudad,
+                    attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
+                }
+            ]
         }
         : null;
 
     try {
         let inmueblesAscenso = await InmuebleAscenso.findAll({
             where: filtro,
-            attributes:{
-                exclude:["id_inmueble"]
+            attributes: {
+                exclude: ["id_inmueble"]
             },
-            include: includeInmueble  ? [includeInmueble] : [] // Agregar el include si existe
+            include: includeInmueble ? [includeInmueble] : [] // Agregar el include si existe
         })
 
         return inmueblesAscenso;
@@ -52,8 +88,8 @@ const traerInmueblesAscenso = async (condiciones = null, whereInmueble = null, a
 function generarCodigoPeriodo(fechaInicioSuscripcion, idSuscripcion) {
     const fechaActual = new Date(); // Fecha actual
     const inicioSuscripcion = new Date(fechaInicioSuscripcion); // Fecha de inicio de la suscripción
-    
-    const mesesTranscurridos = 
+
+    const mesesTranscurridos =
         (fechaActual.getFullYear() - inicioSuscripcion.getFullYear()) * 12 +
         fechaActual.getMonth() - inicioSuscripcion.getMonth() + 1; // +1 porque el primer mes cuenta como 1
 
@@ -80,12 +116,12 @@ const insertarInmuebleAscenso = async (datos) => {
 //Metodo actualizacion
 const modificarAscenso = async (datos, idInmuebleAscenso) => {
     try {
-        InmuebleAscenso.update(datos,{
+        InmuebleAscenso.update(datos, {
             where: {
                 "idAscenso": idInmuebleAscenso
             }
         }
-    )
+        )
     } catch (err) {
         throw err;
     }

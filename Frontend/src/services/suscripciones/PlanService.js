@@ -2,7 +2,6 @@ import { api } from "../api";
 import { jwtDecode } from "jwt-decode";
 import { formatPerfilPlanData } from "../utils/PlanUtils";
 import { handleTokenExpiration } from "../utils/AuthUtils";
-import UsuarioService from "../usuarios/UsuarioService";
 
 // Traer los planes activos segun un perfil o todos si no se inició sesión
 const getPlanesActivosPerfil = async () => {
@@ -48,8 +47,6 @@ const getPlanesActivosPerfil = async () => {
         // Devolver los datos de la ruta alternativa
         return formatPerfilPlanData(responseFallback.data);
     }
-
-    // Si el perfil existe o no entonces se hace una peticion u otra
 }
 
 // Generar la suscripción gratuita

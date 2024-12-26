@@ -11,6 +11,8 @@ const Zona = require("../entities/Zona");
 const Foto = require("../entities/Foto");
 const Video = require("../entities/Video");
 const Customer = require("../../usuarios/entities/Customer");
+const InmuebleAscenso = require("../../suscripciones/entities/InmuebleAscenso");
+const InmuebleDestacado = require("../../suscripciones/entities/InmuebleDestacado");
 
 //Crea un inmueble con sus detalles y proyecto si es el caso
 //Recibe los datos con detalles y una confirmación de si es proyecto
@@ -64,24 +66,25 @@ const traerAtributosAvanzados = (isFiltro = false) => {
 
   const attributes = [
     // Valor minimo y maximo de inmuebles
-    [sequelize.literal('(SELECT MIN(valor_Inmueble) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMinimoDetalles'],
-    [sequelize.literal('(SELECT MAX(valor_Inmueble) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'valorMaximoDetalles'],
+    [sequelize.fn('MIN', sequelize.col('inmueble.detalles.valor_inmueble')), 'valorMinimoDetalles'],
+    [sequelize.fn('MAX', sequelize.col('inmueble.detalles.valor_inmueble')), 'valorMaximoDetalles'],
 
-    // Obtener una foto del primer detalle
+
+    // Obtener una foto del primer detalle     
     [sequelize.literal('(SELECT url_foto FROM Fotos WHERE Fotos.id_detalle_inmueble IN (SELECT id_detalle FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_Inmueble) LIMIT 1)'), 'fotoPrincipal'],
 
   ];
 
   if (isFiltro) {
     attributes.push(
-      // Valor minimo de área
-      [sequelize.literal('(SELECT MIN(area) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'areaMinima'],
+      // Valor minimo de área (usando sequelize.fn y la relación)
+      [sequelize.fn('MIN', sequelize.col('inmueble.detalles.area')), 'areaMinima'],
 
-      // Valor minimo de baños
-      [sequelize.literal('(SELECT MIN(cantidad_baños) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinBaños'],
+      // Valor minimo de baños (usando sequelize.fn y la relación)
+      [sequelize.fn('MIN', sequelize.col('inmueble.detalles.cantidad_baños')), 'cantidadMinBaños'],
 
-      // Valor minimo de habitaciones
-      [sequelize.literal('(SELECT MIN(cantidad_habitaciones) FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_inmueble)'), 'cantidadMinHabitaciones'],
+      // Valor minimo de habitaciones (usando sequelize.fn y la relación)
+      [sequelize.fn('MIN', sequelize.col('inmueble.detalles.cantidad_habitaciones')), 'cantidadMinHabitaciones'],
     );
   }
 
@@ -95,7 +98,7 @@ const getPublicados = async () => {
   try {
 
     const inmuebles = await VistaPublicados.findAll({
-      attributes: { exclude: ['idTipoInmueble', 'cod_ciudad', 'id_inmueble'] },
+      attributes: { exclude: ['idTipoInmueble', 'cod_ciudad', 'id_inmueble', 'idCustomer'] },
       include: [
         {
           model: Inmueble, // Relacion con el modelo inmueble
@@ -108,7 +111,7 @@ const getPublicados = async () => {
             {
               model: DetalleInmueble,
               as: "detalles",
-              attributes: ["parqueadero", "amoblado"]
+              attributes: ["parqueadero", "amoblado",]
             },
             { // Incluir el tipo
               model: TipoInmueble,
@@ -121,15 +124,39 @@ const getPublicados = async () => {
               as: "zonas",
               attributes: ['idZona'],
               through: { attributes: [] }, // Excluir los atributos de la tabla pivote
+            },
+            // Incluir el customer
+            {
+              model: Customer,
+              as: "customer",
+              attributes: ['nombreCustomer']
+            },
+            // Agregar inmuebles en ascenso
+            {
+              model: InmuebleAscenso, // Relación con ascensos
+              as: "inmueblesAscenso",
+              attributes: ['idAscenso'], // Atributo necesario para identificar si está en ascenso
+              where: { estadoAscenso: 1 }, // Solo los que están activos
+              required: false// Incluye la relación solo si existe
+            },
+            // Agregar inmuebles en ascenso
+            {
+              model: InmuebleDestacado, // Relación con ascensos
+              as: "inmueblesDestacados",
+              attributes: ['idDestacado'], // Atributo necesario para identificar si está en ascenso
+              where: { estadoDestacado: 1 }, // Solo los que están activos
+              required: false// Incluye la relación solo si existe
+            },
+            // Informacion de la ciudad
+            {
+              as: 'ciudad', // Se usa el alias definido en la relacion
+              model: Ciudad,
+              attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
             }
           ]
-        },
-        {
-          as: 'ciudad', // Se usa el alias definido en la relacion
-          model: Ciudad,
-          attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
         }
-      ]
+      ],
+      group: 'idInmueble' // Agrupar por ID inmueble
     });
 
     return inmuebles;
@@ -147,7 +174,7 @@ const getInmueblesUsuario = async (idCustomer) => {
       "tituloInmueble",
       "estadoPublicacionInmueble"
     ],
-    include:[
+    include: [
       {
         model: DetalleInmueble,
         as: "detalles"

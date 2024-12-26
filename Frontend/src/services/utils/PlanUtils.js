@@ -1,5 +1,4 @@
-// utils/formatData.js
-
+import { formatPrecio } from "./GeneralUtils";
 // Transforma datos del backend que lleguen como planes agrupados por tipo de perfil
 export const formatPerfilPlanData = (tipos) => {
   const result = {};
@@ -54,7 +53,7 @@ const asignarPrecios = (plan) => {
   // Mapear cada precio 
   return plan.precios.map(precio => ({
     id: precio.idPrecioPlan,
-    price: `$${parseFloat(precio.precio).toLocaleString("es-CO")}`, // Formateo del precio
+    price: formatPrecio(precio.precio), // Formateo del precio
     duration: precio.duracion ? `${precio.duracion} meses.` : "Indefinido", // Manejo de duración nula
     idPlan: plan.idPlan
   }));

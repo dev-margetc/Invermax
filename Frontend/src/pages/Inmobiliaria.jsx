@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../style/App3.css";
-import IconInmobiliaria from "../assets/icons/InmobiliariaIcon.svg";
+import IconInmobiliaria from "../assets/icons/inmobiliariaIcon.svg";
 import CatalogoProductosDosFilas from "../components/InmobiliariaCatalogo"; // Importa el componente
 
 const Inmobiliaria = () => {

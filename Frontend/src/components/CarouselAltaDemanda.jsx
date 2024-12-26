@@ -1,7 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import InmuebleService from '../services/inmuebles/InmuebleService';
 
 const CarouselAltaDemanda = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  
+    // Los ascendidos (alta demanda) traidos por el backend se cargan acá
+    const [altaDemandaItems, setAltaDemanda] = useState([]);
+
+    useEffect(() => {
+      const fetchInmuebles = async () => {
+        try {
+          const data = await InmuebleService.getInmueblesDemanda();
+          setAltaDemanda(data);
+          console.log(data);
+        } catch (error) {
+          console.error("Error al cargar los inmuebles:", error);
+        }
+      };
+      fetchInmuebles();
+    }, []);
 
   const items = [
     {
@@ -72,8 +90,6 @@ const CarouselAltaDemanda = () => {
     },
   ];
 
-  const altaDemandaItems = items.filter(item => item.badge.toLowerCase() === "alta demanda");
-
   const updateCarousel = () => {
     const itemsPerSlide = window.innerWidth >= 768 ? 3 : 1;
     const offset = -(100 / itemsPerSlide) * currentIndex;
@@ -99,7 +115,7 @@ const CarouselAltaDemanda = () => {
       <h1 className="mb-3 text-dark center raya">INMUEBLES <b>EN ALTA DEMANDA</b></h1>
       <div class="centered-line"></div>
       <div className="carousel-track-alta">
-        {altaDemandaItems.map((item, index) => (
+        {altaDemandaItems && altaDemandaItems.map((item, index) => (
           <div className="carousel-items" key={index}>
             <div className="property-card-d">
               {item.badge.toLowerCase() === "alta demanda" && (
