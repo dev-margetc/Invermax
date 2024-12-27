@@ -20,11 +20,12 @@ const getPublicados = async (datos) => {
             parqueadero, // se usará un ==
             amoblado, // se usará un ==
             zonas,
+            idTipoInmueble, // Usar un ==
             idCustomer
         } = datos;
         // Construir el objeto de filtros
         // Por las multiples consultas a la BD en el metodo del repository el filtro se aplica aca
-        resultado = await inmuebleRepository.getPublicados();   
+        resultado = await inmuebleRepository.getPublicados();
         // filtrar la lista
         resultadoFiltrado = resultado.filter((dato) => {
             /* 
@@ -48,6 +49,9 @@ const getPublicados = async (datos) => {
 
             // La ciudad llegará como id
             if (codCiudad && dato.codCiudad != codCiudad) return false;
+
+            // El tipo de inmueble llegará como id
+            if (idTipoInmueble && dato.inmueble.tipoInmueble.idTipoInmueble != idTipoInmueble) return false;
 
             // Se quita si el montoMaximo es menor al valor mas bajo de los detalles del inmueble
             if (montoMaximo && inmuebleData.valorMinimoDetalles >= montoMaximo) return false;

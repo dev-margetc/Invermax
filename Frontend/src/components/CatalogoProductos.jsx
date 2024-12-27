@@ -3,20 +3,26 @@ import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 //import items from './Productos';
 import InmuebleService from '../services/inmuebles/InmuebleService';
 
-const CatalogoProductos = ({ showOnlyFour = false }) => {
+const CatalogoProductos = ({filters, showOnlyFour = false }) => {
  const [items, setInmuebles] = useState([]); 
   
     useEffect(() => {
       const fetchInmuebles = async () => {
+        console.log(filters);
         try {
-          const data = await InmuebleService.getInmueblesPublicados();
-          setInmuebles(data);
+          const data = await InmuebleService.getInmueblesPublicados(filters); // Traer datos del servicio
+          if(!data){
+            setInmuebles([]);
+          }else{
+
+            setInmuebles(data);
+          }
         } catch (error) {
           console.error("Error al cargar los inmuebles:", error);
         }
       };
       fetchInmuebles();
-    }, []);
+    }, [filters]); //Actualizar cuando los filtros cambian
   
   const itemsPerPage = showOnlyFour ? 4 : 12; // Mostrar solo 4 items si 'showOnlyFour' es true
   const [currentPage, setCurrentPage] = useState(0);

@@ -24,17 +24,17 @@ const getPlanesActivosPerfil = async () => {
                 idPerfil = responseUser.data[0].perfil.idPerfil;
             }
         }
-            const endpoint = idPerfil
-                ? `/suscripciones/planes/tipoPerfil/${idPerfil}/activo`
-                : `/suscripciones/planes/tipoPerfil/activo`;
-            const response = await api.get(endpoint);
-            console.log(response.data);
-            if (!response.data) {
-                throw new Error("No se recibieron datos de la API.");
-            }
-            // Usar la función de utils para formatear los datos antes de devolverlos
-            return formatPerfilPlanData(response.data);
-        
+        const endpoint = idPerfil
+            ? `/suscripciones/planes/tipoPerfil/${idPerfil}/activo`
+            : `/suscripciones/planes/tipoPerfil/activo`;
+        const response = await api.get(endpoint);
+        console.log(response.data);
+        if (!response.data) {
+            throw new Error("No se recibieron datos de la API.");
+        }
+        // Usar la función de utils para formatear los datos antes de devolverlos
+        return formatPerfilPlanData(response.data);
+
     } catch (error) {
         handleTokenExpiration(error);
         // Si el error es debido al token expirado o usuario no encontrado, hacer una petición alternativa
@@ -55,40 +55,46 @@ const generarSuscripcionGratuita = async (selectedPlan) => {
     (este valida que si sea gratuito y que el precio coincida con el plan)
     */
     const { idPlan, idPrecioPlan } = selectedPlan;
+    const token = localStorage.getItem("token");
     try {
-        const token = localStorage.getItem("token");
-        const decoded = jwtDecode(token);
-        const idUsuario = decoded.idUsuario;
-        const endpoint = '/suscripciones/suscripcion/gratuita'
-        const response = await api.post(endpoint,
-            {
-                metadata: { // Agrupar los datos
-                    idPlan,
-                    idPrecioPlan,
-                    idUsuario
+        if (token) {
+            const decoded = jwtDecode(token);
+            const idUsuario = decoded.idUsuario;
+            const endpoint = '/suscripciones/suscripcion/gratuita'
+            const response = await api.post(endpoint,
+                {
+                    metadata: { // Agrupar los datos
+                        idPlan,
+                        idPrecioPlan,
+                        idUsuario
+                    }
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Agregar el token en los encabezados
+                    }
                 }
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}`, // Agregar el token en los encabezados
-                }
-            }
-        );
+            );
 
-        console.log(response);
-        // Redirigir según el código de estado
-        if (response.status === 201) {
-            alert("suscripción generada exitosamente.");
-            window.location.href = `${window.location.origin}`;
+            console.log(response);
+            // Redirigir según el código de estado
+            if (response.status === 201) {
+                alert("suscripción generada exitosamente.");
+                window.location.href = `${window.location.origin}`;
+            }
+        } else {
+            alert("Inicie sesión para poder activar un plan.");
         }
     } catch (error) {
+        handleTokenExpiration(error);
+        // Si el error es debido al token expirado o usuario no encontrado, hacer una petición alternativa
         if (error.response) {
             // Errores devueltos por el backend
             const { message } = error.response.data.error;
             alert(message);
         } else {
             // Errores de red u otros problemas
-            console.error("Error en el login:", error);
+            console.error("Error generando la suscripcion:", error);
         }
     }
 }

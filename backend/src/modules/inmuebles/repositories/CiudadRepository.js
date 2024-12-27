@@ -39,7 +39,15 @@ const getDepartamentosConCiudades = async (req, res) => {
     const ciudades = await Ciudad.findAll({
       where:{
         nombreCiudad:{[Op.like]:  `%${nombre}%`}
-      }
+      },
+      attributes:["codCiudad","nombreCiudad"],
+      include:[
+        {
+          model: Departamento,
+          as: "departamento",
+          attributes:['idDepartamento', 'nombreDepartamento']
+        }
+      ]
     });
 
     return (ciudades);

@@ -24,14 +24,19 @@ const convertirPrimeraMayuscula = (txt) => {
 }
 // mostrar tipos de inmuebles que pueden crear, para evitar carga extra a la BD se coloca acá
 const asignarCantidadInmueble = (perfil, caracteristicasPlanes) => {
-
+  const nombrePerfil = perfil.perfil;
   // Buscar la característica 'inmuebles_creados' usando find
   const inmueble = caracteristicasPlanes.find(car => car.caracteristica.claveCaracteristica === "inmuebles_creados");
 
   // Si se encuentra el valor, asignar el texto 
   if (inmueble) {
     const cantidad = inmueble.valorCaracteristica;
-    return perfil === 'constructora' ? `${cantidad} proyectos.` : `${cantidad} propiedades.`;
+    // Si es constructora o inmobiliaria retornar texto proyectos
+    if(nombrePerfil == 'constructora' || nombrePerfil== 'inmobiliaria'){
+      return `${cantidad} proyectos.` 
+    }else{
+      return `${cantidad} propiedades.`
+    }
   }
 
   // En caso de que no se encuentre la característica, se puede devolver un valor por defecto

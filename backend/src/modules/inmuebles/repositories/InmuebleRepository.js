@@ -116,7 +116,7 @@ const getPublicados = async () => {
             { // Incluir el tipo
               model: TipoInmueble,
               as: "tipoInmueble",
-              attributes: ["tipoInmueble"]
+              attributes: ["tipoInmueble", "idTipoInmueble"]
             },
             // Incluir zonas
             {

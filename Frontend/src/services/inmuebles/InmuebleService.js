@@ -1,11 +1,21 @@
 // Ejecuta las peticiones donde los inmuebles son el objeto principal de la relacion
 import { api } from "../api";
 import { formatInmueblePublicadoData } from "../utils/InmuebleUtils";
+import { formatFrontendFilter } from "../utils/FilterUtil";
+import { createQueryString } from "../utils/GeneralUtils";
 
 // Traer los inmuebles publicados
-const getInmueblesPublicados = async () => {
+const getInmueblesPublicados = async (filters) => {
     try {
-        const response = await api.get(`inmuebles/publicados`);
+        console.log(filters);
+        const filtrosMapeados = formatFrontendFilter(filters);
+        const query =createQueryString(filtrosMapeados);
+        let url = `/inmuebles/publicados`;
+        if (query) {
+            url = `/inmuebles/publicados?${query}`; // Adjuntar los filtros como query string
+        }
+console.log(url);
+        const response = await api.get(url);
         console.log(response.data);
         if (!response.data) {
             throw new Error("No se recibieron datos de la API.");
@@ -38,10 +48,10 @@ const getInmueblesDemanda = async () => {
         if (!response.data) {
             throw new Error("No se recibieron datos de la API.");
         }
-        console.log(response.data);
         return formatInmueblePublicadoData(response.data)
     } catch (error) {
         console.log(error);
+        return [];
     }
 }
 export default {

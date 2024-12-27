@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Ejemplo from './extras/Ejemplo';
 import ZonasCercanas from './extras/ZonasCercanas';
+import CityInput from './modules/inmuebles/CityInput';
+import TiposInmueblesSelect from './modules/inmuebles/TiposInmueblesSelect';
 
-const BannerFilter = ({ initialData }) => {
+const BannerFilter = ({ initialData, onApplyFilters }) => {
   const [formData, setFormData] = useState({
     category: '',
     purpose: '',
@@ -80,6 +82,10 @@ const BannerFilter = ({ initialData }) => {
 
     setSelectedFilters(filters);
     setShowMoreFilters(false);
+
+    if (onApplyFilters) {
+      onApplyFilters(data); // Notificar filtros aplicados
+    }
   };
 
   const handleApplyFilters = () => applyFilters(formData);
@@ -133,15 +139,7 @@ const BannerFilter = ({ initialData }) => {
                 <div className="col-md-12 mb-3 p-0">
                   {showCityInputs ? (
                     <div className="row mt-4">
-                      <div className="col-md-3 mb-3 mb-md-0">
-                        <label className="banner-filter-text-white">Categoría del Inmueble</label>
-                        <select name="category" className="banner-filter-select" value={formData.category} onChange={handleChange}>
-                          <option value="">Selecciona...</option>
-                          <option value="Apartamento">Apartamento</option>
-                          <option value="Casa">Casa</option>
-                          <option value="Oficina">Oficina</option>
-                        </select>
-                      </div>
+                      <TiposInmueblesSelect onTipoSelect={handleChange}></TiposInmueblesSelect>
                       <div className="col-md-3 mb-3 mb-md-0">
                         <label className="banner-filter-text-white">¿Qué quieres hacer?</label>
                         <select name="purpose" className="banner-filter-select" value={formData.purpose} onChange={handleChange}>
@@ -150,29 +148,7 @@ const BannerFilter = ({ initialData }) => {
                           <option value="Rentar">Rentar</option>
                         </select>
                       </div>
-                      <div className="col-md-3 mb-3 mb-md-0">
-                        <label className="banner-filter-text-white">Ciudad</label>
-                        <select
-                          name="city"
-                          className="banner-filter-select"
-                          value={formData.city}
-                          onChange={handleChange}
-                        >
-                          <option value="">Selecciona una ciudad...</option>
-                          {[
-                            "Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena", "Cúcuta", 
-                            "Bucaramanga", "Soacha", "Ibagué", "Pereira", "Santa Marta", 
-                            "Manizales", "Villavicencio", "Neiva", "Pasto", "Armenia", "Montería",
-                            "Popayán", "Sincelejo", "Valledupar", "Buenaventura", "Riohacha", 
-                            "Tunja", "Florencia", "Quibdó", "Yopal", "Mocoa", "Leticia",
-                            "San Andrés", "Inírida", "Puerto Carreño", "Arauca"
-                          ].map((city) => (
-                            <option key={city} value={city}>
-                              {city}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                      <CityInput onCitySelect={handleChange}></CityInput>
                       <div className="col-md-3 d-flex align-items-end">
                         <button type="button" className="btn btn-dark w-100" onClick={handleApplyFilters}>
                           <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
