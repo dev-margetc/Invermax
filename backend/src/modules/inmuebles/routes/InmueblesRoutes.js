@@ -11,6 +11,10 @@ const detalleInmuebleController = require("../controllers/DetalleController");
 const interesadoController = require("../controllers/InteresadoController");
 const zonasController = require("../controllers/ZonasController");
 
+
+// Definir una ruta para obtener todos las ciudades dado el ID
+router.get('/ciudades/id/:idCiudad', ciudadController.getCiudadByID);
+
 // Definir una ruta para obtener todos las ciudades dado el nombre
 router.get('/ciudades/:nombreCiudad', ciudadController.getCiudadesNombre);
 

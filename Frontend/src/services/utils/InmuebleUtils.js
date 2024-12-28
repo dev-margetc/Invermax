@@ -4,7 +4,7 @@ import { formatPrecio } from "./GeneralUtils";
 export const formatInmueblePublicadoData = (publicados) => {
     return publicados.map((publicado) => ({
         idInmueble: publicado.idInmueble,
-        imgSrc: publicado.inmueble.fotoPrincipal || "/img/Destacados/img-d-1.png",
+        imgSrc: generarFotoPrincipal(publicado),
         info: generarInfoExtra(publicado),
         price: generarInfoPrecio(publicado),
         area: "Área m²" + (publicado.inmueble.areaMinima || 0),
@@ -50,7 +50,7 @@ const generarBadge = (publicado) => {
         badge: "",
         badge: "destacado",
    */
-    if ((publicado.inmueble.inmueblesAscenso && publicado.inmueble.inmueblesAscenso.length > 0)|| publicado.idAscenso) {
+    if ((publicado.inmueble.inmueblesAscenso && publicado.inmueble.inmueblesAscenso.length > 0) || publicado.idAscenso) {
         return "alta demanda"
     } else if ((publicado.inmueble.inmueblesDestacados && publicado.inmueble.inmueblesDestacados.length > 0) || publicado.idDestacado) {
         return "destacado"
@@ -58,3 +58,11 @@ const generarBadge = (publicado) => {
     return ""
 }
 
+// Generar la URL de la foto principal del inmueble
+const generarFotoPrincipal = (publicado) => {
+    if (publicado.inmueble.fotoPrincipal) {
+        const uploadsPath = import.meta.env.VITE_RUTA_FOTO_INMUEBLES;
+        return uploadsPath+ "/" + publicado.inmueble.fotoPrincipal
+    }
+    return "/img/Destacados/img-d-1.png"
+}

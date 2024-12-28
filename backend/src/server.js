@@ -52,6 +52,13 @@ app.use('/usuarios', usuariosRoutes);
 // Usar las rutas del modulo de suscripciones
 app.use('/suscripciones', suscripcionesRoutes);
 
+// Ruta para acceder a las fotos del servidor
+const uploadsPath = process.env.UPLOADS_PATH || path.join(__dirname, '../../uploads');
+
+// Configurar la carpeta "uploads" como estática
+app.use('/uploads', express.static(uploadsPath));
+
+
 // Manejador de errores globales
 app.use(globalErrorHandler);
 

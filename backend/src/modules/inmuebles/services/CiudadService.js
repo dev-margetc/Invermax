@@ -30,6 +30,18 @@ const getCiudadesNombre= async (params)=>{
   
 }
 
+// Trae solo ciudades cuyo id pertenezca
+const getCiudadByID= async (params)=>{ 
+    const {idCiudad} = params;
+    if(idCiudad){
+        return await ciudadRepository.getCiudadByID(idCiudad);
+    }else{
+        console.log("Nombre no proporcionado para la busqueda de ciudades");
+    }
+  
+}
+
+
 const getDepartamentosID= async (params)=>{ 
     try{
         const {idDepartamento} = params;
@@ -47,5 +59,6 @@ module.exports = {
     getDepartamentosConCiudades,
     getCiudadesNombre,
     getDepartamentoCiudadesNombre,
-    getDepartamentosID
+    getDepartamentosID,
+    getCiudadByID
 }

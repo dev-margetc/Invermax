@@ -28,6 +28,7 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
 
   useEffect(() => {
     if (initialData) {
+      console.log("llegó inicial");
       setFormData((prevData) => ({ ...prevData, ...initialData }));
       applyFilters(initialData);
     }
@@ -139,7 +140,11 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
                 <div className="col-md-12 mb-3 p-0">
                   {showCityInputs ? (
                     <div className="row mt-4">
-                      <TiposInmueblesSelect onTipoSelect={handleChange}></TiposInmueblesSelect>
+                      <TiposInmueblesSelect onTipoSelect={handleChange}
+                        selectClass={"banner-filter-select"}
+                        labelClass={"banner-filter-text-white"}
+                        value={formData.category}
+                      ></TiposInmueblesSelect>
                       <div className="col-md-3 mb-3 mb-md-0">
                         <label className="banner-filter-text-white">¿Qué quieres hacer?</label>
                         <select name="purpose" className="banner-filter-select" value={formData.purpose} onChange={handleChange}>
@@ -148,10 +153,14 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
                           <option value="Rentar">Rentar</option>
                         </select>
                       </div>
-                      <CityInput onCitySelect={handleChange}></CityInput>
+                      <CityInput onCitySelect={handleChange}
+                        inputClass={"banner-filter-input-text"}
+                        selectClass={"banner-filter-select"}
+                        labelClass={"banner-filter-text-white"}
+                        valorFiltro={formData.city}></CityInput>
                       <div className="col-md-3 d-flex align-items-end">
                         <button type="button" className="btn btn-dark w-100" onClick={handleApplyFilters}>
-                          <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
+                          <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy" /> Buscar
                         </button>
                       </div>
                     </div>
@@ -163,7 +172,7 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
                       </div>
                       <div className="col-md-3 d-flex align-items-end">
                         <button type="button" className="btn btn-dark w-100" onClick={handleApplyFilters}>
-                          <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
+                          <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy" /> Buscar
                         </button>
                       </div>
                     </div>
@@ -197,7 +206,7 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
                   <a className="text-dark" style={{ cursor: 'pointer' }}>
                     {showMoreFilters ? 'Cerrar filtros' : 'Más filtros'}
                   </a>
-                  <span className="arrow"><img src="/img/icons/Frame6.svg" alt="toggle filtros" loading="lazy"/></span>
+                  <span className="arrow"><img src="/img/icons/Frame6.svg" alt="toggle filtros" loading="lazy" /></span>
                   <hr />
                 </div>
               )}
@@ -280,7 +289,7 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
               )}
             </div>
           </div>
-        </div> 
+        </div>
       </div>
     </section>
   );

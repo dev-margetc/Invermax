@@ -52,6 +52,24 @@ const getDepartamentosConCiudades = async (req, res) => {
 
     return (ciudades);
 };
+
+const getCiudadByID = async (idCiudad) => {
+  const ciudades = await Ciudad.findOne({
+    where:{
+      codCiudad: idCiudad
+    },
+    attributes:["codCiudad","nombreCiudad"],
+    include:[
+      {
+        model: Departamento,
+        as: "departamento",
+        attributes:['idDepartamento', 'nombreDepartamento']
+      }
+    ]
+  });
+
+  return (ciudades);
+};
   // Traer las ciudades de un departamento dado el ID del departamento
   const getCiudadesconIDDepartamento = async (idDepartamento) => {
     const departamentos = await Departamento.findAll({
@@ -72,5 +90,6 @@ const getDepartamentosConCiudades = async (req, res) => {
     getDepartamentosConCiudades,
     getDepartamentoNombreCiudad,
     getCiudadesconIDDepartamento,
-    getCiudadNombre
+    getCiudadNombre,
+    getCiudadByID
 }

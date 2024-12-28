@@ -8,7 +8,6 @@ const CatalogoProductos = ({filters, showOnlyFour = false }) => {
   
     useEffect(() => {
       const fetchInmuebles = async () => {
-        console.log(filters);
         try {
           const data = await InmuebleService.getInmueblesPublicados(filters); // Traer datos del servicio
           if(!data){

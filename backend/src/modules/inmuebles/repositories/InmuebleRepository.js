@@ -71,7 +71,7 @@ const traerAtributosAvanzados = (isFiltro = false) => {
 
 
     // Obtener una foto del primer detalle     
-    [sequelize.literal('(SELECT url_foto FROM Fotos WHERE Fotos.id_detalle_inmueble IN (SELECT id_detalle FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_Inmueble) LIMIT 1)'), 'fotoPrincipal'],
+    [sequelize.literal('(SELECT url_foto FROM fotos WHERE fotos.id_detalle_inmueble IN (SELECT id_detalle FROM detalles_inmuebles WHERE detalles_inmuebles.id_inmueble = inmueble.id_Inmueble) LIMIT 1)'), 'fotoPrincipal'],
 
   ];
 

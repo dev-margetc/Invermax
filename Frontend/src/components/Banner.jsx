@@ -1,5 +1,7 @@
 // src/components/Banner.js
 import React, { useState } from 'react';
+import CityInput from './modules/inmuebles/CityInput';
+import TiposInmueblesSelect from './modules/inmuebles/TiposInmueblesSelect';
 
 const Banner = ({ onSearch }) => {
   const [showCityInputs, setShowCityInputs] = useState(true);
@@ -7,10 +9,10 @@ const Banner = ({ onSearch }) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const colombianCities = [
-    "Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena", "Cúcuta", 
-    "Bucaramanga", "Soacha", "Ibagué", "Pereira", "Santa Marta", 
+    "Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena", "Cúcuta",
+    "Bucaramanga", "Soacha", "Ibagué", "Pereira", "Santa Marta",
     "Manizales", "Villavicencio", "Neiva", "Pasto", "Armenia", "Montería",
-    "Popayán", "Sincelejo", "Valledupar", "Buenaventura", "Riohacha", 
+    "Popayán", "Sincelejo", "Valledupar", "Buenaventura", "Riohacha",
     "Tunja", "Florencia", "Quibdó", "Yopal", "Mocoa", "Leticia",
     "San Andrés", "Inírida", "Puerto Carreño", "Arauca"
     // Agrega más ciudades si es necesario
@@ -84,15 +86,11 @@ const Banner = ({ onSearch }) => {
               {/* Por Ciudad Inputs */}
               {showCityInputs && (
                 <div id="cityInputs" className="row mt-4">
-                  <div className="col-md-3 mb-3 mb-md-0">
-                    <label htmlFor="category" className="form-label text-white-custom">Categoría del Inmueble</label>
-                    <select className="custom-select-bp" name="category" value={formData.category} onChange={handleChange} required>
-                      <option value="">Selecciona...</option>
-                      <option value="Apartamento">Apartamento</option>
-                      <option value="Casa">Casa</option>
-                      <option value="Oficina">Oficina</option>
-                    </select>
-                  </div>
+                  <TiposInmueblesSelect onTipoSelect={handleChange}
+                    labelClass={"form-label text-white-custom"}
+                    selectClass={"custom-select-bp"}
+                    value={formData.category}
+                  ></TiposInmueblesSelect>
                   <div className="col-md-3 mb-3 mb-md-0">
                     <label htmlFor="purpose" className="form-label text-white-custom">¿Qué quieres hacer?</label>
                     <select className="custom-select-bp" name="purpose" value={formData.purpose} onChange={handleChange} required>
@@ -101,25 +99,15 @@ const Banner = ({ onSearch }) => {
                       <option value="Rentar">Rentar</option>
                     </select>
                   </div>
-                  <div className="col-md-3 mb-3 mb-md-0">
-    <label className="form-label text-white-custom">Ciudad</label>
-    <select
-      name="city"
-      className="custom-select-bp"
-      value={formData.city}
-      onChange={handleChange}
-    >
-      <option value="">Selecciona una ciudad...</option>
-      {colombianCities.map((city) => (
-        <option key={city} value={city}>
-          {city}
-        </option>
-      ))}
-    </select>
-  </div>
+                  <CityInput onCitySelect={handleChange}
+                    inputClass={"custom-select-bp"}
+                    selectClass={"custom-select-bp"}
+                    labelClass={"form-label text-white-custom"}
+                    valorFiltro={formData.city}
+                  ></CityInput>
                   <div className="col-md-3 d-flex align-items-end">
                     <button type="button" className="btn btn-dark w-100" onClick={handleSubmit}>
-                      <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
+                      <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy" /> Buscar
                     </button>
                   </div>
                 </div>
@@ -134,7 +122,7 @@ const Banner = ({ onSearch }) => {
                   </div>
                   <div className="col-md-3 d-flex align-items-end">
                     <button type="button" className="btn btn-dark w-100" onClick={handleSubmit}>
-                      <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy"/> Buscar
+                      <img src="/img/icons/lupa.svg" alt="lupa" width="16" className="me-2" loading="lazy" /> Buscar
                     </button>
                   </div>
                 </div>

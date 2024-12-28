@@ -32,6 +32,15 @@ const getCiudadesNombre = async (req, res) => {
     }
 };
 
+const getCiudadByID = async (req, res) => {
+    try {
+        const results = await ciudadService.getCiudadByID(req.params);
+        res.status(200).json(results); //Se retornan los departamentos
+    } catch (err) {
+        errorHandler.handleControllerError(res, err, "inmuebles");
+    }
+};
+
 
 
 
@@ -52,5 +61,6 @@ module.exports = {
     getDepartamentosConCiudades,
     getCiudadesIDDepartamento,
     getDepartamentosCiudadNombre,
-    getCiudadesNombre
+    getCiudadesNombre,
+    getCiudadByID
 };

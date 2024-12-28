@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { api } from "../../../services/api";
 
 
-const TiposInmueblesSelect = ({ onTipoSelect }) => {
+const TiposInmueblesSelect = ({ onTipoSelect, selectClass, labelClass, value }) => {
     const [types, setTypes] = useState([]);
 
     const fetchTipos = async () => {
@@ -34,19 +34,17 @@ const TiposInmueblesSelect = ({ onTipoSelect }) => {
     const handleTypeSelect = ({ target: { value } }) => {
         const selectedIDType = value; // Obtener el valor seleccionado
         const selectedType = types.find(type => type.idTipoInmueble == selectedIDType); // Encuentra el tipo en la lista
-        if (selectedType) {
             onTipoSelect({
-                target: { name: "category", value: selectedIDType } // Estructura esperada por handleChange
+                target: { name: "category", value: selectedIDType||null } // Estructura esperada por handleChange
             });
-        } // Notificar al componente padre el ID de la ciudad seleccionada
     };
 
     return (
         <div className="col-md-3 mb-3 mb-md-0">
-            <label className="banner-filter-text-white">Categoría del Inmueble</label>
-            <select name="category" defaultValue="" className="banner-filter-select" onChange={handleTypeSelect}>
-                <option value="" disabled>
-                    Selecciona una ciudad
+            <label className={labelClass}>Categoría del Inmueble</label>
+            <select name="category" value={value} className={selectClass} onChange={handleTypeSelect}>
+                <option value="">
+                    Selecciona...
                 </option>
                 {types.map((type) => (
                     <option key={type.idTipoInmueble} value={type.idTipoInmueble}>

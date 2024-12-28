@@ -114,7 +114,7 @@ const CarouselDestacados = () => {
       <h1 className="mb-3 text-dark center raya">INMUEBLES <b>DESTACADOS</b></h1>
       <div class="centered-line"></div>
       <div className="carousel-track">
-        {destacados.map((item, index) => (
+        {destacados && destacados.map((item, index) => (
           <div className="carousel-items" key={index}>
             <div className="property-card-d">
               {item.badge.toLowerCase() === "destacado" && (

@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { api } from "../../../services/api";
 
-const CityInput = ({ valorFiltro, onCitySelect}) => {
+const CityInput = ({ onCitySelect, inputClass, selectClass, labelClass, valorFiltro }) => {
     const [query, setQuery] = useState("");
     const [cities, setCities] = useState([]);
 
-    const fetchCities = async (nombreCiudad) => {
+    const fetchCities = async (nombreCiudad=null, idCiudad=null) => {
         try {
             // Petición al backend.
-            const response = await api.get(`inmuebles/ciudades/${nombreCiudad}`);
-            console.log(response.data);
+            let response;
+            //Si es con nombre o con idCiudad
+            if(nombreCiudad){
+                response = await api.get(`inmuebles/ciudades/${nombreCiudad}`);
+            }else{
+                response = await api.get(`inmuebles/ciudades/id/${idCiudad}`);
+            }
             if (!response.status == 200) {
                 throw new Error("Error al obtener las ciudades.");
             }
@@ -19,6 +24,23 @@ const CityInput = ({ valorFiltro, onCitySelect}) => {
             console.error(err);
         }
     };
+
+    // Este useEffect se ejecutará cada vez que 'valorFiltro' cambie
+    useEffect(() => {
+        if (valorFiltro) {
+            const fetchCityById = async () => {
+                const response = await api.get(`inmuebles/ciudades/id/${valorFiltro}`);
+                console.log("..........");
+                console.log(valorFiltro);
+                if (response.status === 200) {
+                    console.log(response.data);
+                    const city = response.data; // Se asume que la respuesta tiene el nombre y ID
+                    setQuery(city.nombreCiudad); // Establece el nombre en el input
+                }
+            };
+            fetchCityById();
+        }
+    }, [valorFiltro]); // Solo se ejecuta cuando 'valorFiltro' cambia y al inicio   
 
     // Manejar el cambio del input
     const handleInputChange = (e) => {
@@ -31,39 +53,45 @@ const CityInput = ({ valorFiltro, onCitySelect}) => {
         } else {
             setCities([]); // Limpiar resultados si hay menos de 3 letras
         }
+
+        if(value.length==0){
+            setQuery("");
+            onCitySelect({
+                target: { name: "city", value: null } // Envia el id al componente padre
+            });
+        }
     };
 
     // Maneja la selección de la ciudad
     const handleCitySelect = ({ target: { value } }) => {
-        const selectedCityId = value; // Obtener el valor seleccionado
-        const selectedCity = cities.find(city => city.codCiudad == selectedCityId); // Encuentra la ciudad en la lista
-        console.log(cities);
-        console.log(selectedCity); // Muestra la ciudad seleccionada en la consola
+        // Value es el id de la ciudad
+        const selectedCity = cities.find(city => city.codCiudad == value); // Encuentra la ciudad en la lista
 
-        setQuery(selectedCity.nombreCiudad); // Actualiza el input con el nombre de la ciudad seleccionada
+        setQuery(selectedCity ? selectedCity.nombreCiudad : ""); // Actualiza el input con el nombre de la ciudad seleccionada
+
         setCities([]); // Limpiar los resultados
-        
+
         if (selectedCity) {
             onCitySelect({
-              target: { name: "city", value: selectedCityId } // Estructura esperada por handleChange
+                target: { name: "city", value: value } // Envia el id al componente padre
             });
-          } // Notificar al componente padre el ID de la ciudad seleccionada
+        } // Notificar al componente padre el ID de la ciudad seleccionada
     };
 
     return (
         <div className="col-md-3 mb-3 mb-md-0">
-            <label className="banner-filter-text-white">Ciudad</label>
+            <label className={labelClass}>Ciudad</label>
 
             <input
                 type="text"
                 name="city"
-                value={query}
+                value={query||""}
                 onChange={handleInputChange}
                 placeholder="Busca una ciudad"
-                className="banner-filter-input-text"
+                className={inputClass}
             />
             {cities.length > 0 && (
-                <select onChange={handleCitySelect} defaultValue="" value={valorFiltro} className="banner-filter-select">
+                <select onChange={handleCitySelect} className={selectClass} defaultValue="">
                     <option value="" disabled>
                         Selecciona una ciudad
                     </option>

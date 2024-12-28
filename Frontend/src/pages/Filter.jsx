@@ -10,10 +10,8 @@ const Filter = () => {
   const location = useLocation();
   const { formData } = location.state || {}; // Obtener datos del formulario
   const [filters, setFilters] = useState(null); // Estado para almacenar filtros activos
-
   const handleApplyFilters = (appliedFilters) => {
     setFilters(appliedFilters); // Recibir filtros desde BannerFilter
-    console.log(appliedFilters);
   };
   return (
     <div>
