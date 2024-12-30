@@ -3,26 +3,28 @@ import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 //import items from './Productos';
 import InmuebleService from '../services/inmuebles/InmuebleService';
 
-const CatalogoProductos = ({filters, showOnlyFour = false }) => {
- const [items, setInmuebles] = useState([]); 
-  
-    useEffect(() => {
-      const fetchInmuebles = async () => {
-        try {
-          const data = await InmuebleService.getInmueblesPublicados(filters); // Traer datos del servicio
-          if(!data){
-            setInmuebles([]);
-          }else{
+const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
+  const [items, setInmuebles] = useState([]);
 
-            setInmuebles(data);
-          }
-        } catch (error) {
-          console.error("Error al cargar los inmuebles:", error);
+  useEffect(() => {
+    if (!filters || Object.keys(filters).length === 0) {
+      setInmuebles([]); // establece un estado inicial vacio
+      return;
+  }
+
+    const fetchInmuebles = async () => {
+      try {
+        if (filters) {
+          const data = await InmuebleService.getInmueblesPublicados(filters);
+          setInmuebles(data || []);
         }
-      };
-      fetchInmuebles();
-    }, [filters]); //Actualizar cuando los filtros cambian
-  
+      } catch (error) {
+        console.error("Error al cargar los inmuebles:", error);
+      }
+    };
+    fetchInmuebles();
+  }, [filters]); //Actualizar cuando los filtros cambian
+
   const itemsPerPage = showOnlyFour ? 4 : 12; // Mostrar solo 4 items si 'showOnlyFour' es true
   const [currentPage, setCurrentPage] = useState(0);
   const navigate = useNavigate(); // Inicializa el hook de navegación
@@ -75,7 +77,7 @@ const CatalogoProductos = ({filters, showOnlyFour = false }) => {
   return (
     <div className={`catalogo-container container ${showOnlyFour ? "four-items-layout" : ""}`}>
       {!showOnlyFour && renderPagination()} {/* No renderizar paginación si 'showOnlyFour' es true */}
-      
+
       <div className="catalogo">
         {paginatedItems.map((item, index) => (
           <div className="property-card" key={index}>
@@ -83,7 +85,7 @@ const CatalogoProductos = ({filters, showOnlyFour = false }) => {
               <span className="badge-destacado">
                 Destacado
                 <span className="badge-destacado-start">
-                  <img src="/img/icons/Star1.svg" alt="" width="55px" loading="lazy"/>
+                  <img src="/img/icons/Star1.svg" alt="" width="55px" loading="lazy" />
                 </span>
               </span>
             )}
@@ -94,7 +96,7 @@ const CatalogoProductos = ({filters, showOnlyFour = false }) => {
             )}
             {item.badge.toLowerCase() === "alta demanda" && (
               <span className="badge-alta-demanda">
-                <img src="img/icons/vectorFlechaRoja.svg" alt="alta" loading="lazy"/> Alta Demanda
+                <img src="img/icons/vectorFlechaRoja.svg" alt="alta" loading="lazy" /> Alta Demanda
               </span>
             )}
 
@@ -139,25 +141,25 @@ const CatalogoProductos = ({filters, showOnlyFour = false }) => {
               <div className="property-details container">
                 <div className="detail-item">
                   <span className="icon">
-                    <img src="/img/icons/fa-icon.svg" alt="#" loading="lazy"/>
+                    <img src="/img/icons/fa-icon.svg" alt="#" loading="lazy" />
                   </span>
                   <span className="value">{item.area}</span>
                 </div>
                 <div className="detail-item">
                   <span className="icon">
-                    <img src="/img/icons/fa-icon2.svg" alt="#" loading="lazy"/>
+                    <img src="/img/icons/fa-icon2.svg" alt="#" loading="lazy" />
                   </span>
                   <span className="value">{item.rooms}</span>
                 </div>
                 <div className="detail-item">
                   <span className="icon">
-                    <img src="/img/icons/fa-icon3.svg" alt="#" loading="lazy"/>
+                    <img src="/img/icons/fa-icon3.svg" alt="#" loading="lazy" />
                   </span>
                   <span className="value">{item.baths}</span>
                 </div>
               </div>
 
-              <p>{item.nombreCustomer||"Nombre vendedor / Inmobiliaria"}</p>
+              <p>{item.nombreCustomer || "Nombre vendedor / Inmobiliaria"}</p>
             </div>
             <button className="btn-ver-inmueble" onClick={handleNavigate}>
               Ver inmueble

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Ejemplo from './extras/Ejemplo';
 import ZonasCercanas from './extras/ZonasCercanas';
 import CityInput from './modules/inmuebles/CityInput';
+import ZonasComunesSelect from './modules/inmuebles/ZonasComunesSelect';
+import ZonasInteresSelect from './modules/inmuebles/ZonasInteresSelect';
 import TiposInmueblesSelect from './modules/inmuebles/TiposInmueblesSelect';
 
 const BannerFilter = ({ initialData, onApplyFilters }) => {
@@ -28,7 +30,6 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
 
   useEffect(() => {
     if (initialData) {
-      console.log("llegó inicial");
       setFormData((prevData) => ({ ...prevData, ...initialData }));
       applyFilters(initialData);
     }
@@ -267,18 +268,18 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
 
                     <div className="col-md-3">
                       <label className="banner-filter-text-white">Zonas comunes</label>
-                      <Ejemplo
-                        selectedOptions={formData.commonAreas}
-                        setSelectedOptions={(newOptions) => setFormData((prevData) => ({ ...prevData, commonAreas: newOptions }))}
-                      />
+                      <ZonasComunesSelect 
+                      selectedOptions={formData.commonAreas}
+                      setSelectedOptions={(newOptions) => setFormData((prevData) => ({ ...prevData, commonAreas: newOptions }))}
+                      ></ZonasComunesSelect>
                     </div>
 
                     <div className="col-md-3">
                       <label className="banner-filter-text-white">Zonas cercanas</label>
-                      <ZonasCercanas
-                        selectedOptions={formData.nearbyAreas}
-                        setSelectedOptions={(newOptions) => setFormData((prevData) => ({ ...prevData, nearbyAreas: newOptions }))}
-                      />
+                        <ZonasInteresSelect
+                          selectedOptions={formData.nearbyAreas}
+                          setSelectedOptions={(newOptions) => setFormData((prevData) => ({ ...prevData, nearbyAreas: newOptions }))}
+                        />
                     </div>
 
                     <div className="col-md-2 text-center mt-4">

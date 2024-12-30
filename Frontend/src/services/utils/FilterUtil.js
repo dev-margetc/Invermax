@@ -26,8 +26,8 @@ export const formatFrontendFilter = (filter = {}) => {
         parqueadero: filter?.parking, // Mapea 'parking' a 'parqueadero'
         amoblado: furnishedMapping[filter?.furnished] || null, // Mapea 'furnished' a 'amoblado'
         zonas: [...(filter?.commonAreas || []), ...(filter?.nearbyAreas || [])].map(
-            (zona) => zona?.name || zona
-        ),
+            (zona) => zona?.value || zona
+        ), // Pasar unicamente el id de la zona
         idCustomer: filter?.idCustomer || null, // Asigna un valor fijo o extrae el ID según sea necesario
     }
 }

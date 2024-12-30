@@ -7,16 +7,16 @@ import { createQueryString } from "../utils/GeneralUtils";
 // Traer los inmuebles publicados
 const getInmueblesPublicados = async (filters) => {
     try {
-        console.log(filters);
         const filtrosMapeados = formatFrontendFilter(filters);
+        console.log(filtrosMapeados);
         const query =createQueryString(filtrosMapeados);
-        let url = `/inmuebles/publicados`;
+        let url;
         if (query) {
             url = `/inmuebles/publicados?${query}`; // Adjuntar los filtros como query string
+        }else{
+            url = `/inmuebles/publicados`;
         }
-console.log(url);
         const response = await api.get(url);
-        console.log(response.data);
         if (!response.data) {
             throw new Error("No se recibieron datos de la API.");
         }

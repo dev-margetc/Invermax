@@ -30,17 +30,16 @@ const CityInput = ({ onCitySelect, inputClass, selectClass, labelClass, valorFil
         if (valorFiltro) {
             const fetchCityById = async () => {
                 const response = await api.get(`inmuebles/ciudades/id/${valorFiltro}`);
-                console.log("..........");
-                console.log(valorFiltro);
                 if (response.status === 200) {
-                    console.log(response.data);
                     const city = response.data; // Se asume que la respuesta tiene el nombre y ID
                     setQuery(city.nombreCiudad); // Establece el nombre en el input
                 }
-            };
+            }
             fetchCityById();
+        }else{
+            setQuery("");
         }
-    }, [valorFiltro]); // Solo se ejecuta cuando 'valorFiltro' cambia y al inicio   
+    }, [valorFiltro]||[]); // Solo se ejecuta cuando 'valorFiltro' cambia y al inicio   
 
     // Manejar el cambio del input
     const handleInputChange = (e) => {

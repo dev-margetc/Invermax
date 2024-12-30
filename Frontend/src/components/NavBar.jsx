@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Usa Link para manejar las rutas
+import { Link, useNavigate } from "react-router-dom"; // Usa Link para manejar las rutas
 import LoginButton from "./auth/LoginButton";
 import LogoutButton from "./auth/LogoutButton";
+import TiposInmueblesBanner from "./modules/inmuebles/TiposInmueblesBanner";
 const Navbar = () => {
+  // Componente de navegacion
+  const navigate = useNavigate();
   // Token de sesion
   const token = localStorage.getItem("token");
 
   const [isOpen, setIsOpen] = useState(false);
   const [submenuOpenComprar, setSubmenuOpenComprar] = useState(false);
   const [submenuOpenOtrosTramites, setSubmenuOpenOtrosTramites] = useState(false);
+
+  // Manejar busqueda de los dropdown
+  const handleFilterClick = (filters) => (e) => {
+    e.preventDefault(); // Evitar el comportamiento por defecto del enlace
+    navigate('/filter', { state: { formData: filters } }); // Redirigir y pasar los filtros
+  };
+
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -48,7 +58,7 @@ const Navbar = () => {
 
         </div>
         <div className="desktop-menu">
-          <a href="#">Arriendos</a>
+          <a href="#" onClick={handleFilterClick({ purpose: "Rentar", category: "", city:null })}>Arriendos</a>
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuComprar}>
               Comprar{" "}
@@ -58,15 +68,7 @@ const Navbar = () => {
             </button>
             {submenuOpenComprar && (
               <div className="submenu-content">
-                <a href="#" className="highlight">
-                  Apartamentos
-                </a>
-                <a href="#" className="highlight">
-                  Casas
-                </a>
-                <a href="#" className="highlight">
-                  Oficinas
-                </a>
+                <TiposInmueblesBanner></TiposInmueblesBanner>
                 <Link to="/planes" className="highlight">
                   Planes
                 </Link>
