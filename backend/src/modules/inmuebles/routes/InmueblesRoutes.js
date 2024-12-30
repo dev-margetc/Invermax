@@ -41,6 +41,11 @@ router.get('/:idInmueble/interesados',protegerRuta(['admin', 'customer']), inmue
 // Ruta para traer todas las zonas
 router.get('/zonas', zonasController.getAllZonas);
 
+// Ruta para traer todas las zonas de interés
+router.get('/zonas/comunes', zonasController.getAllZonasComunes);
+
+// Ruta para traer todas las zonas
+router.get('/zonas/interes', zonasController.getAllZonasInteres);
 
 // Ruta para traer todos los tipos de inmueble
 router.get('/tipos', inmuebleController.getAllTipos);

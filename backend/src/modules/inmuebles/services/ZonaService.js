@@ -14,8 +14,45 @@ const getAllZonas = async () => {
     }
 };
 
+// Traer zonas comunes
+const getAllZonasComunes = async () => {
+    try {
+        const zonas = Zona.findAll(
+            {
+                where: {
+                    tipoZona: 'zona común'
+                }
+            }
+        );
+        return zonas;
+
+    } catch (error) {
+        console.error("Error obteniendo las zonas:", error);
+        throw error;
+    }
+};
+
+// Traer zonas dadas condiciones del modelo
+const getAllZonasInteres = async () => {
+    try {
+        const zonas = Zona.findAll(
+            {
+                where: {
+                    tipoZona: 'zona de interés'
+                }
+            }
+        );
+        return zonas;
+
+    } catch (error) {
+        console.error("Error obteniendo las zonas:", error);
+        throw error;
+    }
+};
 
 module.exports = {
-    getAllZonas
+    getAllZonas,
+    getAllZonasComunes,
+    getAllZonasInteres
 }
 
