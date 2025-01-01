@@ -49,6 +49,11 @@ const insertarInmueble = async (datosInmueble) => {
             throw new ErrorNegocio("Los inmuebles de tipo 'proyecto' deben ser nuevos.");
         }
 
+        // Verificar si el tipo es "proyecto" y no de arriendo
+        if (tipoInmueble.tipoInmueble === 'proyecto' && modalidadInmueble != 'compra') {
+            throw new ErrorNegocio("Los inmuebles de tipo 'proyecto' no pueden tener esta modalidad.");
+        }
+
         // Verificar si es arriendo entonces el campo de administracion no puede ser null
         if (modalidadInmueble === 'arriendo' && (!administracion)) {
             throw new ErrorNegocio("Los inmuebles en modalidad de arriendo deben especificar si incluyen o no la administracion.");

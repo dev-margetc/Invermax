@@ -75,7 +75,8 @@ const traerInmueblesAscenso = async (condiciones = null, whereInmueble = null, a
             attributes: {
                 exclude: ["id_inmueble"]
             },
-            include: includeInmueble ? [includeInmueble] : [] // Agregar el include si existe
+            include: includeInmueble ? [includeInmueble] : [], // Agregar el include si existe
+            group:'idAscenso'
         })
 
         return inmueblesAscenso;

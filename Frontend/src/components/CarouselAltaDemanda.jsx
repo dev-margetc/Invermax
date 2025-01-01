@@ -1,94 +1,48 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import InmuebleService from '../services/inmuebles/InmuebleService';
 
 const CarouselAltaDemanda = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  
-    // Los ascendidos (alta demanda) traidos por el backend se cargan acá
-    const [altaDemandaItems, setAltaDemanda] = useState([]);
 
-    useEffect(() => {
-      const fetchInmuebles = async () => {
-        try {
-          const data = await InmuebleService.getInmueblesDemanda();
-          setAltaDemanda(data);
-          console.log(data);
-        } catch (error) {
-          console.error("Error al cargar los inmuebles:", error);
-        }
-      };
-      fetchInmuebles();
-    }, []);
+  // Los ascendidos (alta demanda) traidos por el backend se cargan acá
+  const [altaDemandaItems, setAltaDemanda] = useState([]);
 
-  const items = [
-    {
-      imgSrc: "/img/Destacados/img-d-1.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Arriendo - $185.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "Alta demanda", 
-      nuevo: true,
-      proyecto: true,
-    },
-    {
-      imgSrc: "/img/Destacados/img-d-2.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Desde $185.000.000 - Hasta $255.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "Alta demanda", 
-      nuevo: true,
-      proyecto: false,
-    },
-    {
-      imgSrc: "/img/Destacados/img-d-1.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Arriendo - $185.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "Alta demanda", 
-      nuevo: true,
-      proyecto: true,
-    },
-    {
-      imgSrc: "/img/Destacados/img-d-2.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Desde $185.000.000 - Hasta $255.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "Alta demanda", 
-      nuevo: true,
-      proyecto: false,
-    },
-    {
-      imgSrc: "/img/Destacados/img-d-1.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Arriendo - $185.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "Alta demanda", 
-      nuevo: true,
-      proyecto: true,
-    },
-    {
-      imgSrc: "/img/Destacados/img-d-2.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Desde $185.000.000 - Hasta $255.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "Alta demanda", 
-      nuevo: true,
-      proyecto: false,
-    },
-  ];
+
+  const navigate = useNavigate(); // Inicializa el hook de navegación
+
+  // Manejar la navegacion dependiendo del inmueble
+  const handleNavigate = (item) => {
+    // 3 plantillas - para proyectos(compra), para comprar (otros) y arrendar (otros)
+    let idInmueble = item.idInmueble;
+    let modalidad = item.modalidad//arriendo o compra
+    let isProyecto = item.proyecto;
+    let ruta = '/'
+    if (isProyecto) {
+      ruta = '/compra'; // Para proyectos
+    } else {
+      if (modalidad == "arriendo") {
+        ruta = '/arriendo' // Otros para arrendar
+      } else {
+        ruta = '/usado' //Otros para venta   
+      }
+
+    }
+   navigate(ruta, { state: { idInmueble } }); // Pasa los datos como estado
+  };
+
+  useEffect(() => {
+    const fetchInmuebles = async () => {
+      try {
+        const data = await InmuebleService.getInmueblesDemanda();
+        setAltaDemanda(data);
+      } catch (error) {
+        console.error("Error al cargar los inmuebles:", error);
+      }
+    };
+    fetchInmuebles();
+  }, []);
 
   const updateCarousel = () => {
     const itemsPerSlide = window.innerWidth >= 768 ? 3 : 1;
@@ -120,7 +74,7 @@ const CarouselAltaDemanda = () => {
             <div className="property-card-d">
               {item.badge.toLowerCase() === "alta demanda" && (
                 <span className="badge-alta-demanda">
-                  <img src="img/icons/vectorFlechaRoja.svg" alt="flecha" loading="lazy"/> Alta Demanda
+                  <img src="img/icons/vectorFlechaRoja.svg" alt="flecha" loading="lazy" /> Alta Demanda
                 </span>
               )}
               {item.nuevo === true && (
@@ -131,7 +85,7 @@ const CarouselAltaDemanda = () => {
                 {item.proyecto === true && (
                   <span className='zona-proyecto'>Proyecto</span>
                 )}
-                
+
                 {/* Formato de la propiedad info */}
                 <p>
                   {item.info.split(" - ").map((line, index) => (
@@ -177,9 +131,9 @@ const CarouselAltaDemanda = () => {
                     <span className="value">{item.baths}</span>
                   </div>
                 </div>
-                <p>Nombre vendedor / Inmobiliaria</p>
+                <p>{item.nombreCustomer || "Nombre vendedor / Inmobiliaria"}</p>
               </div>
-              <button className="btn-ver-inmueble">Ver inmueble</button>
+              <button className="btn-ver-inmueble" onClick={() => handleNavigate(item)}>Ver inmueble</button>
             </div>
           </div>
         ))}

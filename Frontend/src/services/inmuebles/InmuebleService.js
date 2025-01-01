@@ -1,6 +1,7 @@
 // Ejecuta las peticiones donde los inmuebles son el objeto principal de la relacion
 import { api } from "../api";
-import { formatInmueblePublicadoData } from "../utils/InmuebleUtils";
+import { formatInmueblePublicadoData} from "../utils/InmuebleUtils";
+import {formatProyectoData} from "../utils/ProyectoUtils";
 import { formatFrontendFilter } from "../utils/FilterUtil";
 import { createQueryString } from "../utils/GeneralUtils";
 
@@ -8,12 +9,11 @@ import { createQueryString } from "../utils/GeneralUtils";
 const getInmueblesPublicados = async (filters) => {
     try {
         const filtrosMapeados = formatFrontendFilter(filters);
-        console.log(filtrosMapeados);
-        const query =createQueryString(filtrosMapeados);
+        const query = createQueryString(filtrosMapeados);
         let url;
         if (query) {
             url = `/inmuebles/publicados?${query}`; // Adjuntar los filtros como query string
-        }else{
+        } else {
             url = `/inmuebles/publicados`;
         }
         const response = await api.get(url);
@@ -27,6 +27,33 @@ const getInmueblesPublicados = async (filters) => {
     }
 }
 
+// Traer inmueble dado un ID o un codigo
+const getInmuebleByIDCode = async (idInmueble = null, codigo = null, isProyecto=false) => {
+    try {
+        // Si usa el ID
+        let url = '/'
+        if (idInmueble) {
+            url = `/inmuebles/${idInmueble}`
+        } else {
+            url = `/codigo/${codigo}`
+        }
+        const response = await api.get(url);
+        if (!response.data) {
+            throw new Error("No se recibieron datos de la API.");
+        }
+        
+        // Si es proyecto o no formatea los datos del backend
+        if(isProyecto){
+            return formatProyectoData(response.data);
+        }else{
+            return [];
+        }
+       
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 // Traer los inmuebles destacados
 const getInmueblesDestacados = async () => {
     try {
@@ -34,7 +61,6 @@ const getInmueblesDestacados = async () => {
         if (!response.data) {
             throw new Error("No se recibieron datos de la API.");
         }
-        console.log(response.data);
         return formatInmueblePublicadoData(response.data)
     } catch (error) {
         console.log(error);
@@ -57,5 +83,6 @@ const getInmueblesDemanda = async () => {
 export default {
     getInmueblesPublicados,
     getInmueblesDestacados,
-    getInmueblesDemanda
+    getInmueblesDemanda,
+    getInmuebleByIDCode
 };

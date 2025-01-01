@@ -23,6 +23,7 @@ const getPublicados = async (datos) => {
             idTipoInmueble, // Usar un ==
             idCustomer
         } = datos;
+        console.log("---------------------------------------");
         // Construir el objeto de filtros
         // Por las multiples consultas a la BD en el metodo del repository el filtro se aplica aca
         resultado = await inmuebleRepository.getPublicados();
@@ -54,8 +55,7 @@ const getPublicados = async (datos) => {
             if (idTipoInmueble && dato.inmueble.tipoInmueble.idTipoInmueble != idTipoInmueble) return false;
 
             // Se quita si el montoMaximo es menor al valor mas bajo de los detalles del inmueble
-            if (montoMaximo && inmuebleData.valorMinimoDetalles >= montoMaximo) return false;
-
+            if (montoMaximo && parseFloat(inmuebleData.valorMinimoDetalles) >= parseFloat(montoMaximo)) return false;
 
             // El filtro tiene habitaciones minimas, por lo que se quita un inmueble si tiene menos
             if (habitacionesMinimas && inmuebleData.cantidadMinHabitaciones < Number(habitacionesMinimas)) return false;//Quitar ;

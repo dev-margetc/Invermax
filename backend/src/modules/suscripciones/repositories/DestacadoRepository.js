@@ -19,7 +19,7 @@ const traerDestacados = async (condiciones = null, whereInmueble = null, atribut
 
     // Si atributosInmueble existe, construir el filtro de atributos
     let atributos;
-    if(atributosInmueble){
+    if (atributosInmueble) {
         atributos = {
             include: [
                 ...atributosInmueble, // Atributos adicionales especificados
@@ -36,35 +36,35 @@ const traerDestacados = async (condiciones = null, whereInmueble = null, atribut
             where: whereInmueble || undefined, // Solo aplica el where si existe
             attributes: atributos ? atributos : undefined, // Si no hay atributos, se deja undefined
             //Incluir los detalles
-            include:[
+            include: [
                 {
                     model: DetalleInmueble,
                     as: "detalles",
                     attributes: ["parqueadero", "amoblado",]
-                  },
-                  { // Incluir el tipo
+                },
+                { // Incluir el tipo
                     model: TipoInmueble,
                     as: "tipoInmueble",
                     attributes: ["tipoInmueble"]
-                  },
-                  // Incluir zonas
-                  {
+                },
+                // Incluir zonas
+                {
                     model: Zona,
                     as: "zonas",
                     attributes: ['idZona'],
                     through: { attributes: [] }, // Excluir los atributos de la tabla pivote
-                  },
-                  // Incluir el customer
-                  {
+                },
+                // Incluir el customer
+                {
                     model: Customer,
                     as: "customer",
                     attributes: ['nombreCustomer']
-                  },
-                  {
+                },
+                {
                     as: 'ciudad', // Se usa el alias definido en la relacion
                     model: Ciudad,
                     attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
-                  }
+                }
             ]
         }
         : null;
@@ -72,10 +72,11 @@ const traerDestacados = async (condiciones = null, whereInmueble = null, atribut
     try {
         let destacados = await InmuebleDestacado.findAll({
             where: filtro,
-            attributes:{
-                exclude:["id_inmueble","fechaInicio","estadoDestacado","id_destacado"]
+            attributes: {
+                exclude: ["id_inmueble", "fechaInicio", "estadoDestacado", "id_destacado"]
             },
-            include: includeInmueble  ? [includeInmueble] : [] // Agregar el include si existe
+            include: includeInmueble ? [includeInmueble] : [], // Agregar el include si existe
+            group: 'idDestacado'
         })
 
         return destacados;
@@ -88,8 +89,8 @@ const traerDestacados = async (condiciones = null, whereInmueble = null, atribut
 function generarCodigoPeriodo(fechaInicioSuscripcion, idSuscripcion) {
     const fechaActual = new Date(); // Fecha actual
     const inicioSuscripcion = new Date(fechaInicioSuscripcion); // Fecha de inicio de la suscripción
-    
-    const mesesTranscurridos = 
+
+    const mesesTranscurridos =
         (fechaActual.getFullYear() - inicioSuscripcion.getFullYear()) * 12 +
         fechaActual.getMonth() - inicioSuscripcion.getMonth() + 1; // +1 porque el primer mes cuenta como 1
 
@@ -117,12 +118,12 @@ const insertarDestacado = async (datos) => {
 //Metodo actualizacion
 const modificarDestacado = async (datos, idDestacado) => {
     try {
-        InmuebleDestacado.update(datos,{
+        InmuebleDestacado.update(datos, {
             where: {
                 "idDestacado": idDestacado
             }
         }
-    )
+        )
     } catch (err) {
         throw err;
     }

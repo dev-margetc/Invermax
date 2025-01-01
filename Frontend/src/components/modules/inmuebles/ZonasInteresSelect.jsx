@@ -46,7 +46,6 @@ const ZonasInteresSelect = ({ selectedOptions = [], setSelectedOptions, onSelect
                 }else{
                     setZonas([]);
                 }
-                console.log(data);
             } catch (error) {
                 console.error("Error al cargar los inmuebles:", error);
             }

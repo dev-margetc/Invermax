@@ -104,7 +104,7 @@ const getPublicados = async () => {
           model: Inmueble, // Relacion con el modelo inmueble
           as: 'inmueble',
           attributes: [ // Traer ciertos campos para aplicar el filtro
-            'idInmueble', 'codigoInmueble',
+            'idInmueble', 'codigoInmueble', 'modalidadInmueble',
             ...traerAtributosAvanzados(true)
           ],
           include: [ // Incluir por medio de inmueble
@@ -195,7 +195,9 @@ const getInmueblesCodigo = async (codigo) => {
   const inmuebles = Inmueble.findAll({
     attributes: {
       include: [
-        ...traerAtributosAvanzados(), // Atributos avanzados agregados manualmente
+        [sequelize.fn('MIN', sequelize.col('detalles.valor_inmueble')), 'valorMinimoDetalles'],
+        [sequelize.fn('MAX', sequelize.col('detalles.valor_inmueble')), 'valorMaximoDetalles'],
+        // Atributos avanzados agregados manualmente
       ],
       exclude: ['id_customer', 'idCustomer', 'codigoCiudad', 'cod_ciudad', 'idTipoInmueble', 'id_tipo_inmueble']
     },
@@ -254,11 +256,8 @@ const getInmueblesCodigo = async (codigo) => {
 const getInmuebleByID = async (id) => {
 
   // Solamente trae el id si encuentra un inmueble con ese codigo
-  const inmuebles = Inmueble.findAll({
+  const inmueble = await Inmueble.findOne({
     attributes: {
-      include: [
-        ...traerAtributosAvanzados(), // Atributos avanzados agregados manualmente
-      ],
       exclude: ['id_customer', 'idCustomer', 'codigoCiudad', 'cod_ciudad', 'idTipoInmueble', 'id_tipo_inmueble']
     },
 
@@ -310,7 +309,23 @@ const getInmuebleByID = async (id) => {
     }
   });
 
-  return inmuebles;
+  // Cálculo de valores mínimos y máximos separados
+  const [valores] = await DetalleInmueble.findAll({
+    attributes: [
+      [sequelize.fn('MIN', sequelize.col('valor_inmueble')), 'valorMinimoDetalles'],
+      [sequelize.fn('MAX', sequelize.col('valor_inmueble')), 'valorMaximoDetalles']
+    ],
+    where: {
+      idInmueble: id
+    }
+  });
+
+  return {
+    ...inmueble.toJSON(),
+    valorMinimoDetalles: valores.dataValues.valorMinimoDetalles,
+    valorMaximoDetalles: valores.dataValues.valorMaximoDetalles
+  };
+
 }
 
 

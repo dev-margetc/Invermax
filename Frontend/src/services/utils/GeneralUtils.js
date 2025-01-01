@@ -2,7 +2,7 @@
 
 // Generar formato de precio
 export const formatPrecio = (valor) => {
-   return `$${parseFloat(valor).toLocaleString("es-CO")}`; // Formateo del precio
+   return `${parseFloat(valor).toLocaleString("es-CO")}`; // Formateo del precio
 }
 
 // Convierte un string convirtiendo su primera letra en mayuscula

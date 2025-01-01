@@ -28,6 +28,12 @@ const Inmueble = sequelize.define('Inmueble', {
         unique: true,
         field: 'codigo_inmueble'
     },
+    ubicacionInmueble: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
+        field: 'ubicacion_inmueble'
+    },
     estadoInmueble: {
         type: DataTypes.STRING,
         allowNull: false,

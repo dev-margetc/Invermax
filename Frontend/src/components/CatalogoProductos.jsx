@@ -10,7 +10,7 @@ const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
     if (!filters || Object.keys(filters).length === 0) {
       setInmuebles([]); // establece un estado inicial vacio
       return;
-  }
+    }
 
     const fetchInmuebles = async () => {
       try {
@@ -70,8 +70,23 @@ const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
     );
   };
 
-  const handleNavigate = () => {
-    navigate('/plantillas'); // Navega a la ruta "/plantilla"
+  const handleNavigate = (item) => {
+    // 3 plantillas - para proyectos(compra), para comprar (otros) y arrendar (otros)
+    let idInmueble = item.idInmueble;
+    let modalidad = item.modalidad//arriendo o compra
+    let isProyecto = item.proyecto;
+    let ruta = '/'
+    if (isProyecto) {
+      ruta = '/compra'; // Para proyectos
+    } else {
+      if (modalidad == "arriendo") {
+        ruta = '/arriendo' // Otros para arrendar
+      }else{
+        ruta = '/usado' //Otros para venta   
+      }
+
+    }
+    navigate(ruta, { state: { idInmueble } }); // Pasa los datos como estado
   };
 
   return (
@@ -161,7 +176,7 @@ const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
 
               <p>{item.nombreCustomer || "Nombre vendedor / Inmobiliaria"}</p>
             </div>
-            <button className="btn-ver-inmueble" onClick={handleNavigate}>
+            <button className="btn-ver-inmueble" onClick={() => handleNavigate(item)}>
               Ver inmueble
             </button>
           </div>

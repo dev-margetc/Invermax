@@ -2,11 +2,13 @@ import { formatPrecio } from "./GeneralUtils";
 
 // Transforma datos del backend que lleguen como inmuebles publicados
 export const formatInmueblePublicadoData = (publicados) => {
+    console.log(publicados);
     return publicados.map((publicado) => ({
         idInmueble: publicado.idInmueble,
         imgSrc: generarFotoPrincipal(publicado),
         info: generarInfoExtra(publicado),
         price: generarInfoPrecio(publicado),
+        modalidad: publicado.inmueble.modalidadInmueble,
         area: "Área m²" + (publicado.inmueble.areaMinima || 0),
         rooms: "Habit. " + (publicado.inmueble.cantidadMinHabitaciones || 0),
         baths: "Baños " + (publicado.inmueble.cantidadMinBaños || 0),
@@ -35,11 +37,11 @@ const generarInfoPrecio = (inmueble) => {
     */
     // Si es tipo proyecto, usar el formato desde-hasta
     if (inmueble.inmueble.tipoInmueble.tipoInmueble == "proyecto") {
-        return `Desde ` + formatPrecio(inmueble.inmueble.valorMinimoDetalles) + ` - Hasta ` + formatPrecio(inmueble.inmueble.valorMaximoDetalles); // Formateo del precio
+        return `Desde ` + formatPrecio(inmueble.inmueble.valorMinimoDetalles) + ` - Hasta $` + formatPrecio(inmueble.inmueble.valorMaximoDetalles); // Formateo del precio
     } else {
         // Si no es de este tipo usar el formato estadoInmueble - valorDetalle (refleja el valor del inmueble)
         let modalidad = inmueble.modalidad || inmueble.inmueble.modalidadInmueble || "NN"; // Depende del tipo de peticion al backend
-        return modalidad + ` - ` + formatPrecio(inmueble.inmueble.valorMaximoDetalles); // Formateo del precio
+        return modalidad + ` - $` + formatPrecio(inmueble.inmueble.valorMaximoDetalles); // Formateo del precio
     }
 }
 

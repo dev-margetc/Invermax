@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import InmuebleService from '../services/inmuebles/InmuebleService';
 
 const CarouselDestacados = () => {
@@ -7,12 +8,34 @@ const CarouselDestacados = () => {
   // Los destacados traidos por el backend se cargan acá
   const [destacados, setDestacados] = useState([]);
 
+
+  const navigate = useNavigate(); // Inicializa el hook de navegación
+
+  // Manejar la navegacion dependiendo del inmueble
+  const handleNavigate = (item) => {
+    // 3 plantillas - para proyectos(compra), para comprar (otros) y arrendar (otros)
+    let idInmueble = item.idInmueble;
+    let modalidad = item.modalidad//arriendo o compra
+    let isProyecto = item.proyecto;
+    let ruta = '/'
+    if (isProyecto) {
+      ruta = '/compra'; // Para proyectos
+    } else {
+      if (modalidad == "arriendo") {
+        ruta = '/arriendo' // Otros para arrendar
+      } else {
+        ruta = '/usado' //Otros para venta   
+      }
+
+    }
+    navigate(ruta, { state: { idInmueble } }); // Pasa los datos como estado
+  };
+
   useEffect(() => {
     const fetchInmuebles = async () => {
       try {
         const data = await InmuebleService.getInmueblesDestacados();
         setDestacados(data);
-        console.log(data);
       } catch (error) {
         console.error("Error al cargar los inmuebles:", error);
       }
@@ -22,39 +45,6 @@ const CarouselDestacados = () => {
 
   const items = [
     {
-      imgSrc: "/img/Destacados/img-d-1.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Arriendo - $185.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "destacado",
-      nuevo: true,
-      proyecto: false,
-    },
-    {
-      imgSrc: "/img/Destacados/img-d-1.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Desde $185.000.000 - Hasta $255.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "destacado",
-      nuevo: true,
-      proyecto: true,
-    },
-    {
-      imgSrc: "/img/Destacados/img-d-1.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Arriendo - $185.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "destacado",
-      nuevo: true,
-      proyecto: false,
-    },
-    {
       imgSrc: "/img/Destacados/img-d-2.png",
       info: "Bogotá - Apartaestudio, Chapinero alto",
       price: "Desde $185.000.000 - Hasta $255.000.000",
@@ -75,18 +65,7 @@ const CarouselDestacados = () => {
       badge: "destacado",
       nuevo: true,
       proyecto: false,
-    },
-    {
-      imgSrc: "/img/Destacados/img-d-2.png",
-      info: "Bogotá - Apartaestudio, Chapinero alto",
-      price: "Desde $185.000.000 - Hasta $255.000.000",
-      area: "Área m² 132",
-      rooms: "Habit. 1",
-      baths: "Baños 1",
-      badge: "destacado",
-      nuevo: true,
-      proyecto: true,
-    },
+    }
   ];
 
   const updateCarousel = () => {
@@ -178,10 +157,10 @@ const CarouselDestacados = () => {
                     <span className="value">{item.baths}</span>
                   </div>
                 </div>
-                <p>{item.nombreCustomer||"Nombre vendedor / Inmobiliaria"}</p>
+                <p>{item.nombreCustomer || "Nombre vendedor / Inmobiliaria"}</p>
 
               </div>
-              <button className="btn-ver-inmueble">Ver inmueble</button>
+              <button className="btn-ver-inmueble" onClick={() => handleNavigate(item)}>Ver inmueble</button>
             </div>
           </div>
         ))}
