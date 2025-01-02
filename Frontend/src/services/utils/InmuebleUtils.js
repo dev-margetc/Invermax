@@ -1,70 +1,93 @@
-import { formatPrecio } from "./GeneralUtils";
+import { formatPrecio, convertirPrimeraMayuscula } from "./GeneralUtils";
 
-// Transforma datos del backend que lleguen como inmuebles publicados
-export const formatInmueblePublicadoData = (publicados) => {
-    console.log(publicados);
-    return publicados.map((publicado) => ({
-        idInmueble: publicado.idInmueble,
-        imgSrc: generarFotoPrincipal(publicado),
-        info: generarInfoExtra(publicado),
-        price: generarInfoPrecio(publicado),
-        modalidad: publicado.inmueble.modalidadInmueble,
-        area: "Área m²" + (publicado.inmueble.areaMinima || 0),
-        rooms: "Habit. " + (publicado.inmueble.cantidadMinHabitaciones || 0),
-        baths: "Baños " + (publicado.inmueble.cantidadMinBaños || 0),
-        badge: generarBadge(publicado),
-        nuevo: publicado.estadoInmueble === "nuevo", // Asignar true si el estado es "nuevo",
-        proyecto: publicado.inmueble.tipoInmueble.tipoInmueble === "proyecto", // Asignar true si el tipo es proyecto",
-        nombreCustomer: publicado.inmueble.customer.nombreCustomer // Incluir el nombre del vendedor/inmobiliaria
+// Dar formato a un unico inmueble del backend
+export const formatInmuebleData = (inmueble) => {
+    const zonas = asignarZonas(inmueble.zonas);
+    console.log(inmueble);
+    return {
+        title: inmueble.tituloInmueble,
+        codigo: inmueble.codigoInmueble,
+        status: inmueble.estadoInmueble,
+        ubicacion: inmueble.ubicacionInmueble,
+        frameMap: inmueble.frameMaps,
+        estrato: inmueble.estrato,
+        administracion: inmueble?.administracion == 1? "Administración incluida":"Administracion NO incluida",
+        medidasTipo: generarMedidasTipo(inmueble.detalles),
+        minPrice: formatPrecio(inmueble.valorMinimoDetalles),
+        maxPrice: formatPrecio(inmueble.valorMaximoDetalles),
+        informacionPorTipo: generarInfoTipo(inmueble, zonas),
+        zonasComunes: zonas?.comunes,
+        cercaDe: zonas?.interes, // Zonas de interés
+        logoImage: inmueble.customer.logoCustomer
+            ? import.meta.env.VITE_RUTA_FOTO_CUSTOMERS + "/" + inmueble.customer.logoCustomer
+            : "./img/nombreInmobiliaria.png",
+
+        nombreInmobiliaria: inmueble.customer.nombreCustomer // Incluir el nombre del vendedor/inmobiliaria
+    };
+}
+
+// Generar las medidas por tipo
+const generarMedidasTipo = (detalles) => {
+    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Letras disponibles para los tipos
+    return detalles.map((detalle, index) => ({
+        id: detalle.idDetalle, // Mantener el ID original
+        [`tipo${letras[index]}`]: `${detalle.area} m²` // Generar alias tipoA, tipoB, etc.
     }));
-};
+}
+// Clasificar zonas
+const asignarZonas = (zonasInmueble) => {
+    const zonasClasificadas = {
+        comunes: [],
+        interes: [],
+    };
 
-// Genera la info del inmueble con el nombre de la ciudad y el tipo de inmueble
-const generarInfoExtra = (inmueble) => {
-    //ej: Bogotá - Apartaestudio, Chapinero alto
-    const tipo = inmueble.inmueble.tipoInmueble.tipoInmueble;
-    const ciudad = inmueble.inmueble.ciudad.nombreCiudad;
-    const txtTipo = tipo.charAt(0).toUpperCase() + String(tipo).slice(1);
-    const txtCiudad = ciudad.charAt(0).toUpperCase() + String(ciudad).slice(1);
-    return txtCiudad + " - " + txtTipo;
+    const defaultIcon = "ZonasVerdesIcon";
+    zonasInmueble.forEach((zona) => {
+        const zonaMapeada = {
+            name: zona.nombreZona,
+            icon: zona.iconoZona || defaultIcon,
+        };
+
+        if (zona.tipoZona == "zona común") {
+            zonasClasificadas.comunes.push(zonaMapeada);
+        } else if (zona.tipoZona == "zona de interés") {
+            zonasClasificadas.interes.push(zonaMapeada);
+        }
+    });
+
+    return zonasClasificadas;
 }
 
-// Genera la info del precio del inmueble con el maximo y minimo
-const generarInfoPrecio = (inmueble) => {
-    /*ej: 
-        Arriendo - $185.000.000
-        Desde $185.000.000 - Hasta $255.000.000
-    */
-    // Si es tipo proyecto, usar el formato desde-hasta
-    if (inmueble.inmueble.tipoInmueble.tipoInmueble == "proyecto") {
-        return `Desde ` + formatPrecio(inmueble.inmueble.valorMinimoDetalles) + ` - Hasta $` + formatPrecio(inmueble.inmueble.valorMaximoDetalles); // Formateo del precio
-    } else {
-        // Si no es de este tipo usar el formato estadoInmueble - valorDetalle (refleja el valor del inmueble)
-        let modalidad = inmueble.modalidad || inmueble.inmueble.modalidadInmueble || "NN"; // Depende del tipo de peticion al backend
-        return modalidad + ` - $` + formatPrecio(inmueble.inmueble.valorMaximoDetalles); // Formateo del precio
-    }
-}
+// Generar la información de los tipos usando los detalles del inmueble
+const generarInfoTipo = (inmueble) => {
+    const detalles = inmueble.detalles;
+    const informacionPorTipo = {}; // Objeto que almacenará la información por tipo
+    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Letras disponibles para los tipos
+    // Path de fotos y videos
+    const fotoPath = import.meta.env.VITE_RUTA_FOTO_INMUEBLES;
+    const videoPath = import.meta.env.VITE_RUTA_VIDEO_INMUEBLES;
+    // Recorrer los detalles    
+    detalles.forEach((detalle, index) => {
+        const letraTipo = letras[index] || `Tipo${index + 1}`; // Letras o un fallback si excede el alfabeto
 
-//Generar insignia de destacado o en ascenso (prioridad de ascenso)
-const generarBadge = (publicado) => {
-    /*ej: 
-        badge: "alta demanda",
-        badge: "",
-        badge: "destacado",
-   */
-    if ((publicado.inmueble.inmueblesAscenso && publicado.inmueble.inmueblesAscenso.length > 0) || publicado.idAscenso) {
-        return "alta demanda"
-    } else if ((publicado.inmueble.inmueblesDestacados && publicado.inmueble.inmueblesDestacados.length > 0) || publicado.idDestacado) {
-        return "destacado"
-    }
-    return ""
-}
+        // Crear un objeto con la información del tipo
+        informacionPorTipo[letraTipo] = { //La key será la letra
+            id: detalle.idDetalle, // Mantener el id original
+            description: inmueble.descripcionInmueble,
+            minPrice: formatPrecio(detalle.valorInmueble), // Se coloca el precio del detalle o tipo
+            maxPrice: formatPrecio(detalle.valorInmueble), // Se coloca el precio del detalle o tipo
+            habitaciones: detalle.cantidadHabitaciones,
+            banos: detalle.cantidadBaños,
+            resumen: inmueble.descripcionInmueble,
+            parqueadero: convertirPrimeraMayuscula(detalle.parqueadero),
+            // Extraer solo las URLs de las fotos
+            images: detalle.fotos.map(foto => fotoPath + "/" + foto.urlFoto),
+            videos: detalle.videos.map(video => videoPath + "/" + video.urlVideo),
+        }
+    });
+    // En este al ser solo un tipo no se usa el general como en los utils de proyecto
 
-// Generar la URL de la foto principal del inmueble
-const generarFotoPrincipal = (publicado) => {
-    if (publicado.inmueble.fotoPrincipal) {
-        const uploadsPath = import.meta.env.VITE_RUTA_FOTO_INMUEBLES;
-        return uploadsPath+ "/" + publicado.inmueble.fotoPrincipal
-    }
-    return "/img/Destacados/img-d-1.png"
+
+    return informacionPorTipo;
+
 }

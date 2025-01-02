@@ -1,6 +1,7 @@
 // Ejecuta las peticiones donde los inmuebles son el objeto principal de la relacion
 import { api } from "../api";
-import { formatInmueblePublicadoData} from "../utils/InmuebleUtils";
+import { formatInmueblePublicadoData } from "../utils/FilterUtil";
+import { formatInmuebleData} from "../utils/InmuebleUtils";
 import {formatProyectoData} from "../utils/ProyectoUtils";
 import { formatFrontendFilter } from "../utils/FilterUtil";
 import { createQueryString } from "../utils/GeneralUtils";
@@ -41,12 +42,12 @@ const getInmuebleByIDCode = async (idInmueble = null, codigo = null, isProyecto=
         if (!response.data) {
             throw new Error("No se recibieron datos de la API.");
         }
-        
+        console.log(response.data);
         // Si es proyecto o no formatea los datos del backend
         if(isProyecto){
             return formatProyectoData(response.data);
         }else{
-            return [];
+            return formatInmuebleData(response.data);
         }
        
     } catch (err) {

@@ -51,7 +51,7 @@ const generarInfoTipo = (inmueble) => {
         // Crear un objeto con la información del tipo
         informacionPorTipo[letraTipo] = { //La key será la letra
             id: detalle.idDetalle, // Mantener el id original
-            description: detalle.descripcionInmueble,
+            description: inmueble.descripcionInmueble,
             minPrice: formatPrecio(detalle.valorInmueble), // Se coloca el precio del detalle o tipo
             habitaciones: detalle.cantidadHabitaciones,
             banos: detalle.cantidadBaños,
