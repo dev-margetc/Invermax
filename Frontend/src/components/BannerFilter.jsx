@@ -82,6 +82,12 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
       filters.push({ label: `Zonas cercanas`, key: 'nearbyAreas' });
     }
 
+    // Filtro para el customer
+    if(data.nombreCustomer){
+    //  filters.push({label: 'idCustomer', key:'idCustomer'});
+     filters.push({label: 'vendedor/inmobiliaria', key:'nombreCustomer'});
+    }
+
     setSelectedFilters(filters);
     setShowMoreFilters(false);
 
@@ -106,6 +112,8 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
       furnished: false,
       commonAreas: [],
       nearbyAreas: [],
+      nombreCustomer: '',
+      idCustomer:null
     });
     setSelectedFilters([]);
     setShowMoreFilters(false);

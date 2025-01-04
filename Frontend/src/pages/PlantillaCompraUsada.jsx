@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Carousel from 'react-bootstrap/Carousel';
@@ -33,6 +33,7 @@ const Plantilla = () => {
   const [calculadoraAbierta, setCalculadoraAbierta] = useState(false);
   const [mostrarResultados, setMostrarResultados] = useState(false);
 
+  const navigate = useNavigate();
   const location = useLocation();
   const { idInmueble } = location.state || {};
 
@@ -67,17 +68,15 @@ const Plantilla = () => {
     setModalVisible(false);
   };
 
-  const handleTypeSelect = (type) => {
-    setSelectedType("A");
+  // Navegacion para redirigir al filtro usando el id del customer
+  const handleNavigateCustomer = () => {
+    // Enviar el ID para la consulta al backend y el nombre para mostrar
+    const idCustomer = propertyData.idCustomer;
+    const nombreCustomer = propertyData.nombreInmobiliaria;
+    let ruta = '/filter';
+    const filter = { purpose: "", category: "", city: null, idCustomer: idCustomer, nombreCustomer: nombreCustomer }
+    navigate(ruta, { state: { formData: filter } }); // Pasa los datos como estado
   };
-
-  const toggleSwitch = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      furnished: !prevData.furnished,
-    }));
-  };
-
 
   // Hacer peticion para traer el inmueble
   const fetchInmueble = async () => {
@@ -200,7 +199,7 @@ const Plantilla = () => {
               "https://www.w3schools.com/html/movie.mp4"
             ],
             zonasComunes: [
-              { name: "Parqueadero visitantes", icon:"ParqueaderoIcon"},
+              { name: "Parqueadero visitantes", icon: "ParqueaderoIcon" },
             ],
             cercaDe: [
               { name: "Transporte público", icon: "TransportePublicoIcon" },
@@ -415,7 +414,7 @@ const Plantilla = () => {
                 <a href="#" target="_blank" rel="#">
                   <img src={propertyData.logoImage} alt="logo" loading="lazy" height={60} width={100} />
                 </a>
-                <a href="#" style={{ textDecoration: 'none', color: "black" }}>
+                <a href="#" onClick={() => handleNavigateCustomer()} style={{ textDecoration: 'none', color: "black" }}>
                   <h4 className='pt-2'><b>{propertyData.nombreInmobiliaria}</b></h4>
                 </a>
               </div>

@@ -23,7 +23,8 @@ export const formatProyectoData = (inmueble) => {
             ? import.meta.env.VITE_RUTA_FOTO_CUSTOMERS + "/" + inmueble.customer.logoCustomer
             : "./img/nombreInmobiliaria.png",
 
-        nombreInmobiliaria: inmueble.customer.nombreCustomer // Incluir el nombre del vendedor/inmobiliaria
+        nombreInmobiliaria: inmueble.customer.nombreCustomer, // Incluir el nombre del vendedor/inmobiliaria
+        idCustomer: inmueble.customer.idCustomer // ID del vendedor/inmobiliaria
     };
 };
 

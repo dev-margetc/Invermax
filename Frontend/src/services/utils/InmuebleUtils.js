@@ -3,7 +3,6 @@ import { formatPrecio, convertirPrimeraMayuscula } from "./GeneralUtils";
 // Dar formato a un unico inmueble del backend
 export const formatInmuebleData = (inmueble) => {
     const zonas = asignarZonas(inmueble.zonas);
-    console.log(inmueble);
     return {
         title: inmueble.tituloInmueble,
         codigo: inmueble.codigoInmueble,
@@ -22,7 +21,8 @@ export const formatInmuebleData = (inmueble) => {
             ? import.meta.env.VITE_RUTA_FOTO_CUSTOMERS + "/" + inmueble.customer.logoCustomer
             : "./img/nombreInmobiliaria.png",
 
-        nombreInmobiliaria: inmueble.customer.nombreCustomer // Incluir el nombre del vendedor/inmobiliaria
+        nombreInmobiliaria: inmueble.customer.nombreCustomer, // Incluir el nombre del vendedor/inmobiliaria
+        idCustomer: inmueble.customer.idCustomer // ID del vendedor/inmobiliaria
     };
 }
 

@@ -11,6 +11,7 @@ const getInmueblesPublicados = async (filters) => {
     try {
         const filtrosMapeados = formatFrontendFilter(filters);
         const query = createQueryString(filtrosMapeados);
+        console.log(query);
         let url;
         if (query) {
             url = `/inmuebles/publicados?${query}`; // Adjuntar los filtros como query string

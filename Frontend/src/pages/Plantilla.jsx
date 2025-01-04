@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Carousel from 'react-bootstrap/Carousel';
@@ -13,29 +13,11 @@ import VideoIcon from '../assets/icons/video.svg';
 import MapIcon from '../assets/icons/map.svg';
 import VrIcon from '../assets/icons/vr.svg';
 import ExpandIcon from '../assets/icons/expand.svg'; // Ícono de ampliar
-import ParqueaderoIcon from '../assets/icons/parqueadero.svg';
-import RecepcionIcon from '../assets/icons/recepcion.svg';
-import LavadoIcon from '../assets/icons/lavado.svg';
-import GimnasioIcon from '../assets/icons/gimnasio.svg';
-import SalonSocialIcon from '../assets/icons/salon_social.svg';
-import ZonaNinosIcon from '../assets/icons/zona_ninos.svg';
-import EspacioComunalIcon from '../assets/icons/espacio_comunal.svg';
-import ElevadorIcon from '../assets/icons/elevador.svg';
-import ZonasVerdesIcon from '../assets/icons/zonas_verdes.svg';
-import VigilanciaIcon from '../assets/icons/vigilancia.svg';
+
 import Bano from '../assets/icons/bano.svg';
 import Carro from '../assets/icons/carro.svg';
 import Area from '../assets/icons/area.svg';
 import Cama from '../assets/icons/cama.svg';
-import TransportePublicoIcon from '../assets/icons/transporte_publico.svg';
-import GimnasiosIcon from '../assets/icons/gimnasios.svg';
-import HospitalesIcon from '../assets/icons/hospitales.svg';
-import CentrosComercialesIcon from '../assets/icons/centros_comerciales.svg';
-import SupermercadosIcon from '../assets/icons/supermercados.svg';
-import TiendasBarrioIcon from '../assets/icons/tiendas_barrio.svg';
-import ParquesIcon from '../assets/icons/parques.svg';
-import JardinesColegiosIcon from '../assets/icons/jardines_colegios.svg';
-
 
 import { getIconByName } from '../services/inmuebles/IconsService'; // Importar el servicio de iconos
 import InmuebleService from '../services/inmuebles/InmuebleService';
@@ -50,6 +32,7 @@ const Plantilla = () => {
   const [calculadoraAbierta, setCalculadoraAbierta] = useState(false);
   const [mostrarResultados, setMostrarResultados] = useState(false);
 
+  const navigate = useNavigate();
   const location = useLocation();
   const { idInmueble } = location.state || {};
 
@@ -90,11 +73,14 @@ const Plantilla = () => {
     setSelectedType((prevType) => (prevType === type ? "GENERAL" : type));
   };
 
-  const toggleSwitch = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      furnished: !prevData.furnished,
-    }));
+  // Navegacion para redirigir al filtro usando el id del customer
+  const handleNavigateCustomer = () => {
+    // Enviar el ID para la consulta al backend y el nombre para mostrar
+    const idCustomer = propertyData.idCustomer;
+    const nombreCustomer = propertyData.nombreInmobiliaria;
+    let ruta = '/filter';
+    const filter = { purpose: "", category: "", city:null, idCustomer: idCustomer, nombreCustomer:nombreCustomer }
+    navigate(ruta, { state: {formData: filter}}); // Pasa los datos como estado
   };
 
   // Hacer peticion para traer el inmueble
@@ -192,26 +178,10 @@ const Plantilla = () => {
               "https://www.w3schools.com/html/movie.mp4"
             ],
             zonasComunes: [
-              { name: "Parqueadero visitantes", icon: ParqueaderoIcon },
-              { name: "Recepción", icon: RecepcionIcon },
-              { name: "Zona de lavado", icon: LavadoIcon },
-              { name: "Gimnasio", icon: GimnasioIcon },
-              { name: "Salón social", icon: SalonSocialIcon },
-              { name: "Zona niños", icon: ZonaNinosIcon },
-              { name: "Espacio comunal", icon: EspacioComunalIcon },
-              { name: "Elevadores: 2", icon: ElevadorIcon },
-              { name: "Zonas verdes", icon: ZonasVerdesIcon },
-              { name: "Vigilancia 24 horas", icon: VigilanciaIcon }
+              { name: "Parqueadero visitantes", icon: "ParqueaderoIcon" },
             ],
             cercaDe: [
-              { name: "Transporte público", icon: TransportePublicoIcon },
-              { name: "Gimnasios", icon: GimnasiosIcon },
-              { name: "Hospitales", icon: HospitalesIcon },
-              { name: "Centros comerciales", icon: CentrosComercialesIcon },
-              { name: "Supermercados", icon: SupermercadosIcon },
-              { name: "Tiendas de barrio", icon: TiendasBarrioIcon },
-              { name: "Parques", icon: ParquesIcon },
-              { name: "Jardines y colegios", icon: JardinesColegiosIcon }
+              { name: "Transporte público", icon: "TransportePublicoIcon" }
             ]
           },
           A: {
@@ -435,7 +405,7 @@ const Plantilla = () => {
                     {propertyData.frameMap ? (
 
                       <iframe
-                        src= {propertyData.frameMap}
+                        src={propertyData.frameMap}
                         width="100%"
                         height="400"
                         style={{
@@ -466,7 +436,7 @@ const Plantilla = () => {
                 <a href="#" target="_blank" rel="#">
                   <img src={propertyData.logoImage} alt="logo" loading="lazy" height={60} width={100} />
                 </a>
-                <a href="#" style={{ textDecoration: 'none', color: "black" }}>
+                <a href="#" onClick={() => handleNavigateCustomer()} style={{ textDecoration: 'none', color: "black" }}>
                   <h4 className='pt-2'><b>{propertyData.nombreInmobiliaria}</b></h4>
                 </a>
               </div>

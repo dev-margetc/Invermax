@@ -23,7 +23,6 @@ const getPublicados = async (datos) => {
             idTipoInmueble, // Usar un ==
             idCustomer
         } = datos;
-        console.log("---------------------------------------");
         // Construir el objeto de filtros
         // Por las multiples consultas a la BD en el metodo del repository el filtro se aplica aca
         resultado = await inmuebleRepository.getPublicados();
@@ -41,7 +40,7 @@ const getPublicados = async (datos) => {
             const inmuebleData = dato.inmueble.dataValues;
 
             // Filtrar por idCustomer
-            if (idCustomer && dato.idCustomer != idCustomer) return false;
+            if (idCustomer && inmuebleData.customer.idCustomer!= idCustomer) return false;
 
             // estado
             if (estadoInmueble && dato.estadoInmueble !== estadoInmueble) return false;

@@ -129,7 +129,7 @@ const getPublicados = async () => {
             {
               model: Customer,
               as: "customer",
-              attributes: ['nombreCustomer']
+              attributes: ['nombreCustomer', 'idCustomer']
             },
             // Agregar inmuebles en ascenso
             {

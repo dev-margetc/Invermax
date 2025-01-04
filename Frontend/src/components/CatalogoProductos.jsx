@@ -51,6 +51,9 @@ const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
 
     return (
       <div className="pagination">
+        {filters?.idCustomer && (
+          <p>Inmuebles de {filters.nombreCustomer}</p>
+        )}
         <button
           className="pagination-button"
           disabled={currentPage === 0}

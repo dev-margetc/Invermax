@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Carousel from 'react-bootstrap/Carousel';
@@ -28,7 +28,7 @@ const Plantilla = () => {
   const [selectedType, setSelectedType] = useState("A");
   const [dynamicData, setDynamicData] = useState({});
 
-
+  const navigate = useNavigate();
   const location = useLocation();
   const { idInmueble } = location.state || {};
 
@@ -46,6 +46,16 @@ const Plantilla = () => {
 
   const handleCloseModal = () => {
     setModalVisible(false);
+  };
+
+  // Navegacion para redirigir al filtro usando el id del customer
+  const handleNavigateCustomer = () => {
+    // Enviar el ID para la consulta al backend y el nombre para mostrar
+    const idCustomer = propertyData.idCustomer;
+    const nombreCustomer = propertyData.nombreInmobiliaria;
+    let ruta = '/filter';
+    const filter = { purpose: "", category: "", city: null, idCustomer: idCustomer, nombreCustomer: nombreCustomer }
+    navigate(ruta, { state: { formData: filter } }); // Pasa los datos como estado
   };
 
   // Hacer peticion para traer el inmueble
@@ -361,7 +371,7 @@ const Plantilla = () => {
                 <a href="#" target="_blank" rel="#">
                   <img src={propertyData.logoImage} alt="logo" loading="lazy" height={60} width={100} />
                 </a>
-                <a href="#" style={{ textDecoration: 'none', color: "black" }}>
+                <a href="#" onClick={() => handleNavigateCustomer()} style={{ textDecoration: 'none', color: "black" }}>
                   <h4 className='pt-2'><b>{propertyData.nombreInmobiliaria}</b></h4>
                 </a>
               </div>
@@ -371,85 +381,57 @@ const Plantilla = () => {
               <div className='span-dive'>
                 <h5><b>{propertyData.tipo}</b></h5>
                 <div>
-                  {selectedType === "G" ? (
-                    // Información para tipo "6"
-                    <>
-                      <span>Desde</span>
-                      <h5 className='n'><b>{dynamicData.minPrice || "N/A"}</b></h5>
-                      <span className='hasta'>Hasta</span>
-                      <h5 className='n'><b>{dynamicData.maxPrice || "N/A"}</b></h5>
-                      <span>Fecha próxima de entrega</span>
-                      <h6><b>{propertyData.fechaEntrega}</b></h6>
+                  <>
+                    <div >
+                      {/* Valor del inmueble */}
+                      <div className="valor-inmueble">
+                        <p>Valor del inmueble:</p>
+                        <h5 className="valor-destacado">
+                          ${dynamicData.minPrice || "N/A"}
+                        </h5>
 
-                      <div className='desde-hasta-medidas'>
-                        <div>
-                          <h6>
-                            <b>Medidas: </b>
-                            {propertyData?.medidasTipo?.[0]?.tipoA || "No disponible"}
-                          </h6>
+                        <p style={{ color: "red" }}>{propertyData.administracion}</p>
+
+                      </div>
+
+                      {/* Características */}
+                      <div className="caracteristicas">
+                        <div className="caracteristica">
+                          <img src={Area} alt="Área m²" className="caracteristica-icon" loading="lazy" />
+                          <div className="caracteristica-text">
+                            <p>Área m²</p>
+                            <strong>{propertyData?.medidasTipo?.find(item => item[`tipo${selectedType}`])?.[`tipo${selectedType}`] || "No disponible"}</strong>
+                          </div>
                         </div>
-                        <div>
-                          <h6>
-                            <b>Hasta: </b>
-                            {propertyData?.medidasTipo?.[3]?.tipoD || "No disponible"}
-                          </h6>
+                        <div className="caracteristica">
+                          <img src={Cama} alt="Habitaciones" className="caracteristica-icon" loading="lazy" />
+                          <div className="caracteristica-text">
+                            <p>Habit.</p>
+                            <strong>{dynamicData.habitaciones || "N/A"}</strong>
+                          </div>
+                        </div>
+                        <div className="caracteristica">
+                          <img src={Bano} alt="Baños" className="caracteristica-icon" loading="lazy" />
+                          <div className="caracteristica-text">
+                            <p>Baños</p>
+                            <strong>{dynamicData.banos || "N/A"}</strong>
+                          </div>
+                        </div>
+                        <div className="caracteristica">
+                          <img src={Carro} alt="Parqueadero" className="caracteristica-icon" loading="lazy" />
+                          <div className="caracteristica-text">
+                            <p>Parqueadero</p>
+                            <strong>{dynamicData.parqueadero || "N/A"}</strong>
+                          </div>
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    // Información para tipos diferentes a "6"
-                    <>
-                      <div >
-                        {/* Valor del inmueble */}
-                        <div className="valor-inmueble">
-                          <p>Valor del inmueble:</p>
-                          <h5 className="valor-destacado">
-                            ${dynamicData.minPrice || "N/A"}
-                          </h5>
-
-                          <p style={{ color: "red" }}>{propertyData.administracion}</p>
-
-                        </div>
-
-                        {/* Características */}
-                        <div className="caracteristicas">
-                          <div className="caracteristica">
-                            <img src={Area} alt="Área m²" className="caracteristica-icon" loading="lazy" />
-                            <div className="caracteristica-text">
-                              <p>Área m²</p>
-                              <strong>{propertyData?.medidasTipo?.find(item => item[`tipo${selectedType}`])?.[`tipo${selectedType}`] || "No disponible"}</strong>
-                            </div>
-                          </div>
-                          <div className="caracteristica">
-                            <img src={Cama} alt="Habitaciones" className="caracteristica-icon" loading="lazy" />
-                            <div className="caracteristica-text">
-                              <p>Habit.</p>
-                              <strong>{dynamicData.habitaciones || "N/A"}</strong>
-                            </div>
-                          </div>
-                          <div className="caracteristica">
-                            <img src={Bano} alt="Baños" className="caracteristica-icon" loading="lazy" />
-                            <div className="caracteristica-text">
-                              <p>Baños</p>
-                              <strong>{dynamicData.banos || "N/A"}</strong>
-                            </div>
-                          </div>
-                          <div className="caracteristica">
-                            <img src={Carro} alt="Parqueadero" className="caracteristica-icon" loading="lazy" />
-                            <div className="caracteristica-text">
-                              <p>Parqueadero</p>
-                              <strong>{dynamicData.parqueadero || "N/A"}</strong>
-                            </div>
-                          </div>
-                        </div>
-                        {/* Resumen */}
-                        <div className="resumen">
-                          <h6><b>Resumen</b></h6>
-                          <p>{dynamicData.resumen || "No hay descripción disponible."}</p>
-                        </div>
+                      {/* Resumen */}
+                      <div className="resumen">
+                        <h6><b>Resumen</b></h6>
+                        <p>{dynamicData.resumen || "No hay descripción disponible."}</p>
                       </div>
-                    </>
-                  )}
+                    </div>
+                  </>
                 </div>
 
                 <div className='btn-obtener-contacto'>
