@@ -2,8 +2,6 @@
 Tambien se encarga de interactuar con otros servicios*/
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const Inmueble = require("../entities/Inmueble");
-const ZonaInmuebles = require("../entities/ZonasInmuebles");
-const inmuebleRepository = require("../repositories/InmuebleRepository");
 const ZonasInmueblesRepository = require("../repositories/ZonasInmueblesRepository");
 
 

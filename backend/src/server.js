@@ -11,10 +11,12 @@ const sequelize = require('./conf/database'); // Importar la conexión a la BD
 require('./modules/inmuebles/associations/associations');
 require('./modules/usuarios/associations/associations');
 require('./modules/suscripciones/associations/associations'); 
-
+require('./modules/blogs/associations/associations'); 
+ 
 const inmueblesRoutes = require('./modules/inmuebles/routes/InmueblesRoutes'); // Importar las rutas de inmuebles
 const usuariosRoutes = require('./modules/usuarios/routes/UsuariosRoutes'); // Importar las rutas de usuarios
 const suscripcionesRoutes = require('./modules/suscripciones/routes/SuscripcionesRoutes'); // Importar las rutas de usuarios
+const blogRoutes = require('./modules/blogs/routes/BlogRoutes'); // Importar las rutas de usuarios
 const globalErrorHandler = require("./middleware/globalErrorHandler"); // Handler de errores
 
 
@@ -51,6 +53,10 @@ app.use('/usuarios', usuariosRoutes);
 
 // Usar las rutas del modulo de suscripciones
 app.use('/suscripciones', suscripcionesRoutes);
+
+
+// Usar las rutas del modulo de blogs
+app.use('/blogs', blogRoutes);
 
 // Ruta para acceder a las fotos del servidor
 const uploadsPath = process.env.UPLOADS_PATH || path.join(__dirname, '../../uploads');

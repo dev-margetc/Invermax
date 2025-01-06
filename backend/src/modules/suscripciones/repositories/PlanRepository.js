@@ -1,5 +1,4 @@
 // Se interactua con la base de datos haciendo uso de sequelize o personalizadas
-const sequelize = require("../../../conf/database");
 
 const Plan = require("../entities/Plan");
 const Caracteristica = require("../entities/Caracteristica");
