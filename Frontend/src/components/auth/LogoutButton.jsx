@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { auth } from "../../services/Firebase/Firebase";
 import { signOut } from "firebase/auth";
 
-const LogoutButton = () => {
+const LogoutButton = ({setToken}) => {
     // Estado para almacenar el email decodificado
     const [email, setEmail] = useState(null);
 
@@ -34,8 +34,9 @@ const LogoutButton = () => {
             // Elimina el token del almacenamiento local
             localStorage.removeItem("token");
 
+            // Actualizar el estado del token al padre
+            setToken(null);
             // Enviar el token al backend para validación
-
             const backendUrl = import.meta.env.VITE_BACKEND_URL;
             const res = await fetch(
                 `${backendUrl}/usuarios/logout`,

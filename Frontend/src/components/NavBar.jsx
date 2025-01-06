@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom"; // Usa Link para manejar l
 import LoginButton from "./auth/LoginButton";
 import LogoutButton from "./auth/LogoutButton";
 import TiposInmueblesBanner from "./modules/inmuebles/TiposInmueblesBanner";
-const Navbar = () => {
+
+// Se le pasa el token desde App
+const Navbar = ({token, setToken}) => {
   // Componente de navegacion
   const navigate = useNavigate();
-  // Token de sesion
-  const token = localStorage.getItem("token");
 
   const [isOpen, setIsOpen] = useState(false);
   const [submenuOpenComprar, setSubmenuOpenComprar] = useState(false);
@@ -100,10 +100,10 @@ const Navbar = () => {
         <div className="navbar-right">
           {/* Si el token es null mostrar el boton de login y el enlace de publicar */}
           {token === null ? (
-            <LoginButton />
+            <LoginButton setToken={setToken} />
           ) : (
             // Si el token existe mostrar el boton de logout
-            <LogoutButton />
+            <LogoutButton setToken={setToken}/>
           )
           }
           <a

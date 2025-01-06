@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Navbar from './components/NavBar';
@@ -21,36 +21,46 @@ import Inmobiliaria from './pages/Inmobiliaria';
 import Canasta from './pages/Canasta';
 
 function App() {
-  const [count, setCount] = useState(0);
+
+  // Token de autenticación
+  const [token, setToken] = useState(null);
+
+  // Cargar el token desde localStorage al montar el componente
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
 
   return (
     <Router>
 
       {/* Barra de navegación */}
-       <Navbar />
-       
+      <Navbar token={token} setToken={setToken} />
+
       {/* Rutas */}
       <div className='fondo-principal'>
-      <Routes>
-        <Route path="/" element={<Home />} />    
-        <Route path="/filter" element={<Filter />} /> 
-        <Route path="/compra" element={<Plantilla />} /> 
-        <Route path="/usado" element={<PlantillaCompraUsada />} /> 
-        <Route path="/arriendo" element={<PlantillaArriendo />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/plantillas" element={<Plantillas />} />
-        <Route path="/post" element={<Post />} />
-        <Route path="/otrosServicios" element={<OtrosServicios />} />
-        <Route path="/planes" element={<Planes />} />
-        <Route path="/Inmobiliaria" element={<Inmobiliaria />} />
-        <Route path="/Canasta" element={<Canasta />} />
-      
-      </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/filter" element={<Filter />} />
+          <Route path="/compra" element={<Plantilla />} />
+          <Route path="/usado" element={<PlantillaCompraUsada />} />
+          <Route path="/arriendo" element={<PlantillaArriendo />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/plantillas" element={<Plantillas />} />
+          <Route path="/post" element={<Post />} />
+          <Route path="/otrosServicios" element={<OtrosServicios />} />
+          <Route path="/planes" element={<Planes />} />
+          <Route path="/Inmobiliaria" element={<Inmobiliaria />} />
+          <Route path="/Canasta" element={<Canasta />} />
+
+        </Routes>
       </div>
 
-     {/* Footer */}
+      {/* Footer */}
       <Footer />
-      
+
     </Router>
   );
 }
