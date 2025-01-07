@@ -5,6 +5,7 @@ import InmuebleService from '../services/inmuebles/InmuebleService';
 
 const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
   const [items, setInmuebles] = useState([]);
+  const navigate = useNavigate(); // Inicializa el hook de navegación
 
   useEffect(() => {
     if (!filters || Object.keys(filters).length === 0) {
@@ -15,7 +16,7 @@ const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
     const fetchInmuebles = async () => {
       try {
         if (filters) {
-          const data = await InmuebleService.getInmueblesPublicados(filters);
+          const data = await InmuebleService.getInmueblesPublicados(filters, navigate);
           setInmuebles(data || []);
         }
       } catch (error) {
@@ -27,7 +28,6 @@ const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
 
   const itemsPerPage = showOnlyFour ? 4 : 12; // Mostrar solo 4 items si 'showOnlyFour' es true
   const [currentPage, setCurrentPage] = useState(0);
-  const navigate = useNavigate(); // Inicializa el hook de navegación
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const paginatedItems = showOnlyFour
@@ -72,26 +72,6 @@ const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
       </div>
     );
   };
-
-  const handleNavigate = (item) => {
-    // 3 plantillas - para proyectos(compra), para comprar (otros) y arrendar (otros)
-    let idInmueble = item.idInmueble;
-    let modalidad = item.modalidad//arriendo o compra
-    let isProyecto = item.proyecto;
-    let ruta = '/'
-    if (isProyecto) {
-      ruta = '/compra'; // Para proyectos
-    } else {
-      if (modalidad == "arriendo") {
-        ruta = '/arriendo' // Otros para arrendar
-      }else{
-        ruta = '/usado' //Otros para venta   
-      }
-
-    }
-    navigate(ruta, { state: { idInmueble } }); // Pasa los datos como estado
-  };
-
   return (
     <div className={`catalogo-container container ${showOnlyFour ? "four-items-layout" : ""}`}>
       {!showOnlyFour && renderPagination()} {/* No renderizar paginación si 'showOnlyFour' es true */}
@@ -179,7 +159,7 @@ const CatalogoProductos = ({ filters, showOnlyFour = false }) => {
 
               <p>{item.nombreCustomer || "Nombre vendedor / Inmobiliaria"}</p>
             </div>
-            <button className="btn-ver-inmueble" onClick={() => handleNavigate(item)}>
+            <button className="btn-ver-inmueble" onClick={() => InmuebleService.handleNavigate(item, navigate)}>
               Ver inmueble
             </button>
           </div>

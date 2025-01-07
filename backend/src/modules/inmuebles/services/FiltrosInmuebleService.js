@@ -118,7 +118,12 @@ const getInmueblesCodigo = async (datos) => {
     const { codigo } = datos;
 
     if (codigo) {
-        return inmuebleRepository.getInmueblesCodigo(codigo);
+        const inmuebles = await inmuebleRepository.getInmueblesCodigo(codigo);
+        if(!inmuebles[0].idInmueble){
+            // Retornar una lista vacía si el id es null (no se encontró)
+            return [];
+        }
+        return inmuebles;
     } else {
         return { error: true, message: "Codigo no colocado" };
     }

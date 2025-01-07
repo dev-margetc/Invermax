@@ -46,7 +46,12 @@ const BannerFilter = ({ initialData, onApplyFilters }) => {
     return () => window.removeEventListener('resize', handleResize); // Limpia el listener al desmontar el componente
   }, []);
 
-  const handleCityClick = () => setShowCityInputs(true);
+  const handleCityClick = () => {
+  // Mostrar tab de filtro ciudades
+    setShowCityInputs(true);
+    // Colocar el codigo de filtro vacio
+    formData.code = "";
+  };
   const handleCodeClick = () => setShowCityInputs(false);
 
   const handleChange = (e) => {
