@@ -115,7 +115,6 @@ const deleteMultimediaServidor = async (tipo, nombre, modulo) => {
         // Si el nombre incluye la ruta completa, no se utiliza la ruta base
 
         let ruta = nombre.includes("C:") ? nombre : path.join(process.env.UPLOADS_PATH, modulo, tipo, nombre);
-
         if (fs.existsSync(ruta)) {
             fs.unlink(ruta, (err) => {
                 if (err) {
@@ -125,6 +124,7 @@ const deleteMultimediaServidor = async (tipo, nombre, modulo) => {
                 }
             });
         } else {
+
             console.log("Ruta de multimedia no encontrada");
         }
 

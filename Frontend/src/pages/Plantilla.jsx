@@ -79,8 +79,8 @@ const Plantilla = () => {
     const idCustomer = propertyData.idCustomer;
     const nombreCustomer = propertyData.nombreInmobiliaria;
     let ruta = '/filter';
-    const filter = { purpose: "", category: "", city:null, idCustomer: idCustomer, nombreCustomer:nombreCustomer }
-    navigate(ruta, { state: {formData: filter}}); // Pasa los datos como estado
+    const filter = { purpose: "", category: "", city: null, idCustomer: idCustomer, nombreCustomer: nombreCustomer }
+    navigate(ruta, { state: { formData: filter } }); // Pasa los datos como estado
   };
 
   // Hacer peticion para traer el inmueble
@@ -142,10 +142,20 @@ const Plantilla = () => {
   useEffect(() => {
     if (propertyData) {
       const typeData = propertyData.informacionPorTipo[selectedType];
+      console.log(typeData.images);
       setDynamicData(typeData || {});
     }
   }, [selectedType, propertyData]);
 
+  // Reiniciar el índice activo cuando cambien las imágenes
+  useEffect(() => {
+    setIndex(0);
+  }, [dynamicData.images]);
+
+  // Reiniciar el índice activo cuando cambien los videos
+  useEffect(() => {
+    setVideoIndex(0);
+  }, [dynamicData.videos]);
   useEffect(() => {
     setTimeout(() => {
       const mockData = {
@@ -546,33 +556,42 @@ const Plantilla = () => {
             <div class="centered-line-plantilla"></div>
             <h4><b>{propertyData.ubicacion}</b> | <b>Estrato {propertyData.estrato}</b></h4>
             <p>{dynamicData.description || "Descripción no disponible"}</p>
+            <p>{console.log(propertyData.zonasComunes.length >0)}</p>
             <hr style={{ border: 'none', borderTop: '1px dotted #555555', margin: '10px 0' }} />
 
-            <h2><b>Zonas Comunes</b></h2>
-            <div className="centered-line-plantilla"></div>
+            {propertyData.zonasComunes && propertyData.zonasComunes.length > 0 && (
+              <>
+              
+                <h2><b>Zonas Comunes</b></h2>
+                <div className="centered-line-plantilla"></div>
 
-            <div className="zonas-comunes-container">
-              {(Array.isArray(propertyData.zonasComunes) ? propertyData.zonasComunes : propertyData?.zonasComunes || []).map((zona, index) => (
-                <div className="zona-comun" key={index}>
-                  <img src={getIconByName(zona.icon)} alt={zona.name} className="zona-icon" loading="lazy" />
-                  <span>{zona.name}</span>
+                <div className="zonas-comunes-container">
+                  {(Array.isArray(propertyData.zonasComunes) ? propertyData.zonasComunes : propertyData?.zonasComunes || []).map((zona, index) => (
+                    <div className="zona-comun" key={index}>
+                      <img src={getIconByName(zona.icon)} alt={zona.name} className="zona-icon" loading="lazy" />
+                      <span>{zona.name}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
+            {propertyData.cercaDe && propertyData.cercaDe.length > 0 &&(
+              <>
+                <hr style={{ border: 'none', borderTop: '1px dotted #555555', margin: '10px 0' }} />
 
-            <hr style={{ border: 'none', borderTop: '1px dotted #555555', margin: '10px 0' }} />
+                <h2><b>Cerca de</b></h2>
+                <div class="centered-line-plantilla"></div>
 
-            <h2><b>Cerca de</b></h2>
-            <div class="centered-line-plantilla"></div>
-
-            <div className="cerca-de-container">
-              {(Array.isArray(dynamicData.cercaDe) ? dynamicData.cercaDe : propertyData?.cercaDe || []).map((item, index) => (
-                <div className="cerca-item" key={index}>
-                  <img src={getIconByName(item.icon)} alt={item.name} className="zona-icon" loading="lazy" />
-                  <span>{item.name}</span>
+                <div className="cerca-de-container">
+                  {(Array.isArray(dynamicData.cercaDe) ? dynamicData.cercaDe : propertyData?.cercaDe || []).map((item, index) => (
+                    <div className="cerca-item" key={index}>
+                      <img src={getIconByName(item.icon)} alt={item.name} className="zona-icon" loading="lazy" />
+                      <span>{item.name}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
 
             <hr style={{ border: 'none', borderTop: '1px dotted #555555', margin: '10px 0' }} />
 

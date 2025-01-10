@@ -11,16 +11,11 @@ const { traerToken } = require('../../../conf/firebaseAuth');
 
 // Asignar una foto/video a un detalle
 const insertMultimedia = async (req, res) => {
+
     const token = await traerToken(req);
-    let rutaFoto = null;
-    let nombreFoto = null;
-    let tipoArchivo = null;
-    // Verifica si se subió un archivo
-    if (req.file) {
-        rutaFoto = req.file.path; // Ruta del archivo subido
-        nombreFoto = req.file.filename;
-        tipoArchivo = req.file.tipoArchivo; // Propiedad agregada en la configuracion de subida
-    } else {
+
+    // Verifica si se subieron archivos
+    if (!req.files || req.files.length === 0) {
         return res.status(400).json({ error: { message: "No se subió ningún archivo." } });
     }
 
@@ -29,23 +24,35 @@ const insertMultimedia = async (req, res) => {
         /* Verificar que el customer dueño sea el mismo que inició sesion
           Si el usuario es admin se permite el ver los datos*/
         const idCustomer = await FiltrosInmuebleService.traerCustomerInmueble(idDetalle, null);
-        if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
-            msg = await detalleService.insertarMultimediaDetalle(idDetalle, nombreFoto, tipoArchivo, idCustomer);
-            return res.status(200).json({ message: msg }); // respuesta aquí
 
-        } else {
-            throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesion no coincide con el solicitado.")
+        if (token.tipoUsuario !== "admin" && !(await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer))) {
+            throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesión no coincide con el solicitado.");
         }
+
+
+        // Almacenar información de los archivos procesados
+        const archivosProcesados = [];
+
+        for (const file of req.files) {
+            const nombreArchivo = file.filename;
+            const tipoArchivo = file.tipoArchivo;
+
+            try {
+                // Inserta la información de cada archivo en la base de datos
+                const msg = await detalleService.insertarMultimediaDetalle(idDetalle, nombreArchivo, tipoArchivo, idCustomer);
+                archivosProcesados.push({ nombreArchivo, msg });
+            } catch (error) {
+                // Si ocurre un error, elimina el archivo del servidor
+                let folder = tipoArchivo === "video" ? "videos" : "fotos";
+                deleteMultimediaServidor(folder, file.filename, "inmuebles");
+                throw error; // Propaga el error para manejarlo fuera del bucle
+            }
+        }
+        //s detalles de los archivos procesados
+    return res.status(200).json({ message: "Archivos subidos exitosamente.", archivosProcesados });
+
 
     } catch (err) {
-        // Elimina el archivo subido si hubo un error en la inserción
-        if (rutaFoto) {
-            let folder = "fotos";
-            if (tipoArchivo == "video") {
-                folder = "videos";
-            }
-            deleteMultimediaServidor(folder, nombreFoto, "inmuebles");
-        }
         //Enviar el mensaje de error
         errorHandler.handleControllerError(res, err, "inmuebles");
     }

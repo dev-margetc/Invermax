@@ -4,16 +4,24 @@ const router = express.Router();
 
 const { protegerRuta } = require('../../../middleware/authMiddleware'); // middleware autenticacion
 
+const {upload} = require('../../../middleware/uploadConfig'); // midleware archivos
+
 const BlogController = require("../controllers/BlogController");
 
 /* Rutas consulta*/
 // Traer todos los blogs
 router.get('/', BlogController.getBlogs);
 
+// Traer todos las categorias de blogs
+router.get('/categorias', BlogController.getCategorias);
 /* Rutas creacion*/
 
 // Ruta para crear un blog
 router.post('/', protegerRuta(['admin']), BlogController.registrarBlog);
+
+// Ruta para subir una o mas multimedia a un blog
+router.post('/:idBlog/images', protegerRuta(['admin']), upload.array('multimedia',10), BlogController.subirMultimediaBlog);
+
 
 /* Rutas actualizacion*/
 

@@ -3,6 +3,8 @@ const Blog = require("../entities/Blog");
 const Categoria = require("../entities/Categoria");
 const Usuario = require("../../usuarios/entities/Usuario");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
+const Foto = require("../../inmuebles/entities/Foto");
+const Video = require("../../inmuebles/entities/Video");
 
 /* Metodos de consulta*/
 // Traer los blogs dadas unas condiciones, se le puede asignar uno o mas id de categoria
@@ -23,12 +25,34 @@ const getAllBlogs = async (condiciones = null, categorias = null) => {
                     model: Usuario,
                     as: 'autor',
                     attributes: ["idUsuario", "emailUsuario"]
+                },
+                {
+                    model:Foto,
+                    as:'fotos',
+                    attributes: ["idFoto", "urlFoto"]
+                },
+                {
+                    model:Video,
+                    as:'videos',
+                    attributes: ["idVideo", "urlVideo"]
                 }
             ]
         });
 
 
         return blogs;
+    } catch (err) {
+        throw err;
+    }
+}
+
+// Traer las categorias
+const getAllCategorias = async () => {
+   try {
+        const categorias = await Categoria.findAll();
+
+
+        return categorias;
     } catch (err) {
         throw err;
     }
@@ -55,6 +79,32 @@ const insertarBlog = async (datos) => {
         throw err;
     }
 }
+// Insertar una foto para un blog
+const insertarFoto = async (idBlog, rutaFoto) => {
+    try {
+        await Foto.create({
+            urlFoto: rutaFoto,
+            idBlog: idBlog
+        });
+        return "Foto de blog subida correctamente";
+    } catch (error) {
+        console.log(error);
+        await transaction.rollback(); // Revertir en caso de error
+        throw error;
+    }
+}
+// Insertar video para un blog
+const insertarVideo = async (idBlog, rutaVideo) => {
+    try {
+        await Video.create({
+            urlVideo: rutaVideo,
+            idBlog: idBlog
+        });
+       return "Video de blog subida correctamente";
+    } catch (error) {
+       throw error;
+    }
+}
 /* Metodos de actualizacion*/
 const actualizarBlog = async (idBlog, datos) => {
     const { categorias, ...blogDatos } = datos; // Extrae las categorías del resto de los datos
@@ -70,8 +120,6 @@ const actualizarBlog = async (idBlog, datos) => {
         await blog.update(blogDatos); 
 
         // Gestionar las categorías en la tabla intermedia
-
-        console.log(categorias);
         if (categorias) {
             if (categorias.length > 0) {
                 // Actualizar las relaciones: Sobrescribe con las nuevas categorías
@@ -113,6 +161,9 @@ const eliminarBlog = async (idBlog) => {
 
 module.exports = {
     insertarBlog,
+    insertarFoto,
+    insertarVideo,
+    getAllCategorias,
     getAllBlogs,
     actualizarBlog,
     eliminarBlog

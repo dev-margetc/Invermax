@@ -4,6 +4,8 @@ const Blog = require("../entities/Blog");
 const Categoria = require("../entities/Categoria");
 const Usuario = require("../../usuarios/entities/Usuario");
 const CategoriaBlog = require("../entities/CategoriaBlog");
+const Foto = require("../../inmuebles/entities/Foto");
+const Video = require("../../inmuebles/entities/Video");
 
 
 /* Relaciones  blog-categoria (intermedia) */
@@ -32,3 +34,18 @@ Usuario.hasMany(Blog, { foreignKey: 'id_autor', as: 'blogs' });
 
 // Un blog solo tiene un autor
 Blog.belongsTo(Usuario, { foreignKey: 'id_autor', as: 'autor' });
+
+/* Relaciones blog-video/foto*/
+
+
+// Un Blog tiene varias fotos
+Blog.hasMany(Foto, { foreignKey: 'id_blog', as: 'fotos' });
+
+//Una foto pertenece a un blog
+Foto.belongsTo(Blog, { foreignKey: 'id_blog', as: 'blog' });
+
+// Un Blog tiene varios videos
+Blog.hasMany(Video, { foreignKey: 'id_blog', as: 'videos' });
+ 
+//Un video pertenece a un blog
+Video.belongsTo(Blog, { foreignKey: 'id_blog', as: 'blog' });
