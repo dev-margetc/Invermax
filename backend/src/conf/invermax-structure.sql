@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-01-2025 a las 19:06:58
+-- Tiempo de generación: 13-01-2025 a las 19:33:06
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -32,6 +32,7 @@ CREATE TABLE `blogs` (
   `titulo_blog` varchar(50) NOT NULL,
   `contenido` text NOT NULL,
   `fecha_creacion` datetime NOT NULL,
+  `foto_principal` varchar(50) DEFAULT NULL COMMENT 'Nombre de la foto principal del blog',
   `id_autor` int(11) NOT NULL COMMENT 'Es el id del usuario que creó el blog'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Guarda los blogs de la BD';
 
@@ -357,6 +358,21 @@ CREATE TABLE `saldos_caracteristicas` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `servicios`
+--
+
+CREATE TABLE `servicios` (
+  `id_servicio` int(11) NOT NULL,
+  `codigo` varchar(50) NOT NULL COMMENT 'Código para identificar los servicios sin depender del id o el nombre',
+  `nombre` varchar(50) NOT NULL COMMENT 'Nombre del servicio',
+  `descripcion` text NOT NULL COMMENT 'Descripción del servicio',
+  `foto_servicio` varchar(50) DEFAULT NULL COMMENT 'Guarda el nombre de la foto, la ruta e establece en el frontend',
+  `precio` decimal(10,2) NOT NULL COMMENT 'Precio del servicio en COP'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Permite guardar los servicios ofrecidos por INVERMAX';
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `suscripciones`
 --
 
@@ -647,6 +663,13 @@ ALTER TABLE `saldos_caracteristicas`
   ADD KEY `id_caracteristica` (`id_caracteristica`);
 
 --
+-- Indices de la tabla `servicios`
+--
+ALTER TABLE `servicios`
+  ADD PRIMARY KEY (`id_servicio`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
+
+--
 -- Indices de la tabla `suscripciones`
 --
 ALTER TABLE `suscripciones`
@@ -795,6 +818,12 @@ ALTER TABLE `precios_planes`
 --
 ALTER TABLE `proyectos`
   MODIFY `id_proyecto` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `servicios`
+--
+ALTER TABLE `servicios`
+  MODIFY `id_servicio` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `suscripciones`

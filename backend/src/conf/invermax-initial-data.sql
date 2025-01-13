@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-01-2025 a las 19:09:25
+-- Tiempo de generación: 13-01-2025 a las 19:34:57
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -88,14 +88,6 @@ INSERT INTO `caracteristicas_planes` (`id_plan`, `id_caracteristica`, `valor_car
 (13, 2, '20'),
 (14, 2, '6'),
 (15, 2, '20');
-
---
--- Volcado de datos para la tabla `categorias`
---
-
-INSERT INTO `categorias` (`id_categoria`, `nombre_categoria`) VALUES
-(1, 'Categ_1'),
-(2, 'Palabras');
 
 --
 -- Volcado de datos para la tabla `ciudades`
@@ -1317,6 +1309,14 @@ INSERT INTO `precios_planes` (`id_precio_plan`, `precio`, `duracion`, `estado_pr
 (14, 0.00, NULL, 1, 14),
 (15, 40000.00, NULL, 1, 15),
 (16, 90909.00, 2, 1, 2);
+
+--
+-- Volcado de datos para la tabla `servicios`
+--
+
+INSERT INTO `servicios` (`id_servicio`, `codigo`, `nombre`, `descripcion`, `foto_servicio`, `precio`) VALUES
+(2, 'copias_escrituras', 'Solicitar copias escrituras', 'lOREM IPsum', 'servicio-2-1736636304630-429066564.png', 20000.00),
+(5, 'promesa_compraventa', 'Promesa de compraventa', 'Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen.', NULL, 285000.00);
 
 --
 -- Volcado de datos para la tabla `tipos_inmueble`
