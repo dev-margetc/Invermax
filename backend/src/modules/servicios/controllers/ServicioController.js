@@ -21,10 +21,6 @@ const getServicios = async (req, res) => {
 /* Metodos de creacion*/
 const registrarServicio = async (req, res) => {
     try {
-        const token = await traerToken(req);
-        const datos = {};
-        datos.idUsuario = token.idUsuario;
-
         msg = await ServicioService.registrarServicio(req.body);
         res.status(201).json(msg); //Se retorna un mensaje
     } catch (error) {
@@ -39,6 +35,11 @@ const registrarServicio = async (req, res) => {
 const actualizarServicio = async (req, res) => {
     try {
         const { idServicio } = req.params;
+         // Verifica si se subió uno o mas archivos
+         if (req.files && req.files.length > 0) {
+            // Asignar el nombre
+            req.body.fotoServicio = req.files[0].filename;
+         } 
         req.body.idServicio = idServicio;
         msg = await ServicioService.actualizarServicio(req.body);
         res.status(201).json(msg); //Se retorna un mensaje

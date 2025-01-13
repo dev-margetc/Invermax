@@ -1,6 +1,6 @@
 import { api } from "../api";
 import { jwtDecode } from "jwt-decode";
-import { formatPerfilPlanData } from "../utils/PlanUtils";
+import { formatPerfilPlanData } from "../utils/suscripciones/PlanUtils";
 import { handleTokenExpiration } from "../utils/AuthUtils";
 
 // Traer los planes activos segun un perfil o todos si no se inició sesión

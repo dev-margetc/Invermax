@@ -4,6 +4,8 @@ const router = express.Router();
 
 const { protegerRuta } = require('../../../middleware/authMiddleware'); // middleware autenticacion
 
+const {upload} = require('../../../middleware/uploadConfig'); // midleware archivos
+
 const ServicioController = require("../controllers/ServicioController");
 
 /* Rutas consulta*/
@@ -13,12 +15,12 @@ router.get('/', ServicioController.getServicios);
 /* Rutas creacion*/
 
 // Ruta para crear un servicio
-router.post('/', protegerRuta(['admin']), ServicioController.registrarServicio);
+router.post('/', ServicioController.registrarServicio);
 
 /* Rutas actualizacion*/
 
 // Ruta para actualizar un servicio
-router.put('/:idServicio', protegerRuta(['admin']), ServicioController.actualizarServicio);
+router.put('/:idServicio', protegerRuta(['admin']),upload.array('multimedia',1), ServicioController.actualizarServicio);
 
 /* Rutas borrado*/
 // Ruta para actualizar un servicio

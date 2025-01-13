@@ -18,6 +18,7 @@ const usuariosRoutes = require('./modules/usuarios/routes/UsuariosRoutes'); // I
 const suscripcionesRoutes = require('./modules/suscripciones/routes/SuscripcionesRoutes'); // Importar las rutas de usuarios
 const blogRoutes = require('./modules/blogs/routes/BlogRoutes'); // Importar las rutas de usuarios
 const servicioRoutes = require('./modules/servicios/routes/ServicioRoutes'); // Importar las rutas de usuarios
+const configuracionRoutes = require('./modules/configuraciones/routes/ConfiguracionesRoutes');
 const globalErrorHandler = require("./middleware/globalErrorHandler"); // Handler de errores
 
 
@@ -60,6 +61,10 @@ app.use('/blogs', blogRoutes);
 
 // Usar las rutas del modulo de servicios
 app.use('/servicios', servicioRoutes);
+
+
+// Usar las rutas del modulo de configuraciones
+app.use('/configuraciones', configuracionRoutes);
 
 // Ruta para acceder a las fotos del servidor
 const uploadsPath = process.env.UPLOADS_PATH || path.join(__dirname, '../../uploads');

@@ -1,4 +1,4 @@
-import { formatPrecio } from "./GeneralUtils";
+import { formatPrecio } from "../GeneralUtils";
 // Transforma datos del backend que lleguen como planes agrupados por tipo de perfil
 export const formatPerfilPlanData = (tipos) => {
   const result = {};

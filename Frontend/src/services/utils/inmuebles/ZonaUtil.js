@@ -1,4 +1,4 @@
-import { convertirPrimeraMayuscula } from "./GeneralUtils";
+import { convertirPrimeraMayuscula } from "../GeneralUtils";
 
 export const formatZona = (zonas) => {
   return zonas.map((zona) => ({

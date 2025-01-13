@@ -1,5 +1,5 @@
 /* Util para convertir datos de filtros entre el backend y frontend*/
-import { formatPrecio } from "./GeneralUtils";
+import { formatPrecio } from "../GeneralUtils";
 
 // Mapeo de purpose - modalidad
 const purposeMapping = {

@@ -46,6 +46,35 @@ const getAllBlogs = async (condiciones = null, categorias = null) => {
     }
 }
 
+// Traer info de un video
+const getInfoVideo = async (idVideo, idBlog) => {
+    try {
+        const videos = await Video.findAll({
+            where: {
+                idBlog: idBlog,
+                idVideo: idVideo
+            }
+        });
+        return videos;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Traer info de una foto
+const getInfoFoto = async (idFoto, idBlog) => {
+    try {
+        const fotos = await Foto.findAll({
+            where: {
+                idFoto: idFoto,
+                idBlog: idBlog
+            }
+        });
+        return fotos;
+    } catch (error) {
+        throw error;
+    }
+}
 // Traer las categorias
 const getAllCategorias = async () => {
    try {
@@ -158,6 +187,26 @@ const eliminarBlog = async (idBlog) => {
     }
 };
 
+// Eliminar una foto de la bd
+const eliminarFoto = async (idFoto, idBlog, transaccion) => {
+    try {
+        await Foto.destroy({ where: { idBlog: idBlog, idFoto: idFoto }, transaccion });
+        return "Foto eliminada correctamente.";
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Eliminar un video de la bd
+const eliminarVideo = async (idVideo, idBlog, transaccion) => {
+    try {
+        await Video.destroy({ where: { idBlog: idBlog, idVideo: idVideo }, transaccion });
+        return "Video eliminado correctamente.";
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 module.exports = {
     insertarBlog,
@@ -165,6 +214,10 @@ module.exports = {
     insertarVideo,
     getAllCategorias,
     getAllBlogs,
+    getInfoVideo,
+    getInfoFoto,
     actualizarBlog,
-    eliminarBlog
+    eliminarBlog,
+    eliminarFoto,
+    eliminarVideo
 }

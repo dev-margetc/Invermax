@@ -47,13 +47,15 @@ const setDestination = (tipoModulo, tipoArchivo) => {
 // Funcion que determina el nombre del archivo
 const setNombre = (params) => {
     let nombre = "NN";
-    const { idDetalle, idBlog, idCustomer } = params
+    const { idDetalle, idBlog, idCustomer, idServicio } = params
     if (idDetalle) {
         nombre = `detalle-${idDetalle}`;
     } else if (idBlog) {
         nombre = `blog-${idBlog}`;
     } else if (idCustomer) {
         nombre = `customer-${idCustomer}`;
+    }else if(idServicio){
+        nombre = `servicio-${idServicio}`;
     }
 
     // Agregar sufijo único con fecha y número aleatorio

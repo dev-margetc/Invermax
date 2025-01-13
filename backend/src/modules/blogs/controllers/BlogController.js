@@ -36,6 +36,7 @@ const registrarBlog = async (req, res) => {
     try {
         const token = await traerToken(req);
         const datos = {};
+
         datos.idUsuario = token.idUsuario;
 
         msg = await BlogService.registrarBlog(token.idUsuario, req.body);
@@ -90,11 +91,18 @@ const subirMultimediaBlog = async (req, res) => {
 const actualizarBlog = async (req, res) => {
     try {
         const { idBlog } = req.params;
+        // Verifica si se subió uno o mas archivos
+        if (req.files && req.files.length > 0) {
+           // Asignar el nombre
+           req.body.fotoPrincipalBlog = req.files[0].filename;
+        }
+
         req.body.idBlog = idBlog;
         msg = await BlogService.actualizarBlog(req.body);
         res.status(201).json(msg); //Se retorna un mensaje
     }
     catch (err) {
+        console.log(err);
         errorHandler.handleControllerError(res, err, "blogs");
     }
 }
@@ -112,11 +120,31 @@ const eliminarBlog = async (req, res) => {
     }
 }
 
+// Eliminar multimedia asociada a un blog
+const eliminarMultimediaBlog = async (req, res) => {
+    try {
+        const { idBlog, idFoto, idVideo } = req.params;
+
+        // Si idFoto existe el tipo es foto, si no es tipo video
+        const tipo = idFoto ? 'foto' : 'video';
+
+        // Toma el id de foto o video
+        const id = idFoto || idVideo;
+
+        let msg = await BlogService.deleteMultimediaBD(id, tipo, idBlog);
+        res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
+    } catch (err) {
+        console.log(err);
+        errorHandler.handleControllerError(res, err, "inmuebles");
+    }
+};
+
 module.exports = {
     getBlogs,
     getCategorias,
     subirMultimediaBlog,
     registrarBlog,
     actualizarBlog,
-    eliminarBlog
+    eliminarBlog,
+    eliminarMultimediaBlog
 }

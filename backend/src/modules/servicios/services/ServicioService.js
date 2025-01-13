@@ -3,6 +3,7 @@ Tambien se encarga de interactuar con otros servicios*/
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const { filtrarCampos } = require("../../../utils/utils");
 
+const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
 
 const ServicioRepo = require("../repositories/ServicioRepository");
 
@@ -42,8 +43,16 @@ const registrarServicio = async (datosServicio) => {
 const actualizarServicio = async (datosServicio) => {
     try {
         // Campos permitidos para actualizar
-        const campos = ["nombreServicio", "descripcionServicio", "precioServicio", "codigoServicio"];
+        const campos = ["nombreServicio", "descripcionServicio", "precioServicio", "codigoServicio", "fotoServicio"];
 
+         /* Si los nuevos datos tienen la foto entonces se debe eliminar la anterior*/
+         if(datosServicio.fotoServicio){
+            const servicios = await ServicioRepo.getAllServicios({idServicio: datosServicio.idServicio})
+            // Eliminar la foto si la tenia
+            if(servicios[0].fotoServicio){
+                await deleteMultimediaServidor("fotos", servicios[0].fotoServicio, "servicios");
+            }
+        }
         // Filtraar los datos permitidos
         const servicioData = filtrarCampos(datosServicio, campos);
 

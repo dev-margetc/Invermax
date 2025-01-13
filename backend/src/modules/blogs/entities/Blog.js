@@ -24,6 +24,11 @@ const Blog = sequelize.define('Blog', {
     allowNull: false,
     field: 'fecha_creacion'
   },
+  fotoPrincipalBlog: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'foto_principal'
+  },
   idAutor: {
     type: DataTypes.INTEGER,
     references:{

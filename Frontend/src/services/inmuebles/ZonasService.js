@@ -1,6 +1,6 @@
 // Ejecuta las peticiones donde los inmuebles son el objeto principal de la relacion
 import { api } from "../api";
-import { formatZona } from "../utils/ZonaUtil";
+import { formatZona } from "../utils/inmuebles/ZonaUtil";
 // Traer las zonas
 const getZonas = async (tipo) => {
     let url;

@@ -31,7 +31,7 @@ const insertarMultimediaDetalle = async (detalleId, rutaFoto, tipoArchivo, idCus
         msg = "";
         if (tipoArchivo === 'foto') {
             // Verificar que el plan le permita subir fotos
-            await CaracteristicaService.verificarFotoDetalle(idCustomer, detalleId);
+           await CaracteristicaService.verificarFotoDetalle(idCustomer, detalleId);
             msg = await detalleRepo.insertarFoto(detalleId, rutaFoto);
         } else if (tipoArchivo === 'video') {
             await CaracteristicaService.verificarVideoDetalle(idCustomer,detalleId);
@@ -183,7 +183,7 @@ const deleteDetalle = async (idDetalle) => {
             const urlsVideo = videosDetalle.flatMap(video => video.dataValues.urlVideo);
 
             // Borrar el detalle
-            detalleRepo.eliminarDetalle(idDetalle);
+            await detalleRepo.eliminarDetalle(idDetalle);
 
             // Eliminar fotos y videos usando las URL
             await Promise.all(

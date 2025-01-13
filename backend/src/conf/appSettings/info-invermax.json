@@ -1,0 +1,17 @@
+{
+  "informacion_json": "Información a mostrar en el frontend no relacionada a la lógica de la aplicacion",
+  "contactInfo": {
+    "telefono": "+1-234-567-890",
+    "email": "nuevo_correo@example.com",
+    "direccion": "123 Main Street, City",
+    "movil": "+57 300 123 4567"
+  },
+  "socialInfo": {
+    "url_facebook": "",
+    "url_twitter": "",
+    "url_instagram": "",
+    "url_youtube": "",
+    "url_linkedin": "",
+    "url_tiktok": ""
+  }
+}

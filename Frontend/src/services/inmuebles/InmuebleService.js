@@ -1,10 +1,10 @@
 // Ejecuta las peticiones donde los inmuebles son el objeto principal de la relacion
 import { api } from "../api";
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
-import { formatInmueblePublicadoData } from "../utils/FilterUtil";
-import { formatInmuebleData } from "../utils/InmuebleUtils";
-import { formatProyectoData } from "../utils/ProyectoUtils";
-import { formatFrontendFilter } from "../utils/FilterUtil";
+import { formatInmueblePublicadoData } from "../utils/inmuebles/FilterUtil";
+import { formatInmuebleData } from "../utils/inmuebles/InmuebleUtils";
+import { formatProyectoData } from "../utils/inmuebles/ProyectoUtils";
+import { formatFrontendFilter } from "../utils/inmuebles/FilterUtil";
 import { createQueryString } from "../utils/GeneralUtils";
 
 // Redireccionar a la vista completa de un inmueble dependiendo de modalidad y proyecto, solicita el navigate de react

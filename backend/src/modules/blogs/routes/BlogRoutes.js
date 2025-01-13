@@ -20,16 +20,24 @@ router.get('/categorias', BlogController.getCategorias);
 router.post('/', protegerRuta(['admin']), BlogController.registrarBlog);
 
 // Ruta para subir una o mas multimedia a un blog
-router.post('/:idBlog/images', protegerRuta(['admin']), upload.array('multimedia',10), BlogController.subirMultimediaBlog);
+router.post('/:idBlog/multimedia', protegerRuta(['admin']), upload.array('multimedia',10), BlogController.subirMultimediaBlog);
 
 
 /* Rutas actualizacion*/
 
 // Ruta para actualizar un blog
-router.put('/:idBlog', protegerRuta(['admin']), BlogController.actualizarBlog);
+router.put('/:idBlog', protegerRuta(['admin']), upload.array('multimedia',1), BlogController.actualizarBlog);
 
 /* Rutas borrado*/
 // Ruta para actualizar un blog
 router.delete('/:idBlog', protegerRuta(['admin']), BlogController.eliminarBlog);
+
+
+// Ruta para eliminar una foto de un blog. Apunta a la misma ruta de eliminar el video, cambia el tipo
+router.delete('/:idBlog/multimedia/fotos/:idFoto', protegerRuta(['admin']), BlogController.eliminarMultimediaBlog);
+
+// Ruta para eliminar un video
+router.delete('/:idBlog/multimedia/videos/:idVideo', protegerRuta(['admin']), BlogController.eliminarMultimediaBlog);
+
 
 module.exports = router;

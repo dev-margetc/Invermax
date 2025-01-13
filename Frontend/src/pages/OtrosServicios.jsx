@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Accordion } from "react-bootstrap";
+import servicioService from "../services/servicios/ServicioService"
 import "../style/App3.css";
 import Ima1 from "../assets/img/servicios.png";
 import Ima2 from "../assets/img/ima2.png";
@@ -7,6 +8,22 @@ import Ima3 from "../assets/img/ima3.png";
 import Ima4 from "../assets/img/ima4.png";
 
 const OtrosServicios = () => {
+
+  const [servicios, setServicios] = useState([]);
+
+  useEffect(() => {
+    const fetchServicios = async () => {
+      try {
+        const data = await servicioService.getServicios();
+        setServicios(data); // Los datos ya están formateados
+        console.log(data);
+      } catch (error) {
+        console.error("Error al cargar los planes:", error);
+      }
+    };
+    fetchServicios();
+  }, []);
+
   // Datos simulados del backend
   const serviciosData = [
     {
@@ -75,7 +92,7 @@ const OtrosServicios = () => {
           </p>
 
           <Accordion defaultActiveKey="0">
-            {serviciosData.map((servicio, index) => (
+            {servicios.map((servicio, index) => (
               <Accordion.Item eventKey={index.toString()} key={servicio.id}>
                 <Accordion.Header>{servicio.titulo}</Accordion.Header>
                 <Accordion.Body>
