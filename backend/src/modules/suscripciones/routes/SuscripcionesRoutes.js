@@ -54,11 +54,15 @@ router.get('/ascenso/customer/:idCustomer', AscensoController.getAscensoCustomer
 
 /* Rutas POST */
 
-// Recibir un pago
-router.post('/suscripcion/pago', SuscripcionController.handlePago)
+// Recibir un pago payU
+router.post('/suscripcion/payu/pago', SuscripcionController.handlePago)
 
 // Generar una suscripcion para un plan gratuito para el usuario que envíe la petición
 router.post('/suscripcion/gratuita', protegerRuta(['admin', 'customer']), SuscripcionController.generarSuscripcionGratuita)
+
+// Generar y validar los datos para la webhook de payU y validar que el plan seleccionado esté activo
+router.post('/suscripcion/checkout', SuscripcionController.generarDatosWebhook)
+
 
 
 //Insertar un inmueble en destacados (o actualizarlo si ya existe)

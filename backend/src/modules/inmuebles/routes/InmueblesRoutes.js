@@ -61,7 +61,7 @@ router.post('/', protegerRuta(['admin', 'customer']), inmuebleController.insertI
 
 // ruta para insertar una foto/video para un detalle inmueble
 router.post('/detalles/:idDetalle/multimedia',
-    protegerRuta(['admin', 'customer']),
+
     upload.array('multimedia', 10), detalleInmuebleController.insertMultimedia); //No enviar el archivo de primero
 
 // Ruta para asociar una zona a un inmueble

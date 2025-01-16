@@ -100,7 +100,7 @@ const OtrosServicios = () => {
                     <Row>
                       <Col md={4}>
                         <img
-                          src={servicio.imagen}
+                          src={servicio?.imagen}
                           alt={servicio.titulo}
                           className="img-fluid"
                         />

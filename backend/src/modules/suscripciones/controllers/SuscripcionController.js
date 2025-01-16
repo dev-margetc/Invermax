@@ -4,8 +4,11 @@ const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 
 const SuscripcionService = require('../services/SuscripcionService');
 const PlanService = require('../services/PlanService');
-const CustomerService = require('../../usuarios/services/CustomerService')
+const CustomerService = require('../../usuarios/services/CustomerService');
+const UsuarioService = require('../../usuarios/services/UsuariosService');
+const PayUWebHookService = require('../services/PayUWebhookService');
 const { traerToken } = require('../../../conf/firebaseAuth');
+const admin = require('firebase-admin');
 
 // Manejar el pago
 const handlePago = async (req, res) => {
@@ -92,10 +95,13 @@ const generarSuscripcionGratuita = async (req, res) => {
             infoSuscripcion.customer = customer; //Acceder al customer para crear la suscripcion
             infoSuscripcion.idCustomer = customer.idCustomer; // Entregar el objeto completo para validar estado
 
+            // Si el customer existe verificar que el plan sea del mismo tipo
+            if (plan[0].perfil.idPerfil != customer.perfil.idPerfil) {
+                throw new ErrorNegocio("El perfil actual del customer no le permite generar una suscripción a este plan");
+            }
             // Crear la suscripcion para el customer
             infoSuscripcion.idPlan = idPlan;
             infoSuscripcion.idPrecioPlan = idPrecioPlan;
-
             let msg = await SuscripcionService.crearSuscripcionGratuita(infoSuscripcion);
             res.status(201).json(msg); //Se retorna la respuesta
         }
@@ -106,8 +112,42 @@ const generarSuscripcionGratuita = async (req, res) => {
 
 }
 
+
+// Generar datos para enviar al webhook de payU
+const generarDatosWebhook = async (req, res) => {
+    try {
+
+        const token = await traerToken(req);
+        let { idUsuario, idPlan, idPrecioPlan } = req.body.metadata; // El id del plan y el usuario llegan en el body
+
+        // Verificar el plan que sea compatible con el usuario, se recupera el plan completo con el precioPlan
+        const plan = await PlanService.verificarPlanUsuario(idPlan, idPrecioPlan, idUsuario);
+
+        /* Generar datos para el webhook */
+        // Traer usuario
+        // Verifica el idToken con Firebase Admin
+        const uid = token.uid;
+        // Buscar el usuario por UID de la BD
+        const user = await UsuarioService.getUserByUID(uid);
+        // Buscar el usuario en la BD de firebase
+        const firebaseUser = await admin.auth().getUser(uid);
+        const paymentData = await PayUWebHookService.generarPaymentData(user, plan.precios[0], plan, firebaseUser);
+
+        // Retornar la información de pago y la url a la que se debe dirigir
+        res.status(201).json({
+            url: process.env.PAYU_PAYMENT_URL,
+            params: paymentData,
+        }); //Se retorna la respuesta
+    } catch (err) {
+        console.log(err);
+        errorHandler.handleControllerError(res, err, "suscripciones");
+    }
+
+}
+
 module.exports = {
     handlePago,
     getSuscripcionesCustomer,
-    generarSuscripcionGratuita
+    generarSuscripcionGratuita,
+    generarDatosWebhook
 }

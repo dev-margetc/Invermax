@@ -12,7 +12,7 @@ const { traerToken } = require('../../../conf/firebaseAuth');
 // Asignar una foto/video a un detalle
 const insertMultimedia = async (req, res) => {
 
-    const token = await traerToken(req);
+   
 
     // Verifica si se subieron archivos
     if (!req.files || req.files.length === 0) {
@@ -20,16 +20,17 @@ const insertMultimedia = async (req, res) => {
     }
 
     try {
+       // const token = await traerToken(req);
         const { idDetalle } = req.params;
         /* Verificar que el customer dueño sea el mismo que inició sesion
           Si el usuario es admin se permite el ver los datos*/
         const idCustomer = await FiltrosInmuebleService.traerCustomerInmueble(idDetalle, null);
 
-        if (token.tipoUsuario !== "admin" && !(await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer))) {
+      /*  if (token.tipoUsuario !== "admin" && !(await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer))) {
             throw new ErrorNegocio("No tiene permisos o el id del usuario que inició sesión no coincide con el solicitado.");
         }
 
-
+*/
         // Almacenar información de los archivos procesados
         const archivosProcesados = [];
 

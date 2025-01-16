@@ -18,5 +18,5 @@ const generarFotoPrincipal = (servicio) => {
         const uploadsPath = import.meta.env.VITE_RUTA_FOTO_SERVICIOS;
         return uploadsPath + "/" + servicio.fotoServicio
     }
-    return "../src/assets/img/servicios.png"
+    return null;
 }

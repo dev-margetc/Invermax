@@ -75,8 +75,6 @@ const generarSuscripcionGratuita = async (selectedPlan) => {
                     }
                 }
             );
-
-            console.log(response);
             // Redirigir según el código de estado
             if (response.status === 201) {
                 alert("suscripción generada exitosamente.");
@@ -99,8 +97,56 @@ const generarSuscripcionGratuita = async (selectedPlan) => {
     }
 }
 
+const generarSuscripcionPaga = async (selectedPlan) => {
+    /* Enviar solicitud al backend para generar la suscripcion 
+    (este valida que esté activo y que el precio coincida con el plan)
+    */
+    const { idPlan, idPrecioPlan } = selectedPlan;
+    const token = localStorage.getItem("token");
+    try {
+        if (token) {
+            const decoded = jwtDecode(token);
+            const idUsuario = decoded.idUsuario;
+            const endpoint = '/suscripciones/suscripcion/checkout'
+            // ----------------------------------
+            const response = await api.post(endpoint,
+                {
+                    metadata: { // Agrupar los datos
+                        idPlan,
+                        idPrecioPlan,
+                        idUsuario
+                    }
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Agregar el token en los encabezados
+                    }
+                }
+            );
+            // Redirigir según el código de estado
+            if (response.status === 201) {
+                return response;
+               // window.location.href = `${window.location.origin}`;
+            }
+        } else {
+            alert("Inicie sesión para poder activar un plan.");
+        }
+    } catch (error) {
+        handleTokenExpiration(error);
+        // Si el error es debido al token expirado o usuario no encontrado, hacer una petición alternativa
+        if (error.response) {
+            // Errores devueltos por el backend
+            const { message } = error.response.data.error;
+            alert(message);
+        } else {
+            // Errores de red u otros problemas
+            console.error("Error generando la suscripcion:", error);
+        }
+    }
+}
 export default {
     getPlanesActivosPerfil,
-    generarSuscripcionGratuita
+    generarSuscripcionGratuita,
+    generarSuscripcionPaga
 };
 

@@ -31,10 +31,10 @@ const insertarMultimediaDetalle = async (detalleId, rutaFoto, tipoArchivo, idCus
         msg = "";
         if (tipoArchivo === 'foto') {
             // Verificar que el plan le permita subir fotos
-           await CaracteristicaService.verificarFotoDetalle(idCustomer, detalleId);
+        //   await CaracteristicaService.verificarFotoDetalle(idCustomer, detalleId);
             msg = await detalleRepo.insertarFoto(detalleId, rutaFoto);
         } else if (tipoArchivo === 'video') {
-            await CaracteristicaService.verificarVideoDetalle(idCustomer,detalleId);
+          //  await CaracteristicaService.verificarVideoDetalle(idCustomer,detalleId);
             msg = await detalleRepo.insertarVideo(detalleId, rutaFoto);
         } else {
             throw new ErrorNegocio("Tipo de archivo no especificado");

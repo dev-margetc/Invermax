@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; // Importar useNavigate
 import "../style/App3.css";
 import IconCanasta from "../assets/icons/quitar_icon.svg";
@@ -11,6 +11,7 @@ const Canasta = () => {
   const navigate = useNavigate(); // Inicializar useNavigate
   const [selectedPlan, setSelectedPlan] = useState(state?.selectedPlan || null); // Inicializar con el plan recibido
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null); // Método de pago seleccionado
+  const [paymentData, setPaymentData] = useState(null);
 
   const handleIrPlanes = () => {
     navigate("/planes"); // Redirige a la página de planes
@@ -19,12 +20,11 @@ const Canasta = () => {
   // Traer los precios de los planes
   const plans = (selectedPlan && selectedPlan.precios) ? selectedPlan.precios : [];
 
-
   const paymentMethods = [
-    { id: 1, name: "PSE", icon: "/img/pse1.png" },
-    { id: 2, name: "Tarjeta de Crédito", icon: "/img/pse1.png" },
-    { id: 3, name: "Transferencia Bancaria", icon: "/img/pse1.png" },
-    { id: 4, name: "Efectivo", icon: "/img/pse1.png" },
+    { id: 1, name: "PayU", icon: "/img/pse1.png" },
+    //{ id: 2, name: "Tarjeta de Crédito", icon: "/img/pse1.png" },
+    //{ id: 3, name: "Transferencia Bancaria", icon: "/img/pse1.png" },
+    //{ id: 4, name: "Efectivo", icon: "/img/pse1.png" },
   ];
 
   const freePaymentMethod = [
@@ -40,11 +40,48 @@ const Canasta = () => {
 
   const handlePayment = async () => {
     // Pasar el id del precio seleccionado y el plan correspondiente
-     const response = await planService.generarSuscripcionGratuita(selectedPlan)
-   /* alert(
-      `Plan seleccionado: ${selectedPlan.titulo}, Duración: ${selectedPlan.duration}, Precio: ${selectedPlan.price}, Método de pago: ${selectedPaymentMethod?.name}`
-    )*/
+    if (selectedPlan.price == 0) {
+      await planService.generarSuscripcionGratuita(selectedPlan);
+    } else {
+      const response = await planService.generarSuscripcionPaga(selectedPlan);
+      const data = await response.data;
+      console.log(response.data);
+      setPaymentData(data);
+    }
+
+    /* alert(
+       `Plan seleccionado: ${selectedPlan.titulo}, Duración: ${selectedPlan.duration}, Precio: ${selectedPlan.price}, Método de pago: ${selectedPaymentMethod?.name}`
+     )*/
   }
+
+  // Enviar los datos al backend y redirigir al usuario
+  const handlePayURedirection = () => {
+    // Crear el formulario dinámicamente
+    const form = document.createElement('form');
+    console.log(paymentData.url);
+    form.action = paymentData.url;  // URL de pago obtenida del backend
+    form.method = 'POST';
+
+    // Añadir los datos de pago al formulario
+    Object.keys(paymentData.params).forEach(key => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = paymentData.params[key];
+      form.appendChild(input);
+    });
+
+    // Añadir el formulario al body y enviarlo
+    document.body.appendChild(form);
+    form.submit();
+  };
+
+      // Ejecutar handlePayment cuando paymentData se actualice
+      useEffect(() => {
+        if (paymentData) {
+            handlePayURedirection();
+        }
+    }, [paymentData]);
 
   return (
     <>

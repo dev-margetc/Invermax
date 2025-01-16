@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 
+const { protegerRuta } = require('../../../middleware/authMiddleware'); // middleware autenticacion
+
 const ConfigController = require("../controllers/ConfiguracionesController");
 /* Rutas de consulta*/
 
