@@ -3,9 +3,10 @@ import { Link, useNavigate } from "react-router-dom"; // Usa Link para manejar l
 import LoginButton from "./auth/LoginButton";
 import LogoutButton from "./auth/LogoutButton";
 import TiposInmueblesBanner from "./modules/inmuebles/TiposInmueblesBanner";
+import servicioService from "../services/servicios/ServicioService";
 
 // Se le pasa el token desde App
-const Navbar = ({token, setToken}) => {
+const Navbar = ({ token, setToken }) => {
   // Componente de navegacion
   const navigate = useNavigate();
 
@@ -13,11 +14,20 @@ const Navbar = ({token, setToken}) => {
   const [submenuOpenComprar, setSubmenuOpenComprar] = useState(false);
   const [submenuOpenOtrosTramites, setSubmenuOpenOtrosTramites] = useState(false);
 
+  // Servicios
+  const [servicios, setServicios] = useState([]);
+
   // Manejar busqueda de los dropdown
   const handleFilterClick = (filters) => (e) => {
     e.preventDefault(); // Evitar el comportamiento por defecto del enlace
     navigate('/filter', { state: { formData: filters } }); // Redirigir y pasar los filtros
   };
+
+  // Manejar redireccion a servicios. Toma la posicion de la lista
+  const handleServiceClick = (posicion) => (e) =>{
+    e.preventDefault();// Evitar el comportamiento por defecto del enlace
+    navigate('/otrosServicios', { state: { posicionServicio: posicion } }); // Redirigir y pasar la posicion del servicio
+  }
 
 
   const toggleMenu = () => {
@@ -48,6 +58,19 @@ const Navbar = ({token, setToken}) => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    const fetchServicios = async () => {
+      try {
+        const data = await servicioService.getServicios();
+        setServicios(data); // Los datos ya están formateados
+        console.log(data);
+      } catch (error) {
+        console.error("Error al cargar los planes:", error);
+      }
+    };
+    fetchServicios();
+  }, []);
+
   return (
     <header className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="navbar-header">
@@ -58,7 +81,7 @@ const Navbar = ({token, setToken}) => {
 
         </div>
         <div className="desktop-menu">
-          <a href="#" onClick={handleFilterClick({ purpose: "Rentar", category: "", city:null })}>Arriendos</a>
+          <a href="#" onClick={handleFilterClick({ purpose: "Rentar", category: "", city: null })}>Arriendos</a>
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuComprar}>
               Comprar{" "}
@@ -84,12 +107,12 @@ const Navbar = ({token, setToken}) => {
             </button>
             {submenuOpenOtrosTramites && (
               <div className="submenu-content">
-                <a href="#" className="highlight">
-                  Certificados
-                </a>
-                <a href="#" className="highlight">
-                  Tasaciones
-                </a>
+                {servicios && servicios.map((servicio, index) => (
+                  // Se pasa el indice o posicion en la lista
+                  <a onClick={handleServiceClick(index)} className="highlight" href="#">
+                    {servicio.titulo}
+                  </a>
+                ))}
                 <Link to="/otrosServicios" className="highlight">
                   Otros servicios
                 </Link>
@@ -103,7 +126,7 @@ const Navbar = ({token, setToken}) => {
             <LoginButton setToken={setToken} />
           ) : (
             // Si el token existe mostrar el boton de logout
-            <LogoutButton setToken={setToken}/>
+            <LogoutButton setToken={setToken} />
           )
           }
           <a

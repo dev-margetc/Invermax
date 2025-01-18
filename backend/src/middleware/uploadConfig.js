@@ -47,7 +47,7 @@ const setDestination = (tipoModulo, tipoArchivo) => {
 // Funcion que determina el nombre del archivo
 const setNombre = (params) => {
     let nombre = "NN";
-    const { idDetalle, idBlog, idCustomer, idServicio } = params
+    const { idDetalle, idBlog, idCustomer, idServicio, idAliado } = params
     if (idDetalle) {
         nombre = `detalle-${idDetalle}`;
     } else if (idBlog) {

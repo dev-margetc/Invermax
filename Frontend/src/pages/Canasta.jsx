@@ -58,6 +58,7 @@ const Canasta = () => {
   const handlePayURedirection = () => {
     // Crear el formulario dinámicamente
     const form = document.createElement('form');
+    console.log(paymentData);
     console.log(paymentData.url);
     form.action = paymentData.url;  // URL de pago obtenida del backend
     form.method = 'POST';
@@ -73,7 +74,7 @@ const Canasta = () => {
 
     // Añadir el formulario al body y enviarlo
     document.body.appendChild(form);
-    form.submit();
+   form.submit();
   };
 
       // Ejecutar handlePayment cuando paymentData se actualice

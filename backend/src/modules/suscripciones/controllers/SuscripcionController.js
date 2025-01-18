@@ -11,19 +11,29 @@ const { traerToken } = require('../../../conf/firebaseAuth');
 const admin = require('firebase-admin');
 
 // Manejar el pago
-const handlePago = async (req, res) => {
+const handlePagoPayU = async (req, res) => {
     try {
-        let { idUsuario, idPlan, idPrecioPlan } = req.body.metadata; // El id del plan y el usuario llegan en el body
-        let { status, id, amount, payment_method } = req.body; // Informacion que llegaría de la pasarela de pago
-        let infoSuscripcion = {};
+        // Verificar la firma y el estado de la transaccion 
+        const valido = await PayUWebHookService.recibirConfirmacionPayU(req);
+        console.log(req.body);
+        /* Si es valido se genera la suscripcion */
+        if (valido) {
+            let infoSuscripcion = {};
 
-        if (status == "success") { // Si el pago fue recibido correctamente se crea la suscripcion
-            // Asignar info extra
-            infoSuscripcion.montoPagado = amount;
+            const extraData1 = JSON.parse(req.body.extra1);
+            const idUsuario = extraData1.idUsuario;
 
-            infoSuscripcion.medioPago = payment_method;
+            const extraData2 = JSON.parse(req.body.extra2);
+            const idPlan = extraData2.idPlan;
 
-            infoSuscripcion.idTransaccion = id;
+            const extraData3 = JSON.parse(req.body.extra3);
+            const idPrecioPlan = extraData3.idPrecioPlan; //Duracion
+
+            infoSuscripcion.montoPagado = req.body.value;
+
+            infoSuscripcion.medioPago = req.body.payment_method_name;
+
+            infoSuscripcion.idTransaccion = req.body.transaction_id;
 
             // Traer informacion del plan
             let plan = await PlanService.getAllPlanes({ idPlan: idPlan });
@@ -41,7 +51,8 @@ const handlePago = async (req, res) => {
             infoSuscripcion.idPlan = idPlan;
             infoSuscripcion.idPrecioPlan = idPrecioPlan;
             let msg = await SuscripcionService.crearSuscripcionPagada(infoSuscripcion);
-            res.status(201).json(msg); //Se retorna la respuesta
+            console.log(msg);
+            //res.status(201).json(msg); //Se retorna la respuesta
         }
     } catch (err) {
         console.log(err);
@@ -146,7 +157,7 @@ const generarDatosWebhook = async (req, res) => {
 }
 
 module.exports = {
-    handlePago,
+    handlePagoPayU,
     getSuscripcionesCustomer,
     generarSuscripcionGratuita,
     generarDatosWebhook

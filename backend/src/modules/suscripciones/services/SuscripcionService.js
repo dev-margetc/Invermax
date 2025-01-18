@@ -108,7 +108,7 @@ const crearSuscripcionPagada = async (infoSuscripcion) => {
 
 
         // Crear la suscripcion y los saldos en el repository
-        let creada = suscripcionRepository.crearSuscripcion(infoSuscripcion, datosCaracteristicas)
+        let creada = await suscripcionRepository.crearSuscripcion(infoSuscripcion, datosCaracteristicas)
         //let creada = true;
         if (creada) {
             return "Suscripción creada";

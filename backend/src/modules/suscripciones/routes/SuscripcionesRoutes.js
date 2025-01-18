@@ -55,7 +55,7 @@ router.get('/ascenso/customer/:idCustomer', AscensoController.getAscensoCustomer
 /* Rutas POST */
 
 // Recibir un pago payU
-router.post('/suscripcion/payu/pago', SuscripcionController.handlePago)
+router.post('/suscripcion/payu/pago', SuscripcionController.handlePagoPayU)
 
 // Generar una suscripcion para un plan gratuito para el usuario que envíe la petición
 router.post('/suscripcion/gratuita', protegerRuta(['admin', 'customer']), SuscripcionController.generarSuscripcionGratuita)

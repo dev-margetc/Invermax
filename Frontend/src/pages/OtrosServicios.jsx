@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Accordion } from "react-bootstrap";
+import { useLocation } from "react-router-dom"; // Usa Link para manejar las rutas
 import servicioService from "../services/servicios/ServicioService"
 import "../style/App3.css";
 import Ima1 from "../assets/img/servicios.png";
@@ -11,12 +12,23 @@ const OtrosServicios = () => {
 
   const [servicios, setServicios] = useState([]);
 
+  // Componente de navegacion para recibir la posicion del servicio a abrir
+  const location = useLocation();
+  const { posicionServicio } = location.state || 0; // Colocar la posicion obtenida o 0 (primer elemento)
+  const [activeKey, setActiveKey] = useState(
+    posicionServicio != null ? posicionServicio.toString() : "0" // Valor por defecto "0"
+  );
+  useEffect(() => {
+    if (posicionServicio != null) {
+      setActiveKey(posicionServicio.toString());
+    }
+  }, [posicionServicio]);
+
   useEffect(() => {
     const fetchServicios = async () => {
       try {
         const data = await servicioService.getServicios();
         setServicios(data); // Los datos ya están formateados
-        console.log(data);
       } catch (error) {
         console.error("Error al cargar los planes:", error);
       }
@@ -91,7 +103,7 @@ const OtrosServicios = () => {
             un libro de textos especimen.
           </p>
 
-          <Accordion defaultActiveKey="0">
+          <Accordion activeKey={activeKey} onSelect={(key)=>setActiveKey(key)}>
             {servicios.map((servicio, index) => (
               <Accordion.Item eventKey={index.toString()} key={servicio.id}>
                 <Accordion.Header>{servicio.titulo}</Accordion.Header>

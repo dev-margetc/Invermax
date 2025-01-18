@@ -59,6 +59,45 @@ const generarPaymentData = async (usuario, precioPlan, plan, firebaseUser) => {
     }
 }
 
-module.exports = {
- generarPaymentData
+/* Recibir el pago de PAYU*/
+const recibirConfirmacionPayU = async (request) => {
+    console.log(request.body);
+    const { reference_sale, state_pol, sign, transaction_id } = request.body;
+    const valorNormalizado = normalizePayUValue(request.body.value);
+
+    // Validar firma    
+    const signatureString = `${process.env.PAYU_API_SECRET}~${process.env.PAYU_MERCHANT_ID}~${reference_sale}~${valorNormalizado}~COP~${state_pol}`;
+    const expectedSignature = crypto
+        .createHash('md5')
+        .update(signatureString)
+        .digest('hex');
+    // Si la firma es valida se verifica que el estado de la transaccion sea exitoso
+    if (sign == expectedSignature) {
+        // Procesar solo pagos aprobados
+        if (state_pol === '4') { // 4 = aprobado
+            console.log(`Pago aprobado para la referencia ${reference_sale}- idTransaccion ${transaction_id}`);
+            return true;
+        }
+    }
+    // Enviar false como default
+    return false;
 }
+    // Funcion necesaria para generar la clave esperada por PaYU, cambia dependiendo de los decimales del precio
+    function normalizePayUValue(value) {
+        // valor numérico
+        const numericValue = parseFloat(value);
+
+        // Si tiene exactamente dos decimales y el segundo es 0, reduce a un decimal
+        if (numericValue.toFixed(2).endsWith('0')) {
+            return numericValue.toFixed(1);
+        }
+
+        // De lo contrario, devuelve el valor original formateado con dos decimales
+        return numericValue.toFixed(2);
+    }
+
+    module.exports = {
+        generarPaymentData,
+        normalizePayUValue,
+        recibirConfirmacionPayU
+    }
