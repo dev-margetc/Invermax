@@ -19,6 +19,10 @@ import Planes from './pages/Planes';
 import TablaPlanes from './components/TablaPlanes';
 import Inmobiliaria from './pages/Inmobiliaria';
 import Canasta from './pages/Canasta';
+import NuevoInmueble from './pages/NuevoInmueble';
+import MisInmuebles from './pages/MisInmuebles';
+import Leads from './pages/Leads';
+import MiPlan from './pages/MiPlan';
 
 function App() {
 
@@ -54,6 +58,12 @@ function App() {
           <Route path="/planes" element={<Planes />} />
           <Route path="/Inmobiliaria" element={<Inmobiliaria />} />
           <Route path="/Canasta" element={<Canasta />} />
+          <Route path="/Nuevo-Inmueble" element={<NuevoInmueble />} />
+
+          <Route path="/publicar-nuevo-inmueble" element={<NuevoInmueble />} />
+          <Route path="/mis-inmuebles" element={<MisInmuebles />} />
+          <Route path="/leads" element={<Leads />} />
+          <Route path="/mi-plan" element={<MiPlan />} />
 
         </Routes>
       </div>

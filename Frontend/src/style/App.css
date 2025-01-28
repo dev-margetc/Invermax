@@ -981,6 +981,7 @@ font-size: 18px;
 
 /* Estilo general del navbar */
 .navbar {
+  background-color: #FFFFFF;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 1000;
@@ -1027,7 +1028,24 @@ font-size: 18px;
   transform: translateX(-50%);
 }
 
+.desktop-menu-nuevo-inmueble {
+  display: flex;
+  gap: 50px;
+  position: absolute;
+  left: 30%;
+  transform: translateX(-50%);
+}
+
 .desktop-menu a {
+  color: black;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 10px 0; /* Asegura que todos los enlaces tengan el mismo padding */
+  margin: 0; /* Elimina márgenes adicionales */
+  position: relative;
+}
+
+.desktop-menu-nuevo-inmueble a {
   color: black;
   text-decoration: none;
   font-size: 16px;
@@ -1093,6 +1111,10 @@ font-size: 18px;
   }
 
   .desktop-menu {
+    display: none;
+  }
+
+  .desktop-menu-nuevo-inmueble {
     display: none;
   }
 
