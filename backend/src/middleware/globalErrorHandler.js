@@ -26,7 +26,7 @@ const globalErrorHandler = (err, req, res, next) => {
 
     // Verificar si el error es de token vencido
     if(err.name == "TokenExpiredError"){
-        return res.status(500).json({ error: { message: "El token enviado expiró. Inicie nuevamente sesion." } });
+        return res.status(401).json({ error: { message: "El token enviado expiró. Inicie nuevamente sesion." } });
     }
     // Mensaje genérico para otros errores
     let msg = "Ocurrió un error inesperado." + err.errno + "-" + err.message + ". \n Intentalo de nuevo más tarde";

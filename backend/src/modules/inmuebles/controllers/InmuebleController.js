@@ -4,6 +4,8 @@ const inmuebleService = require('../services/InmuebleService'); //Importar el se
 const CustomerService = require('../../usuarios/services/CustomerService');
 const filtroInmueble = require('../services/FiltrosInmuebleService');
 const zonasInmueblesService = require('../services/ZonasInmueblesService');
+const TipoInmueblePerfilService = require('../services/TipoInmueblePerfilService');
+const ZonaService = require('../services/ZonaService');
 const errorHandler = require('../../../utils/ErrorHandler');
 
 const { traerToken } = require('../../../conf/firebaseAuth');
@@ -140,6 +142,26 @@ const getInteresadosInmueble = async (req, res) => {
     }
 };
 
+// Traer informacion requerida para la creacion desde un solo endpoint
+const getInfoCreacion = async(req, res) =>{
+    try {
+        const data = {};
+        const token = await traerToken(req);
+
+        /* Generar datos asociados al usuario */
+        const customerList = await CustomerService.getAllCustomers({idUsuario: token.idUsuario});
+        console.log(customerList);
+        // Traer tipos de inmueble segun el perfil
+        data.tiposInmueble = await TipoInmueblePerfilService.getInmueblesPerfil(null, customerList[0].perfil.idPerfil);
+
+        // Traer las zonas
+        data.zonas = await ZonaService.getAllZonas();
+        console.log(data);
+        res.status(201).json(data); //Se retorna un mensaje si se encuentra un error
+    }catch(err){
+        errorHandler.handleControllerError(res, err, "inmuebles");
+    }
+}
 
 //Editar un inmueble con detalles
 const actualizarInmuebleDetalles = async (req, res) => {
@@ -199,5 +221,6 @@ module.exports = {
     getInmueblesCodigo,
     getInteresadosInmueble,
     actualizarInmuebleDetalles,
+    getInfoCreacion,
     eliminarInmueble
 }; 

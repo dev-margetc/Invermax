@@ -73,7 +73,7 @@ const traerDestacados = async (condiciones = null, whereInmueble = null, atribut
         let destacados = await InmuebleDestacado.findAll({
             where: filtro,
             attributes: {
-                exclude: ["id_inmueble", "fechaInicio", "estadoDestacado", "id_destacado"]
+                exclude: ["id_inmueble", "estadoDestacado", "id_destacado"]
             },
             include: includeInmueble ? [includeInmueble] : [], // Agregar el include si existe
             group: 'idDestacado'

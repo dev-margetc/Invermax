@@ -57,7 +57,6 @@ const handleSequelizeErrors = (error, modulo) => {
 
 // metodo que permite asignar un status a un error especifico. Se llama desde los controllers
 const handleControllerError = (res, error, moduleName) => {
-
     // Verificar si el error es una instancia de ErrorNegocio
     if (error instanceof ErrorNegocio) {
         return res.status(error.statusCode).json({
@@ -67,7 +66,6 @@ const handleControllerError = (res, error, moduleName) => {
             },
         });
     }
-
     const mensajeError = handleSequelizeErrors(error, moduleName);
     if (error.name === 'SequelizeValidationError') {
         return res.status(422).json({ error: {message: mensajeError} }); // 422 para errores de validación

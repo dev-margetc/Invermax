@@ -57,8 +57,8 @@ const verifyCustomToken = async (token) => {
 
 // Traer token
 const traerToken = async (req) => {
-  const token = req.headers.authorization && req.headers.authorization.split(' ')[1]; // Token en el header
-
+  
+  const token = req.headers.authorization && req.headers.authorization.split(' ')[1]; // Token en el header   
   //const decodedToken = await verifyToken(token); // Verificar el token con la función de firebase
   const decodedToken = await verifyCustomToken(token); // Verificar con el token custom
 

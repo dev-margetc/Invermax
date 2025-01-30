@@ -22,6 +22,7 @@ const getAllUsuarios = async (req, res) => {
     }
 };
 
+// Autenticar un usuario y generar  su token
 const autenticarUsuario = async (req, res) => {
     const { idToken } = req.body; // Recibe el idToken de Firebase desde el frontend
     if (!idToken) {

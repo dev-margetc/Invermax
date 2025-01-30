@@ -56,6 +56,8 @@ const setNombre = (params) => {
         nombre = `customer-${idCustomer}`;
     }else if(idServicio){
         nombre = `servicio-${idServicio}`;
+    }else if(idAliado){
+        nombre = `aliado-${idAliado}`;
     }
 
     // Agregar sufijo único con fecha y número aleatorio

@@ -28,9 +28,18 @@ async function verificarPerfilInmueble(idPerfil, idTipoInmueble) {
 //Traer todos los registros dado condiciones
 async function getAllTipoInmueblePerfil(condiciones = null) {
     const filtro = { ...condiciones || {} } // Combinar condiciones extra
-    const tipoInmueblePerfil = await TipoInmueblePerfil.findAll({
-        where: filtro
-    });
+    const tipoInmueblePerfil = await TipoInmueblePerfil.findAll(
+        {
+            attributes: {
+                exclude: ["id_perfil", "id_tipo_inmueble"]
+            },
+            include: [{
+                model: TipoInmueble,
+                as: "tipoInmueble"
+            }],
+            where: filtro
+        }
+    );
 
 
     return tipoInmueblePerfil;

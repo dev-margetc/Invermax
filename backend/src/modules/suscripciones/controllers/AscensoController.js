@@ -16,7 +16,6 @@ const insertarInmuebleAscenso = async (req, res) => {
 
         // Traer dueño del inmueble
         const idCustomer = await filtroService.traerCustomerInmueble(null, idInmueble);
-
         // Validar que sea el dueño
         if (token.tipoUsuario == "admin" || await CustomerService.coincideIdUsuario(token.idUsuario, idCustomer)) {
             let msg = await AscensoService.manejarRegistroAscenso(idInmueble);

@@ -1,7 +1,7 @@
 {
   "informacion_json": "Información a mostrar en el frontend no relacionada a la lógica de la aplicacion",
   "contactInfo": {
-    "telefono": "+1-234-567-890",
+    "telefono": "+1 -343444-1200-499",
     "email": "nuevo_correo@example.com",
     "direccion": "Cll 100# 34",
     "movil": "+57 300 123 4567"
@@ -14,10 +14,8 @@
     "url_linkedin": "https://www.linkedin.com",
     "url_tiktok": "https://www.tiktok.com"
   },
-"legalInfo": {
-  "terminos": "<p>Lorem ipsum dolor sit amet, <strong>consectetur adipiscing elit</strong>. Morbi at varius dolor. <a href='https://example.com'>Visita nuestro sitio</a>. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p><p>In hac habitasse platea dictumst. Sed at tellus pharetra, viverra velit quis, auctor quam. Cras id malesuada magna.</p><ul><li>Ut non eleifend urna.</li><li>Morbi vehicula, justo eu ultrices varius.</li></ul><p><em>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;</em> Ut rhoncus hendrerit risus, vitae pretium nulla euismod a.</p>",
-  "tratamiento_datos": "<p>Lorem ipsum dolor sit amet, <strong>consectetur adipiscing elit</strong>. Morbi at varius dolor. <a href='https://example.com'>Visita nuestro sitio</a>. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p><p>In hac habitasse platea dictumst. Sed at tellus pharetra, viverra velit quis, auctor quam. Cras id malesuada magna.</p><ul><li>Ut non eleifend urna.</li><li>Morbi vehicula, justo eu ultrices varius.</li></ul><p><em>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;</em> Ut rhoncus hendrerit risus, vitae pretium nulla euismod a.</p>"
-
-}
-
+  "legalInfo": {
+    "terminos": "<p>Lorem ipsum dolor sit amet, <strong>consectetur adipiscing elit</strong>. Morbi at varius dolor. <a href='https://example.com'>Visita nuestro sitio</a>. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p><p>In hac habitasse platea dictumst. Sed at tellus pharetra, viverra velit quis, auctor quam. Cras id malesuada magna.</p><ul><li>Ut non eleifend urna.</li><li>Morbi vehicula, justo eu ultrices varius.</li></ul><p><em>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;</em> Ut rhoncus hendrerit risus, vitae pretium nulla euismod a.</p>",
+    "tratamiento_datos": "<p>Lorem ipsum dolor sit amet, <strong>consectetur adipiscing elit</strong>. Morbi at varius dolor. <a href='https://example.com'>Visita nuestro sitio</a>. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p><p>In hac habitasse platea dictumst. Sed at tellus pharetra, viverra velit quis, auctor quam. Cras id malesuada magna.</p><ul><li>Ut non eleifend urna.</li><li>Morbi vehicula, justo eu ultrices varius.</li></ul><p><em>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;</em> Ut rhoncus hendrerit risus, vitae pretium nulla euismod a.</p>"
+  }
 }

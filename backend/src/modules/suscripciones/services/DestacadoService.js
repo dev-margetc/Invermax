@@ -192,7 +192,7 @@ const actualizarDestacadosActivos = async () => {
                     let datos = {};
                     datos.fechaInicio = null;
                     datos.estadoDestacado = 0;
-                    datos.acumulado = nuevoAcumulado;
+                    datos.tiempoAcumulado = nuevoAcumulado;
                     await destacadoRepo.modificarDestacado(datos, destacado.idDestacado);
                 }
                 // Si NO supera el límite, no se hace ninguna actualización 

@@ -73,8 +73,7 @@ const manejarRegistroAscenso = async (idInmueble) => {
 
         // Si el estado del inmueble no es publicado entonces no lo deja
         let inmueble = await InmuebleRepo.getInmuebleByID(idInmueble);
-
-        let dataInmueble = inmueble[0].dataValues;
+        let dataInmueble = inmueble;
 
         // Traer el customer
         let customer = await CustomerService.getAllCustomers({ idCustomer: dataInmueble.customer.idCustomer });
@@ -193,7 +192,7 @@ const actualizarAscendidosActivos = async () => {
                     let datos = {};
                     datos.fechaInicio = null;
                     datos.estadoAscenso = 0;
-                    datos.acumulado = nuevoAcumulado;
+                    datos.tiempoAcumulado = nuevoAcumulado;
                     await ascensoRepo.modificarAscenso(datos, ascendido.idAscenso);
                 }
                 // Si NO supera el límite, no se hace ninguna actualización 
@@ -293,12 +292,13 @@ const desactivarAscendidosVencidos = async () => {
 /* Calcular minutos acumulados de un inmueble en ascenso
  teniendo en cuenta la fecha de inicio y el acumulado de un ascendido */
 function calcularMinutosTranscurridos(inmuebleAscenso) {
-    let ahora = new Date();
-
-    let fechaInicio = inmuebleAscenso.fechaInicio;
-
+    // Si está desactivado como ascenso retornar 0
+    if(inmuebleAscenso.estadoAscenso == 0){
+        return 0;
+    }
+    const ahora = new Date();
+    const fechaInicio = inmuebleAscenso.fechaInicio;
     let minutosTranscurridos = Math.floor((ahora - fechaInicio) / (1000 * 60));
-
     return minutosTranscurridos;
 }
 

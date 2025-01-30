@@ -56,6 +56,9 @@ router.get('/codigo/:codigo', inmuebleController.getInmueblesCodigo);
 // Ruta para traer inmuebles dependiendo de su ID en la BD
 router.get('/:idInmueble', inmuebleController.getInmuebleByID);
 
+// Ruta para traer toda la información requerida para crear un inmueble
+router.get('/configuracion/creacion',protegerRuta(['admin','customer']), inmuebleController.getInfoCreacion);
+
 // ruta para insertar un inmueble (ruta tipo post)
 router.post('/', protegerRuta(['admin', 'customer']), inmuebleController.insertInmueble);
 

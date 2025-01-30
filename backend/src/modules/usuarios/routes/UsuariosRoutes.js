@@ -32,6 +32,11 @@ router.get('/:idUsuario/customer', protegerRuta(['admin', 'customer']), customer
 // Traer información de un customer dado su ID. Ruta para que se use como parametro el id 
 router.get('/customers/:idCustomer', protegerRuta(['admin', 'customer']), customerController.getCustomerByID);
 
+// Ruta para verificar que un token está activo
+router.get('/validar', protegerRuta(['customer', 'admin']), (req, res) => {
+  return res.json({ valid: true });
+});
+
 /* Rutas Post */
 
 //Ruta para autenticar al usuario usando el idToken de firebase
@@ -49,7 +54,9 @@ router.post('/customers/:idCustomer/logo', protegerRuta(['admin', 'customer']), 
 /* Rutas Put */
 
 // Actualizar un customer. Solo puede usarlo el customer iniciado y el admin (GOOGLEAUTH REQUERIDO)
-router.put('/customer/:idCustomer',  protegerRuta(['admin', 'customer']), customerController.actualizarCustomer);
+router.put('/customer/:idCustomer',  
+  protegerRuta(['admin', 'customer']), 
+  customerController.actualizarCustomer);
 /* Rutas delete*/
 
 // Borrar un usuario y customer dado el ID del usuario y del customer. Solo lo puede usar el admin  (GOOGLEAUTH REQUERIDO)

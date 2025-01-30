@@ -110,7 +110,7 @@ const modificarEstadoPago = async (customer) => {
     // Verificar si tiene suscripcion activa
     let suscripcionActiva = await SuscripcionService.getSuscripcionesCustomer(customer.idCustomer, "activa"); // Validar con modulo de suscripciones
     let tieneSuscripcionActiva = false;
-    if (suscripcionActiva) {
+    if (suscripcionActiva && suscripcionActiva.length>0) {
         tieneSuscripcionActiva = true;
     }
     if (tieneSuscripcionActiva && (estadoActual == "inactivo" || estadoActual == "nuevo")) {

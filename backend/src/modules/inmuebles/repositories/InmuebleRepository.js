@@ -26,6 +26,11 @@ const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
       detalles: datosInmueble.detalles // Se manejan luego los detalles
     }, { transaction });
 
+    // Si hay zonas se agregan
+    if(datosInmueble.zonas && datosInmueble.zonas.length>0){
+      await inmueble.addZonas(datosInmueble.zonas, {transaction});
+    }
+
     // Se obtiene el id del inmueble creado
     const inmuebleId = inmueble.idInmueble;
 
