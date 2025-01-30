@@ -57,7 +57,7 @@ const Footer = () => {
           <h5>Otros trámites</h5>
           <ul>
             {servicios && servicios.map((servicio, index) => (
-              <li><a href="#" onClick={handleServiceClick(index)}>{servicio.titulo}</a></li>
+              <li key={index}><a href="#" onClick={handleServiceClick(index)}>{servicio.titulo}</a></li>
             ))}
 
           </ul>

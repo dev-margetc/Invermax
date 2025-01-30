@@ -109,7 +109,7 @@ const Navbar = ({ token, setToken }) => {
               <div className="submenu-content">
                 {servicios && servicios.map((servicio, index) => (
                   // Se pasa el indice o posicion en la lista
-                  <a onClick={handleServiceClick(index)} className="highlight" href="#">
+                  <a key={index} onClick={handleServiceClick(index)} className="highlight" href="#">
                     {servicio.titulo}
                   </a>
                 ))}
@@ -147,9 +147,10 @@ const Navbar = ({ token, setToken }) => {
           <button className="close-button" onClick={toggleMenu}>
             <img src="/img/icons/xmark.svg" alt="exis" loading="lazy" />
           </button>
-          <a href="#" className="arriendo-link" style={{ paddingTop: "65px" }}>
-            Arriendos
-          </a>
+          <a href="#"  className="arriendo-link" style={{ paddingTop: "65px" }}
+          onClick={handleFilterClick({ purpose: "Rentar", category: "", city: null })}>
+            Arriendos</a>
+       
           <div className="submenu">
             <button className="submenu-toggle" onClick={toggleSubmenuComprar}>
               Comprar{" "}
@@ -159,15 +160,7 @@ const Navbar = ({ token, setToken }) => {
             </button>
             {submenuOpenComprar && (
               <div className="submenu-content">
-                <a href="#" className="highlight">
-                  Apartamentos
-                </a>
-                <a href="#" className="highlight">
-                  Casas
-                </a>
-                <a href="#" className="highlight">
-                  Oficinas
-                </a>
+                <TiposInmueblesBanner/>
                 <Link to="/planes" className="highlight">
                   Planes
                 </Link>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { auth } from "../../services/Firebase/Firebase";
 import { signOut } from "firebase/auth";
+import AuthService from "../../services/usuarios/AuthService";
 
 const LogoutButton = ({setToken}) => {
     // Estado para almacenar el email decodificado
@@ -26,29 +27,8 @@ const LogoutButton = ({setToken}) => {
     // Manejar Logout
     const handleLogout = async () => {
         try {
-            await signOut(auth); // Cierra la sesión en Firebase
-
-            // Obtener el token JWT del almacenamiento local
-            const token = localStorage.getItem("token");
-
-            // Elimina el token del almacenamiento local
-            localStorage.removeItem("token");
-
-            // Actualizar el estado del token al padre
-            setToken(null);
-            // Enviar el token al backend para validación
-            const backendUrl = import.meta.env.VITE_BACKEND_URL;
-            const res = await fetch(
-                `${backendUrl}/usuarios/logout`,
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
-                    },
-                }
-            );
-            const redirectUrl = `${window.location.origin}`;
-            window.location.href = redirectUrl;
+            // Cerrar la sesion 
+            await AuthService.logout();
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
         }

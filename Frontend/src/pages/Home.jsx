@@ -26,10 +26,8 @@ const Home = () => {
     const fetchAliados = async () => {
       try {
         const data = await AliadoService.getAliados();
-        console.log(data);
         // Dividir los aliados en grupos y colocarlo en la variable
         setAliados(chunkArray(data, 5));
-        console.log(data);
       } catch (error) {
         console.error("Error al cargar los aliados:", error);
       }
@@ -59,12 +57,12 @@ const Home = () => {
               <div className={`carousel-item ${index === 0 ? "active" : ""}`} key={index}>
                 <div className="d-flex justify-content-center gap-5">
                   {grupo.map((aliado, idx) => (
-                    <a
+                    <a key={idx}
                       href={aliado.urlRedireccion} // URL a la que se redirige
                       target="_blank" // Abre en una nueva pestaña
                       rel="noopener noreferrer" // Seguridad al abrir una nueva pestaña
                     >
-                      <div className="allies-card" key={idx}>
+                      <div className="allies-card" >
                         <img src={aliado.logoAliado ?
                           `${import.meta.env.VITE_RUTA_FOTO_ALIADOS}/${aliado.logoAliado}` :
                           LogoDefault}

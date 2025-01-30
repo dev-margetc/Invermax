@@ -6,6 +6,8 @@ import { formatInmuebleData } from "../utils/inmuebles/InmuebleUtils";
 import { formatProyectoData } from "../utils/inmuebles/ProyectoUtils";
 import { formatFrontendFilter } from "../utils/inmuebles/FilterUtil";
 import { createQueryString } from "../utils/GeneralUtils";
+import AuthService from "../usuarios/AuthService";
+import {clasificarZonas} from "../utils/inmuebles/ZonaUtil";
 
 // Redireccionar a la vista completa de un inmueble dependiendo de modalidad y proyecto, solicita el navigate de react
 const handleNavigate = (item, navigate) => {
@@ -43,8 +45,8 @@ const getInmueblesPublicados = async (filters, navigate = null) => {
             if (response.data.length > 0) {
                 // Realizar la redirección si se encontró
                 handleNavigate(response.data[0], navigate);
-            }else{
-                alert("Inmueble con código: "+filters.code+" no encontrado.");
+            } else {
+                alert("Inmueble con código: " + filters.code + " no encontrado.");
             }
 
         } else {
@@ -123,10 +125,39 @@ const getInmueblesDemanda = async () => {
         return [];
     }
 }
+
+// Traer datos necesarios para la creación de un inmueble
+const getConfiguracionCreacion = async () => {
+    // Traer el token
+    const token = await AuthService.getToken();
+    try {
+        if (token) {
+            const endpoint = '/inmuebles/configuracion/creacion'
+            // ----------------------------------
+            const response = await api.get(endpoint,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Agregar el token en los encabezados
+                    }
+                }
+            );
+            // Convertir datos a los formatos usados en el frontend
+            const data = {};
+            data.zonas = clasificarZonas(response.data.zonas);
+            data.tiposInmueble = response.data.tiposInmueble;
+            return data;
+        } else {
+            alert("Inicie sesión para poder ver esto.");
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
 export default {
     getInmueblesPublicados,
     getInmueblesDestacados,
     getInmueblesDemanda,
     getInmuebleByIDCode,
+    getConfiguracionCreacion,
     handleNavigate
 };
