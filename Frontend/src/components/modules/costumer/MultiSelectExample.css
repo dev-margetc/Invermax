@@ -1,0 +1,160 @@
+.multi-select-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+
+  }
+  
+  .multi-select-container {
+    position: relative;
+    flex: 0;
+    /* min-width: 200px; */
+
+  }
+  
+  .multi-select {
+    width: 229.33px;
+    height: 40px;
+    padding: 11px 12px;
+    border-radius: 6px;
+    border: 1px solid #000;
+    box-sizing: border-box;
+    background-color: #fff;
+    position: relative; /* Esto permite posicionar elementos dentro usando position: absolute */
+  }
+  
+  .arrow-icon {
+    position: absolute; /* Posicionamos el ícono respecto al contenedor */
+    top: 50%; /* Centrado vertical */
+    right: 12px; /* Pegado a la derecha según el padding del contenedor */
+    transform: translateY(-50%) rotate(45deg); /* Centrado vertical y rotación para la flecha */
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border: solid rgb(70, 69, 69);
+    border-width: 0 2px 2px 0;
+  }
+  
+  
+  
+  .dropdown {
+    position: absolute;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000000;
+    margin-top: 3px;
+  }
+  
+  .search-container {
+    position: relative;
+    padding: 10px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 5px 10px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 35px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .options {
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-color: red;
+  }
+  
+  .option-item {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px dotted #000000;
+  }
+  
+  .option-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .selected-options {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .selected-option {
+    background-color: #EFF5F4;
+    padding: 3px 0px 3px 3px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 24;
+    width: auto;
+    font-size: 14px;
+    font-weight: 400;
+  }
+  
+  .remove-btn-multi-select {
+    margin-left: 5px;
+    cursor: pointer;
+    color: red;
+    background: none;
+    border: none;
+    font-size: 16px;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  /* Media queries */
+  @media (max-width: 650px) {
+    .multi-select-wrapper {
+      flex-direction: column;
+    }
+  
+    .multi-select-container {
+      width: 100%;
+    }
+  
+    .dropdown {
+      position: relative;
+      margin-top: 5px;
+    }
+
+    .multi-select {
+        width: 100%;
+        height: 40px;
+        padding: 11px 12px;
+        border-radius: 6px;
+        border: 1px solid #000;
+        box-sizing: border-box;
+        background-color: #fff;
+      }
+  }
+
+
+  .remove-option-icon-container{
+    margin-left: 10px;
+    border-left: 3px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    font-weight: 700;
+  }

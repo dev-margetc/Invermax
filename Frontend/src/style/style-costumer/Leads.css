@@ -1,0 +1,171 @@
+/* leads.css */
+
+.leads {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow: visible; /* Permitir que el contenido se expanda */
+    /* background-color: #ff0000; */
+  }
+
+  .leads .main-container-leads {
+    width: 80%;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: visible;
+  }
+  
+  
+  .leads h1{
+    padding-top: 10px;
+    font-size: 40px;
+    font-weight: 700;
+  }
+
+/* Contenedor principal */
+.leads-container {
+    width: 80%;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: visible;
+  }
+  
+  /* Tabla para vista de escritorio */
+  .leads-table-container {
+    margin: 20px 0;
+  }
+  
+  .leads-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+  }
+  
+  .leads-table-header {
+    background-color: #000;
+    color: #fff;
+  }
+  
+  .leads-th {
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .leads-tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .leads-td {
+    padding: 12px;
+    border-top: 1px solid #ddd;
+  }
+  
+  /* Botón de la tabla */
+  .leads-button {
+    background-color: #000;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .leads-button:hover {
+    background-color: #333;
+  }
+  
+  /* Vista móvil */
+  .leads-mobile-container {
+    margin-top: 20px;
+  }
+  
+  .leads-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .leads-card-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .leads-card-text {
+    margin: 4px 0;
+  }
+  
+  .leads-card-label {
+    font-weight: bold;
+  }
+  
+  .leads-card-button {
+    background-color: #000;
+    color: #fff;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .leads-card-button:hover {
+    background-color: #333;
+  }
+  
+  /* Responsivo */
+  @media (max-width: 994px) {
+    .leads-table-container {
+      display: none;
+    }
+  }
+  
+  @media (min-width: 995px) {
+    .leads-mobile-container {
+      display: none;
+    }
+  }
+  
+
+
+  @media (max-width: 994px) {
+
+
+    .leads{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0px;
+      overflow: visible; /* Permitir que el contenido se expanda */
+      /* background-color: #ff0000; */
+      margin-bottom: 60px;
+    }
+
+    .leads-container {
+        width: 100%;
+        background-color: white;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: visible;
+      }
+
+      .leads-card {
+        border: none;
+        border-radius: none;
+        padding: none;
+        margin-bottom: none;
+        box-shadow: none;
+      }
+}

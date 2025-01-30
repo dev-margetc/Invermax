@@ -1,0 +1,208 @@
+/* mis-inmuebles.css */
+
+.mis-inmuebles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  overflow: visible; /* Permitir que el contenido se expanda */
+  /* background-color: #ff0000; */
+}
+
+.mis-inmuebles .main-container-mis-inmuebles {
+  width: 80%;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: visible;
+}
+
+
+.mis-inmuebles h1{
+  padding-top: 10px;
+  font-size: 40px;
+  font-weight: 700;
+}
+
+/* Estilo general de la tabla */
+.mis-inmuebles-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    /* border: 1px solid #ddd; */
+    border-radius: 8px;
+  }
+  
+  .mis-inmuebles-th,
+  .mis-inmuebles-td {
+    padding: 10px;
+    border-top: 1px dotted #CCCCCC;
+    border-bottom: 1px dotted #CCCCCC;
+    background-color: white;
+  }
+  
+  .mis-inmuebles-th {
+    background-color: #000000;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .mis-inmuebles-tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  /* Estilo de estado */
+  .mis-inmuebles-estado-borrador {
+    color: #ff8c00; /* Naranja para borrador */
+  }
+  
+  .mis-inmuebles-estado-publicado {
+    color: #28a745; /* Verde para publicado */
+  }
+  
+  /* Botones */
+  .mis-inmuebles-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .mis-inmuebles-edit-button {
+    background-color: white;
+    
+  }
+  
+  .mis-inmuebles-delete-button {
+    background-color: white;
+  }
+  
+  /* Tarjetas para vista móvil */
+  .mis-inmuebles-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mis-inmuebles-card-mobile {
+    background-color: #fff;
+  }
+  
+  .mis-inmuebles-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .mis-inmuebles-codigo,
+  .mis-inmuebles-dias,
+  .mis-inmuebles-horas {
+    margin: 4px 0;
+  }
+  
+  /* Checkbox y grupo */
+  .mis-inmuebles-checkbox-group label {
+    display: flex;
+    align-items: center;
+    margin: 4px 0;
+  }
+  
+  .mis-inmuebles-checkbox {
+    margin-right: 8px;
+  }
+  
+  /* Acciones */
+  .mis-inmuebles-actions {
+    display: grid;
+    margin-top: 16px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+
+@media (min-width: 995px) {
+    .mis-inmuebles-table {
+      display: block;
+    }
+  
+    .mis-inmuebles-card {
+      display: block;
+    }
+  
+    .mis-inmuebles-card-mobile {
+      display: none;
+    }
+}
+
+  @media (max-width: 994px) {
+    .mis-inmuebles-table {
+      display: none;
+    }
+  
+    .mis-inmuebles-card {
+      display: none;
+    }
+  
+    .mis-inmuebles-card-mobile {
+      display: block;
+    }
+
+    .mis-inmuebles h1{
+      font-size: 24px;
+      font-weight: 700;
+      padding: 20px 0px;
+    }
+
+    .mis-inmuebles .main-container-mis-inmuebles {
+      width: 100%;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      overflow: visible;
+    }
+
+    .mis-inmuebles-card {
+      border: none;
+      border-radius: none;
+      padding: none;
+      margin-bottom: none;
+      box-shadow: none;
+    }
+
+    .mis-inmuebles {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0px;
+      overflow: visible; /* Permitir que el contenido se expanda */
+      /* background-color: #ff0000; */
+    }
+
+
+    .mis-inmuebles-delete-button {
+      background-color: white;
+      border: solid 1px red;
+      color: red;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .mis-inmuebles-edit-button {
+      background-color: #50B51A;
+      font-weight: 700;
+      font-size: 16px;
+      color: white;
+      
+    }
+}
+
+.mis-inmuebles-checkbox {
+  accent-color: red; /* Cambia el color del checkbox a rojo */
+}

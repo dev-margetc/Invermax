@@ -19,3 +19,4 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 // Exportar servicios
 export { auth, provider, signInWithPopup, signInWithRedirect, getRedirectResult };
+ 
