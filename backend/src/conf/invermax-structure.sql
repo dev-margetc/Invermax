@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-01-2025 a las 19:33:06
+-- Tiempo de generación: 30-01-2025 a las 16:43:42
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -24,16 +24,32 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `aliados`
+--
+
+CREATE TABLE IF NOT EXISTS `aliados` (
+  `id_aliado` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre_aliado` varchar(50) NOT NULL,
+  `logo_aliado` varchar(50) DEFAULT NULL COMMENT 'Nombre de la foto guardada en el servidor',
+  `url_redireccion` varchar(50) NOT NULL COMMENT 'Url de pagina del aliado',
+  PRIMARY KEY (`id_aliado`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `blogs`
 --
 
-CREATE TABLE `blogs` (
-  `id_blog` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `blogs` (
+  `id_blog` int(11) NOT NULL AUTO_INCREMENT,
   `titulo_blog` varchar(50) NOT NULL,
   `contenido` text NOT NULL,
   `fecha_creacion` datetime NOT NULL,
   `foto_principal` varchar(50) DEFAULT NULL COMMENT 'Nombre de la foto principal del blog',
-  `id_autor` int(11) NOT NULL COMMENT 'Es el id del usuario que creó el blog'
+  `id_autor` int(11) NOT NULL COMMENT 'Es el id del usuario que creó el blog',
+  PRIMARY KEY (`id_blog`),
+  KEY `id_autor` (`id_autor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Guarda los blogs de la BD';
 
 -- --------------------------------------------------------
@@ -42,12 +58,14 @@ CREATE TABLE `blogs` (
 -- Estructura de tabla para la tabla `caracteristicas`
 --
 
-CREATE TABLE `caracteristicas` (
-  `id_caracteristica` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `caracteristicas` (
+  `id_caracteristica` int(11) NOT NULL AUTO_INCREMENT,
   `nombre_caracteristica` varchar(50) NOT NULL,
   `descripcion` varchar(200) NOT NULL COMMENT 'Descripción mas detallada en caso de ocuparse',
   `clave` varchar(25) NOT NULL COMMENT 'Valor único que permite buscar en la BD y permitirá no basarse en el nombre para consultas',
-  `obligatoria` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0-- No es obligatoria\r\n1-- Obligatoria'
+  `obligatoria` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0-- No es obligatoria\r\n1-- Obligatoria',
+  PRIMARY KEY (`id_caracteristica`),
+  UNIQUE KEY `clave` (`clave`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Caracteristicas de los planes';
 
 -- --------------------------------------------------------
@@ -56,10 +74,13 @@ CREATE TABLE `caracteristicas` (
 -- Estructura de tabla para la tabla `caracteristicas_planes`
 --
 
-CREATE TABLE `caracteristicas_planes` (
+CREATE TABLE IF NOT EXISTS `caracteristicas_planes` (
   `id_plan` int(11) NOT NULL,
   `id_caracteristica` int(11) NOT NULL,
-  `valor_caracteristica` varchar(25) NOT NULL COMMENT 'Define el valor de la caracteristica asociada en el plan asociado'
+  `valor_caracteristica` varchar(25) NOT NULL COMMENT 'Define el valor de la caracteristica asociada en el plan asociado',
+  PRIMARY KEY (`id_plan`,`id_caracteristica`),
+  KEY `id_plan` (`id_plan`),
+  KEY `id_caracteristica` (`id_caracteristica`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -68,9 +89,10 @@ CREATE TABLE `caracteristicas_planes` (
 -- Estructura de tabla para la tabla `categorias`
 --
 
-CREATE TABLE `categorias` (
-  `id_categoria` int(11) NOT NULL,
-  `nombre_categoria` varchar(25) NOT NULL
+CREATE TABLE IF NOT EXISTS `categorias` (
+  `id_categoria` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre_categoria` varchar(25) NOT NULL,
+  PRIMARY KEY (`id_categoria`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -79,9 +101,11 @@ CREATE TABLE `categorias` (
 -- Estructura de tabla para la tabla `categorias_blogs`
 --
 
-CREATE TABLE `categorias_blogs` (
+CREATE TABLE IF NOT EXISTS `categorias_blogs` (
   `id_categoria` int(11) NOT NULL,
-  `id_blog` int(11) NOT NULL
+  `id_blog` int(11) NOT NULL,
+  PRIMARY KEY (`id_categoria`,`id_blog`),
+  KEY `id_blog` (`id_blog`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -90,10 +114,12 @@ CREATE TABLE `categorias_blogs` (
 -- Estructura de tabla para la tabla `ciudades`
 --
 
-CREATE TABLE `ciudades` (
-  `cod_ciudad` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `ciudades` (
+  `cod_ciudad` int(11) NOT NULL AUTO_INCREMENT,
   `nombre_ciudad` varchar(20) NOT NULL,
-  `id_departamento` int(11) NOT NULL
+  `id_departamento` int(11) NOT NULL,
+  PRIMARY KEY (`cod_ciudad`),
+  KEY `id_municipio` (`id_departamento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -102,8 +128,8 @@ CREATE TABLE `ciudades` (
 -- Estructura de tabla para la tabla `customers`
 --
 
-CREATE TABLE `customers` (
-  `id_customer` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `customers` (
+  `id_customer` int(11) NOT NULL AUTO_INCREMENT,
   `nombre_customer` varchar(50) NOT NULL,
   `logo_customer` varchar(255) DEFAULT NULL COMMENT 'Contiene la URL con el logo de la inmobiliaria',
   `correo_notificaciones` varchar(50) NOT NULL,
@@ -113,7 +139,12 @@ CREATE TABLE `customers` (
   `numero_comercial` varchar(25) DEFAULT NULL,
   `estado_customer` varchar(25) NOT NULL DEFAULT 'inactivo' COMMENT 'Estados posibles: "activo", "inactivo", "nuevo"',
   `id_usuario` int(11) NOT NULL,
-  `id_perfil` int(11) NOT NULL COMMENT 'id del perfil asociado a este customer'
+  `id_perfil` int(11) NOT NULL COMMENT 'id del perfil asociado a este customer',
+  PRIMARY KEY (`id_customer`),
+  UNIQUE KEY `codigo_inmobiliaria` (`codigo_customer`),
+  KEY `id_inmobiliaria` (`id_customer`),
+  KEY `id_usuario` (`id_usuario`),
+  KEY `id_perfil` (`id_perfil`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene a los usuarios tipo inmobiliaria';
 
 --
@@ -138,9 +169,10 @@ DELIMITER ;
 -- Estructura de tabla para la tabla `departamentos`
 --
 
-CREATE TABLE `departamentos` (
-  `id_departamento` int(11) NOT NULL,
-  `nombre_departamento` varchar(25) NOT NULL
+CREATE TABLE IF NOT EXISTS `departamentos` (
+  `id_departamento` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre_departamento` varchar(25) NOT NULL,
+  PRIMARY KEY (`id_departamento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -149,8 +181,8 @@ CREATE TABLE `departamentos` (
 -- Estructura de tabla para la tabla `detalles_inmuebles`
 --
 
-CREATE TABLE `detalles_inmuebles` (
-  `id_detalle` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `detalles_inmuebles` (
+  `id_detalle` int(11) NOT NULL AUTO_INCREMENT,
   `valor_inmueble` decimal(12,2) NOT NULL COMMENT 'Valor definido como COP',
   `area` int(11) NOT NULL COMMENT 'Area definida en metros cuadrados',
   `iframe_recorrido` varchar(255) DEFAULT NULL COMMENT 'Solo se guarda la URL del iframe del recorrido virtual',
@@ -159,7 +191,10 @@ CREATE TABLE `detalles_inmuebles` (
   `parqueadero` varchar(25) NOT NULL COMMENT 'Posibles valores: ''Sí, carros'',''Sí, moto'',''No''',
   `amoblado` tinyint(1) NOT NULL COMMENT '0 indica que no es amoblado, 1 indica que sí',
   `id_inmueble` int(11) NOT NULL,
-  `id_proyecto` int(11) DEFAULT NULL COMMENT 'Referencia al proyecto. si es null es porque no pertenece a un proyecto'
+  `id_proyecto` int(11) DEFAULT NULL COMMENT 'Referencia al proyecto. si es null es porque no pertenece a un proyecto',
+  PRIMARY KEY (`id_detalle`),
+  KEY `id_inmueble` (`id_inmueble`),
+  KEY `id_proyecto` (`id_proyecto`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene detalles de los inmuebles y separar proyectos';
 
 -- --------------------------------------------------------
@@ -168,11 +203,14 @@ CREATE TABLE `detalles_inmuebles` (
 -- Estructura de tabla para la tabla `fotos`
 --
 
-CREATE TABLE `fotos` (
-  `id_foto` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `fotos` (
+  `id_foto` int(11) NOT NULL AUTO_INCREMENT,
   `url_foto` varchar(255) NOT NULL,
   `id_detalle_inmueble` int(11) DEFAULT NULL,
-  `id_blog` int(11) DEFAULT NULL COMMENT 'id del blog al que pertenece la foto'
+  `id_blog` int(11) DEFAULT NULL COMMENT 'id del blog al que pertenece la foto',
+  PRIMARY KEY (`id_foto`),
+  KEY `id_detalle_inmueble` (`id_detalle_inmueble`),
+  KEY `id_blog` (`id_blog`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -181,8 +219,8 @@ CREATE TABLE `fotos` (
 -- Estructura de tabla para la tabla `inmuebles`
 --
 
-CREATE TABLE `inmuebles` (
-  `id_inmueble` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `inmuebles` (
+  `id_inmueble` int(11) NOT NULL AUTO_INCREMENT,
   `codigo_inmueble` varchar(30) NOT NULL COMMENT 'Codigo unico de un inmueble dado por alguna entidad',
   `descripcion` text NOT NULL,
   `ubicacion_inmueble` varchar(50) NOT NULL COMMENT 'Dirección del inmueble',
@@ -197,7 +235,12 @@ CREATE TABLE `inmuebles` (
   `fecha_publicacion` datetime DEFAULT NULL COMMENT 'Fecha de publicacion, es null cuando no está publicado el inmueble',
   `id_customer` int(11) NOT NULL,
   `cod_ciudad` int(11) NOT NULL,
-  `id_tipo_inmueble` int(11) NOT NULL
+  `id_tipo_inmueble` int(11) NOT NULL,
+  PRIMARY KEY (`id_inmueble`),
+  UNIQUE KEY `codigo_inmueble` (`codigo_inmueble`),
+  KEY `id_inmobiliaria` (`id_customer`),
+  KEY `cod_ciudad` (`cod_ciudad`),
+  KEY `id_tipo_inmueble` (`id_tipo_inmueble`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -252,13 +295,15 @@ DELIMITER ;
 -- Estructura de tabla para la tabla `inmuebles_destacados`
 --
 
-CREATE TABLE `inmuebles_destacados` (
-  `id_destacado` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `inmuebles_destacados` (
+  `id_destacado` int(11) NOT NULL AUTO_INCREMENT,
   `fecha_inicio` datetime DEFAULT NULL COMMENT 'Fecha y hora de cuando se marcó como destacado la primera vez. Permite luego calcular cuantos días le quedan',
   `estado_destacado` tinyint(1) NOT NULL COMMENT 'Cuando tiene su valor en activo se hará el calculo para descontar los días del plan. 0 inactivo, 1 activo',
   `tiempo_acumulado` int(11) NOT NULL COMMENT 'En minutos, refleja cuanto tiempo lleva el inmueble como destacado',
   `codigo_periodo` varchar(10) NOT NULL COMMENT 'periodo de tiempo correspondiente a la suscripción activa \r\n        * en el que un inmueble es marcado como destacado',
-  `id_inmueble` int(11) DEFAULT NULL
+  `id_inmueble` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id_destacado`),
+  KEY `id_inmueble` (`id_inmueble`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -267,13 +312,15 @@ CREATE TABLE `inmuebles_destacados` (
 -- Estructura de tabla para la tabla `inmuebles_en_ascenso`
 --
 
-CREATE TABLE `inmuebles_en_ascenso` (
-  `id_ascenso` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `inmuebles_en_ascenso` (
+  `id_ascenso` int(11) NOT NULL AUTO_INCREMENT,
   `fecha_inicio` datetime DEFAULT NULL COMMENT 'Fecha de inicio del inmueble como "en ascenso"',
   `estado_ascenso` tinyint(1) NOT NULL COMMENT 'Verdadero si está en ascenso falso si no. Se usa para descontar las horas del plan',
   `tiempo_acumulado` int(11) NOT NULL,
   `codigo_periodo` varchar(15) NOT NULL,
-  `id_inmueble` int(11) DEFAULT NULL
+  `id_inmueble` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id_ascenso`),
+  KEY `id_inmueble` (`id_inmueble`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -282,15 +329,17 @@ CREATE TABLE `inmuebles_en_ascenso` (
 -- Estructura de tabla para la tabla `interesados`
 --
 
-CREATE TABLE `interesados` (
-  `id_interesado` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `interesados` (
+  `id_interesado` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL COMMENT 'Nombre completo del interesado',
   `telefono` varchar(20) NOT NULL,
   `correo` varchar(50) NOT NULL,
   `ubicacion` varchar(25) NOT NULL COMMENT 'Puede ser rural o urbana',
   `subsidio` tinyint(1) NOT NULL COMMENT 'Con o sin subsidio. Con: True, Sin: False',
   `estado_civil` varchar(40) NOT NULL,
-  `id_inmueble` int(11) NOT NULL COMMENT 'Inmueble al cual está interesado el usuario'
+  `id_inmueble` int(11) NOT NULL COMMENT 'Inmueble al cual está interesado el usuario',
+  PRIMARY KEY (`id_interesado`),
+  KEY `id_inmueble` (`id_inmueble`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -299,9 +348,10 @@ CREATE TABLE `interesados` (
 -- Estructura de tabla para la tabla `perfiles_customer`
 --
 
-CREATE TABLE `perfiles_customer` (
-  `id_perfil` int(11) NOT NULL,
-  `perfil` varchar(25) NOT NULL
+CREATE TABLE IF NOT EXISTS `perfiles_customer` (
+  `id_perfil` int(11) NOT NULL AUTO_INCREMENT,
+  `perfil` varchar(25) NOT NULL,
+  PRIMARY KEY (`id_perfil`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Perfiles de los diferentes customer';
 
 -- --------------------------------------------------------
@@ -310,11 +360,13 @@ CREATE TABLE `perfiles_customer` (
 -- Estructura de tabla para la tabla `planes`
 --
 
-CREATE TABLE `planes` (
-  `id_plan` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `planes` (
+  `id_plan` int(11) NOT NULL AUTO_INCREMENT,
   `tipo_plan` varchar(50) NOT NULL COMMENT 'Nombre del plan',
   `estado_plan` tinyint(1) NOT NULL COMMENT '0 inactivo, 1 activo',
-  `id_perfil` int(11) NOT NULL COMMENT 'id del perfil customer asociado a este plan'
+  `id_perfil` int(11) NOT NULL COMMENT 'id del perfil customer asociado a este plan',
+  PRIMARY KEY (`id_plan`),
+  KEY `id_perfil_customer` (`id_perfil`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -323,12 +375,14 @@ CREATE TABLE `planes` (
 -- Estructura de tabla para la tabla `precios_planes`
 --
 
-CREATE TABLE `precios_planes` (
-  `id_precio_plan` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `precios_planes` (
+  `id_precio_plan` int(11) NOT NULL AUTO_INCREMENT,
   `precio` decimal(10,2) NOT NULL,
   `duracion` int(11) DEFAULT NULL COMMENT 'Duracion en meses',
   `estado_precio` tinyint(1) NOT NULL COMMENT '0 inactivo, 1 activo',
-  `id_plan` int(11) NOT NULL
+  `id_plan` int(11) NOT NULL,
+  PRIMARY KEY (`id_precio_plan`),
+  KEY `id_plan` (`id_plan`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Guarda detalles de precio y duracion de los planes';
 
 -- --------------------------------------------------------
@@ -337,10 +391,12 @@ CREATE TABLE `precios_planes` (
 -- Estructura de tabla para la tabla `proyectos`
 --
 
-CREATE TABLE `proyectos` (
-  `id_proyecto` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `proyectos` (
+  `id_proyecto` int(11) NOT NULL AUTO_INCREMENT,
   `fecha_entrega` date NOT NULL,
-  `id_inmueble` int(11) NOT NULL COMMENT 'Referencia al inmueble para acceder a sus datos'
+  `id_inmueble` int(11) NOT NULL COMMENT 'Referencia al inmueble para acceder a sus datos',
+  PRIMARY KEY (`id_proyecto`),
+  KEY `id_inmueble` (`id_inmueble`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Contiene datos particulares de los proyectos';
 
 -- --------------------------------------------------------
@@ -349,10 +405,13 @@ CREATE TABLE `proyectos` (
 -- Estructura de tabla para la tabla `saldos_caracteristicas`
 --
 
-CREATE TABLE `saldos_caracteristicas` (
+CREATE TABLE IF NOT EXISTS `saldos_caracteristicas` (
   `id_suscripcion` int(11) NOT NULL,
   `id_caracteristica` int(11) NOT NULL,
-  `capacidad_disponible` decimal(10,2) DEFAULT NULL COMMENT 'Muestra qué tanto de la caracteristica le queda a la suscripción'
+  `capacidad_disponible` decimal(10,2) DEFAULT NULL COMMENT 'Muestra qué tanto de la caracteristica le queda a la suscripción',
+  PRIMARY KEY (`id_suscripcion`,`id_caracteristica`),
+  KEY `id_suscripción` (`id_suscripcion`),
+  KEY `id_caracteristica` (`id_caracteristica`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='"cuanto" de una característica le queda a una suscripción';
 
 -- --------------------------------------------------------
@@ -361,13 +420,15 @@ CREATE TABLE `saldos_caracteristicas` (
 -- Estructura de tabla para la tabla `servicios`
 --
 
-CREATE TABLE `servicios` (
-  `id_servicio` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `servicios` (
+  `id_servicio` int(11) NOT NULL AUTO_INCREMENT,
   `codigo` varchar(50) NOT NULL COMMENT 'Código para identificar los servicios sin depender del id o el nombre',
   `nombre` varchar(50) NOT NULL COMMENT 'Nombre del servicio',
   `descripcion` text NOT NULL COMMENT 'Descripción del servicio',
   `foto_servicio` varchar(50) DEFAULT NULL COMMENT 'Guarda el nombre de la foto, la ruta e establece en el frontend',
-  `precio` decimal(10,2) NOT NULL COMMENT 'Precio del servicio en COP'
+  `precio` decimal(10,2) NOT NULL COMMENT 'Precio del servicio en COP',
+  PRIMARY KEY (`id_servicio`),
+  UNIQUE KEY `codigo` (`codigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Permite guardar los servicios ofrecidos por INVERMAX';
 
 -- --------------------------------------------------------
@@ -376,8 +437,8 @@ CREATE TABLE `servicios` (
 -- Estructura de tabla para la tabla `suscripciones`
 --
 
-CREATE TABLE `suscripciones` (
-  `id_suscripcion` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `suscripciones` (
+  `id_suscripcion` int(11) NOT NULL AUTO_INCREMENT,
   `fecha_inicio` datetime NOT NULL,
   `fecha_fin` datetime DEFAULT NULL,
   `medio_pago` varchar(25) DEFAULT NULL,
@@ -386,7 +447,10 @@ CREATE TABLE `suscripciones` (
   `monto_pagado` decimal(10,2) DEFAULT NULL,
   `estado` varchar(25) NOT NULL COMMENT 'POSIBLES ESTADOS= "activa", "inactiva", "pendiente"',
   `id_customer` int(11) NOT NULL COMMENT 'Referencia al suscriptor del plan',
-  `id_precio_plan` int(11) NOT NULL COMMENT 'Referencia al precio y duración del plan'
+  `id_precio_plan` int(11) NOT NULL COMMENT 'Referencia al precio y duración del plan',
+  PRIMARY KEY (`id_suscripcion`),
+  KEY `id_customer` (`id_customer`),
+  KEY `id_precio_plan` (`id_precio_plan`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -395,9 +459,10 @@ CREATE TABLE `suscripciones` (
 -- Estructura de tabla para la tabla `tipos_inmueble`
 --
 
-CREATE TABLE `tipos_inmueble` (
-  `id_tipo_inmueble` int(11) NOT NULL,
-  `tipo_inmueble` varchar(25) NOT NULL
+CREATE TABLE IF NOT EXISTS `tipos_inmueble` (
+  `id_tipo_inmueble` int(11) NOT NULL AUTO_INCREMENT,
+  `tipo_inmueble` varchar(25) NOT NULL,
+  PRIMARY KEY (`id_tipo_inmueble`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -406,9 +471,12 @@ CREATE TABLE `tipos_inmueble` (
 -- Estructura de tabla para la tabla `tipo_inmueble_perfil`
 --
 
-CREATE TABLE `tipo_inmueble_perfil` (
+CREATE TABLE IF NOT EXISTS `tipo_inmueble_perfil` (
   `id_tipo_inmueble` int(11) NOT NULL,
-  `id_perfil` int(11) NOT NULL
+  `id_perfil` int(11) NOT NULL,
+  PRIMARY KEY (`id_tipo_inmueble`,`id_perfil`),
+  KEY `id_tipo_inmueble` (`id_tipo_inmueble`),
+  KEY `id_perfil` (`id_perfil`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Define tipos de inmueble que pueden ser creados por perfiles';
 
 -- --------------------------------------------------------
@@ -417,11 +485,13 @@ CREATE TABLE `tipo_inmueble_perfil` (
 -- Estructura de tabla para la tabla `usuarios`
 --
 
-CREATE TABLE `usuarios` (
-  `id_usuario` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `id_usuario` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(50) NOT NULL,
   `tipo_usuario` varchar(25) NOT NULL COMMENT 'Estos pueden ser,''customer'',''admin''',
-  `UID_firebase` varchar(50) DEFAULT NULL COMMENT 'Unique ID que da firebase'
+  `UID_firebase` varchar(50) DEFAULT NULL COMMENT 'Unique ID que da firebase',
+  PRIMARY KEY (`id_usuario`),
+  UNIQUE KEY `UID_firebase` (`UID_firebase`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -430,11 +500,14 @@ CREATE TABLE `usuarios` (
 -- Estructura de tabla para la tabla `videos`
 --
 
-CREATE TABLE `videos` (
-  `id_video` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `videos` (
+  `id_video` int(11) NOT NULL AUTO_INCREMENT,
   `url_video` varchar(255) NOT NULL,
   `id_detalle_inmueble` int(11) DEFAULT NULL,
-  `id_blog` int(11) DEFAULT NULL COMMENT 'Id del blog al que pertenece la imagen'
+  `id_blog` int(11) DEFAULT NULL COMMENT 'Id del blog al que pertenece la imagen',
+  PRIMARY KEY (`id_video`),
+  KEY `id_negocio` (`id_detalle_inmueble`),
+  KEY `id_blog` (`id_blog`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -443,7 +516,7 @@ CREATE TABLE `videos` (
 -- Estructura Stand-in para la vista `vista_inmuebles_filtros`
 -- (Véase abajo para la vista actual)
 --
-CREATE TABLE `vista_inmuebles_filtros` (
+CREATE TABLE IF NOT EXISTS `vista_inmuebles_filtros` (
 `id_inmueble` int(11)
 ,`estado_inmueble` varchar(25)
 ,`modalidad` varchar(15)
@@ -465,7 +538,7 @@ CREATE TABLE `vista_inmuebles_filtros` (
 -- Estructura Stand-in para la vista `vista_inmuebles_publicados`
 -- (Véase abajo para la vista actual)
 --
-CREATE TABLE `vista_inmuebles_publicados` (
+CREATE TABLE IF NOT EXISTS `vista_inmuebles_publicados` (
 `id_inmueble` int(11)
 ,`estado_inmueble` varchar(25)
 ,`modalidad` varchar(15)
@@ -482,11 +555,12 @@ CREATE TABLE `vista_inmuebles_publicados` (
 -- Estructura de tabla para la tabla `zonas`
 --
 
-CREATE TABLE `zonas` (
-  `id_zona` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `zonas` (
+  `id_zona` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(25) NOT NULL,
   `icono` varchar(25) DEFAULT NULL,
-  `tipo_zona` varchar(25) NOT NULL COMMENT '"Zona de interés" o "zona común"'
+  `tipo_zona` varchar(25) NOT NULL COMMENT '"Zona de interés" o "zona común"',
+  PRIMARY KEY (`id_zona`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Zonas de interes o comunes para los inmuebles ';
 
 -- --------------------------------------------------------
@@ -495,9 +569,11 @@ CREATE TABLE `zonas` (
 -- Estructura de tabla para la tabla `zonas_inmuebles`
 --
 
-CREATE TABLE `zonas_inmuebles` (
+CREATE TABLE IF NOT EXISTS `zonas_inmuebles` (
   `id_inmueble` int(11) NOT NULL,
-  `id_zona` int(11) NOT NULL
+  `id_zona` int(11) NOT NULL,
+  PRIMARY KEY (`id_inmueble`,`id_zona`),
+  KEY `id_zona` (`id_zona`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Intermedia entre los inmuebles y las zonas';
 
 -- --------------------------------------------------------
@@ -517,343 +593,6 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `vista_inmuebles_publicados`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_inmuebles_publicados`  AS SELECT `inmuebles`.`id_inmueble` AS `id_inmueble`, `inmuebles`.`estado_inmueble` AS `estado_inmueble`, `inmuebles`.`modalidad` AS `modalidad`, `inmuebles`.`titulo_inmueble` AS `titulo_inmueble`, `inmuebles`.`fecha_publicacion` AS `fecha_publicacion`, `inmuebles`.`id_customer` AS `id_customer`, `inmuebles`.`cod_ciudad` AS `cod_ciudad`, `inmuebles`.`id_tipo_inmueble` AS `id_tipo_inmueble` FROM `inmuebles` WHERE `inmuebles`.`estado_publicacion` = 'publicado' ORDER BY `inmuebles`.`fecha_publicacion` ASC ;
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `blogs`
---
-ALTER TABLE `blogs`
-  ADD PRIMARY KEY (`id_blog`),
-  ADD KEY `id_autor` (`id_autor`);
-
---
--- Indices de la tabla `caracteristicas`
---
-ALTER TABLE `caracteristicas`
-  ADD PRIMARY KEY (`id_caracteristica`),
-  ADD UNIQUE KEY `clave` (`clave`);
-
---
--- Indices de la tabla `caracteristicas_planes`
---
-ALTER TABLE `caracteristicas_planes`
-  ADD PRIMARY KEY (`id_plan`,`id_caracteristica`),
-  ADD KEY `id_plan` (`id_plan`),
-  ADD KEY `id_caracteristica` (`id_caracteristica`);
-
---
--- Indices de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  ADD PRIMARY KEY (`id_categoria`);
-
---
--- Indices de la tabla `categorias_blogs`
---
-ALTER TABLE `categorias_blogs`
-  ADD PRIMARY KEY (`id_categoria`,`id_blog`),
-  ADD KEY `id_blog` (`id_blog`);
-
---
--- Indices de la tabla `ciudades`
---
-ALTER TABLE `ciudades`
-  ADD PRIMARY KEY (`cod_ciudad`),
-  ADD KEY `id_municipio` (`id_departamento`);
-
---
--- Indices de la tabla `customers`
---
-ALTER TABLE `customers`
-  ADD PRIMARY KEY (`id_customer`),
-  ADD UNIQUE KEY `codigo_inmobiliaria` (`codigo_customer`),
-  ADD KEY `id_inmobiliaria` (`id_customer`),
-  ADD KEY `id_usuario` (`id_usuario`),
-  ADD KEY `id_perfil` (`id_perfil`);
-
---
--- Indices de la tabla `departamentos`
---
-ALTER TABLE `departamentos`
-  ADD PRIMARY KEY (`id_departamento`);
-
---
--- Indices de la tabla `detalles_inmuebles`
---
-ALTER TABLE `detalles_inmuebles`
-  ADD PRIMARY KEY (`id_detalle`),
-  ADD KEY `id_inmueble` (`id_inmueble`),
-  ADD KEY `id_proyecto` (`id_proyecto`);
-
---
--- Indices de la tabla `fotos`
---
-ALTER TABLE `fotos`
-  ADD PRIMARY KEY (`id_foto`),
-  ADD KEY `id_detalle_inmueble` (`id_detalle_inmueble`),
-  ADD KEY `id_blog` (`id_blog`);
-
---
--- Indices de la tabla `inmuebles`
---
-ALTER TABLE `inmuebles`
-  ADD PRIMARY KEY (`id_inmueble`),
-  ADD UNIQUE KEY `codigo_inmueble` (`codigo_inmueble`),
-  ADD KEY `id_inmobiliaria` (`id_customer`),
-  ADD KEY `cod_ciudad` (`cod_ciudad`),
-  ADD KEY `id_tipo_inmueble` (`id_tipo_inmueble`);
-
---
--- Indices de la tabla `inmuebles_destacados`
---
-ALTER TABLE `inmuebles_destacados`
-  ADD PRIMARY KEY (`id_destacado`),
-  ADD KEY `id_inmueble` (`id_inmueble`);
-
---
--- Indices de la tabla `inmuebles_en_ascenso`
---
-ALTER TABLE `inmuebles_en_ascenso`
-  ADD PRIMARY KEY (`id_ascenso`),
-  ADD KEY `id_inmueble` (`id_inmueble`);
-
---
--- Indices de la tabla `interesados`
---
-ALTER TABLE `interesados`
-  ADD PRIMARY KEY (`id_interesado`),
-  ADD KEY `id_inmueble` (`id_inmueble`);
-
---
--- Indices de la tabla `perfiles_customer`
---
-ALTER TABLE `perfiles_customer`
-  ADD PRIMARY KEY (`id_perfil`);
-
---
--- Indices de la tabla `planes`
---
-ALTER TABLE `planes`
-  ADD PRIMARY KEY (`id_plan`),
-  ADD KEY `id_perfil_customer` (`id_perfil`);
-
---
--- Indices de la tabla `precios_planes`
---
-ALTER TABLE `precios_planes`
-  ADD PRIMARY KEY (`id_precio_plan`),
-  ADD KEY `id_plan` (`id_plan`);
-
---
--- Indices de la tabla `proyectos`
---
-ALTER TABLE `proyectos`
-  ADD PRIMARY KEY (`id_proyecto`),
-  ADD KEY `id_inmueble` (`id_inmueble`);
-
---
--- Indices de la tabla `saldos_caracteristicas`
---
-ALTER TABLE `saldos_caracteristicas`
-  ADD PRIMARY KEY (`id_suscripcion`,`id_caracteristica`),
-  ADD KEY `id_suscripción` (`id_suscripcion`),
-  ADD KEY `id_caracteristica` (`id_caracteristica`);
-
---
--- Indices de la tabla `servicios`
---
-ALTER TABLE `servicios`
-  ADD PRIMARY KEY (`id_servicio`),
-  ADD UNIQUE KEY `codigo` (`codigo`);
-
---
--- Indices de la tabla `suscripciones`
---
-ALTER TABLE `suscripciones`
-  ADD PRIMARY KEY (`id_suscripcion`),
-  ADD KEY `id_customer` (`id_customer`),
-  ADD KEY `id_precio_plan` (`id_precio_plan`);
-
---
--- Indices de la tabla `tipos_inmueble`
---
-ALTER TABLE `tipos_inmueble`
-  ADD PRIMARY KEY (`id_tipo_inmueble`);
-
---
--- Indices de la tabla `tipo_inmueble_perfil`
---
-ALTER TABLE `tipo_inmueble_perfil`
-  ADD PRIMARY KEY (`id_tipo_inmueble`,`id_perfil`),
-  ADD KEY `id_tipo_inmueble` (`id_tipo_inmueble`),
-  ADD KEY `id_perfil` (`id_perfil`);
-
---
--- Indices de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id_usuario`),
-  ADD UNIQUE KEY `UID_firebase` (`UID_firebase`);
-
---
--- Indices de la tabla `videos`
---
-ALTER TABLE `videos`
-  ADD PRIMARY KEY (`id_video`),
-  ADD KEY `id_negocio` (`id_detalle_inmueble`),
-  ADD KEY `id_blog` (`id_blog`);
-
---
--- Indices de la tabla `zonas`
---
-ALTER TABLE `zonas`
-  ADD PRIMARY KEY (`id_zona`);
-
---
--- Indices de la tabla `zonas_inmuebles`
---
-ALTER TABLE `zonas_inmuebles`
-  ADD PRIMARY KEY (`id_inmueble`,`id_zona`),
-  ADD KEY `id_zona` (`id_zona`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `blogs`
---
-ALTER TABLE `blogs`
-  MODIFY `id_blog` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `caracteristicas`
---
-ALTER TABLE `caracteristicas`
-  MODIFY `id_caracteristica` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `ciudades`
---
-ALTER TABLE `ciudades`
-  MODIFY `cod_ciudad` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `customers`
---
-ALTER TABLE `customers`
-  MODIFY `id_customer` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `departamentos`
---
-ALTER TABLE `departamentos`
-  MODIFY `id_departamento` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `detalles_inmuebles`
---
-ALTER TABLE `detalles_inmuebles`
-  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `fotos`
---
-ALTER TABLE `fotos`
-  MODIFY `id_foto` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `inmuebles`
---
-ALTER TABLE `inmuebles`
-  MODIFY `id_inmueble` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `inmuebles_destacados`
---
-ALTER TABLE `inmuebles_destacados`
-  MODIFY `id_destacado` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `inmuebles_en_ascenso`
---
-ALTER TABLE `inmuebles_en_ascenso`
-  MODIFY `id_ascenso` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `interesados`
---
-ALTER TABLE `interesados`
-  MODIFY `id_interesado` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `perfiles_customer`
---
-ALTER TABLE `perfiles_customer`
-  MODIFY `id_perfil` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `planes`
---
-ALTER TABLE `planes`
-  MODIFY `id_plan` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `precios_planes`
---
-ALTER TABLE `precios_planes`
-  MODIFY `id_precio_plan` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `proyectos`
---
-ALTER TABLE `proyectos`
-  MODIFY `id_proyecto` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `servicios`
---
-ALTER TABLE `servicios`
-  MODIFY `id_servicio` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `suscripciones`
---
-ALTER TABLE `suscripciones`
-  MODIFY `id_suscripcion` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `tipos_inmueble`
---
-ALTER TABLE `tipos_inmueble`
-  MODIFY `id_tipo_inmueble` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `videos`
---
-ALTER TABLE `videos`
-  MODIFY `id_video` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `zonas`
---
-ALTER TABLE `zonas`
-  MODIFY `id_zona` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
