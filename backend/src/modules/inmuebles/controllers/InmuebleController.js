@@ -93,7 +93,7 @@ const getInmuebleByID = async (req, res) => {
 };
 
 
-//Traer inmuebles publicados
+//Traer inmuebles de un usuario
 const getInmueblesUsuario = async (req, res) => {
     try {
         const token = await traerToken(req);
@@ -129,6 +129,8 @@ const getInteresadosInmueble = async (req, res) => {
         const token = await traerToken(req);
         const { idInmueble } = req.params;
         const isDueño = await inmuebleService.isUsuarioDueño(token.idUsuario, idInmueble);
+        console.log(token.idUsuario);
+        console.log(idInmueble);
         // Verificar que el que inició sesión sea el dueño  
         if (isDueño) {
             interesados = await inmuebleService.traerInteresados(req.params);

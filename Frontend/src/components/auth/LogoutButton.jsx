@@ -1,27 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { auth } from "../../services/Firebase/Firebase";
-import { signOut } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import AuthService from "../../services/usuarios/AuthService";
 
-const LogoutButton = ({setToken}) => {
+const LogoutButton = () => {
     // Estado para almacenar el email decodificado
     const [email, setEmail] = useState(null);
 
+    const [name, setName] = useState(null);
     // Efecto para decodificar el token al cargar el componente
     useEffect(() => {
-        // Obtener el token del almacenamiento local
-        const token = localStorage.getItem("token");
+        const fetchUser = async () => {
+            // Obtener el token del almacenamiento local
+            const token = localStorage.getItem("token");
 
-        if (token) {
-            try {
-                // Decodificar el token y obtener el email
-                const decoded = jwtDecode(token);
-                setEmail(decoded.email); // Suponiendo que el campo 'email' está en el payload del token
-            } catch (error) {
-                console.error("Error al decodificar el token", error);
+            if (token) {
+                try {
+                    const unsubscribe = onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            setName(user.displayName);
+                            setEmail(user.email);
+                        } else {
+                            setName(null);
+                            setEmail(null);
+                        }
+                    });
+
+                    return () => unsubscribe(); // Limpiar el listener cuando el componente se desmonta
+
+                } catch (error) {
+                    console.error("Error al decodificar el token o obtener el usuario", error);
+                }
             }
-        }
+        };
+
+        fetchUser(); // Llamar la función asíncrona dentro del useEffect
     }, []); // Se ejecuta solo al montar el componente
 
     // Manejar Logout
@@ -36,16 +50,9 @@ const LogoutButton = ({setToken}) => {
 
 
     return (
-        <a className="nav-link menus" onClick={handleLogout} href="#">
-            <img
-                src="/img/icons/fa-icon-user.svg"
-                alt="icon-ingresar"
-                loading="lazy"
-            />
-            <span className="ingresar-text">
-                Salir {email && `(${email})`} {/* Mostrar el email si está disponible */}
-            </span>
-        </a>
+        <button className="btn btn-secondary ms-2" onClick={handleLogout} style={{ color: 'red', background: 'none', border: "none" }}>
+            <i className="fas fa-sign-out"></i> Cerrar Sesión {name && `(${name})`}
+        </button>
     );
 };
 

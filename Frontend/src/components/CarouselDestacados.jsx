@@ -35,9 +35,9 @@ const CarouselDestacados = () => {
     const fetchInmuebles = async () => {
       try {
         const data = await InmuebleService.getInmueblesDestacados();
-        const dataInmueble = await InmuebleService.getConfiguracionCreacion();
+        //const dataInmueble = await InmuebleService.getConfiguracionCreacion();
 
-        console.log(dataInmueble);
+        //console.log(dataInmueble);
         setDestacados(data);
       } catch (error) {
         console.error("Error al cargar los inmuebles:", error);

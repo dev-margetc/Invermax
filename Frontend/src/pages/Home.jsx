@@ -6,7 +6,7 @@ import CarouselAltaDemanda from '../components/CarouselAltaDemanda';
 import { useNavigate } from 'react-router-dom';
 import AliadoService from "../services/configuraciones/AliadoService";
 import { chunkArray } from '../services/utils/GeneralUtils';
-import LogoDefault from "../../dist/img/Blog/logo-a-1.svg";
+import LogoDefault from "../assets/img/ima2.png";
 const Home = () => {
   const navigate = useNavigate();
 
@@ -74,46 +74,7 @@ const Home = () => {
                 </div>
               </div>
             ))}
-            {/* 
-          <div className="carousel-item active">
-              <div className="d-flex justify-content-center gap-5">
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-1.svg" className="allies-logo" alt="Aliado 1" loading="lazy" />
-                </div>
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-2.svg" className="allies-logo" alt="Aliado 2" loading="lazy" />
-                </div>
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-3.svg" className="allies-logo" alt="Aliado 3" loading="lazy" />
-                </div>
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-4.svg" className="allies-logo" alt="Aliado 4" loading="lazy" />
-                </div>
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-5.svg" className="allies-logo" alt="Aliado 5" loading="lazy" />
-                </div>
-              </div>
-            </div>
-            <div className="carousel-item">
-              <div className="d-flex justify-content-center gap-5">
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-1.svg" className="allies-logo" alt="Aliado 6" loading="lazy" />
-                </div>
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-2.svg" className="allies-logo" alt="Aliado 7" loading="lazy" />
-                </div>
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-3.svg" className="allies-logo" alt="Aliado 8" loading="lazy" />
-                </div>
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-4.svg" className="allies-logo" alt="Aliado 9" loading="lazy" />
-                </div>
-                <div className="allies-card">
-                  <img src="img/Blog/logo-a-5.svg" className="allies-logo" alt="Aliado 10" loading="lazy" />
-                </div>
-              </div>
-            </div>
-            */}
+            
             {/* Agrega más .carousel-item según el número de grupos de logotipos que quieras mostrar */}
           </div>
           <button className="carousel-control-prev" type="button" data-bs-target="#aliadosCarousel" data-bs-slide="prev">

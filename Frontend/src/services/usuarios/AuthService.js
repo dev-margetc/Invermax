@@ -24,7 +24,7 @@ const AuthService = {
     /**
      * Elimina el token y cierra sesión
      */
-    logout: async() => {
+    logout: async () => {
         const token = AuthService.getToken(); // Obtiene el token de localStorage
         console.log(token);
         if (token) {
@@ -38,6 +38,13 @@ const AuthService = {
         localStorage.removeItem(TOKEN_KEY);
 
         window.location.href = "/"; // Redirigir al home
+    },
+    /**
+        Traer el usuario activo desde firebase, no desde el backend 
+    */
+    getUser: async () =>{
+        const user = auth.currentUser;
+        return user;
     },
 
     /**
@@ -55,7 +62,7 @@ const AuthService = {
 
             return response.data.valid; // Devuelve true si el token es válido
         } catch (err) {
-           console.log(err);
+            console.log(err);
             return false;
         }
     },

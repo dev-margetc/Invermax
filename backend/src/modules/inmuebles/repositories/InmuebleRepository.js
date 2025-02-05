@@ -171,19 +171,33 @@ const getPublicados = async () => {
 }
 
 // Traer los inmuebles de un customer
-const getInmueblesUsuario = async (idCustomer) => {
+const getInmueblesUsuario = async (idCustomer, codigoPeriodo = null) => {
   const inmuebles = Inmueble.findAll({
     attributes: [
       "idInmueble", // Para renombrar se coloca a la izquierda el nombre que está en la BD
       "codigoInmueble",
       "tituloInmueble",
-      "estadoPublicacionInmueble"
+      "estadoPublicacionInmueble",
+      "idCustomer"
     ],
     include: [
       {
         model: DetalleInmueble,
         as: "detalles"
-      }
+      },
+      {
+        model: InmuebleAscenso, // Relación con ascensos
+        as: "inmueblesAscenso",
+        where: { codigoPeriodo: codigoPeriodo}, // Solo los que tienen el codigo requerido y existe
+        required: false// Incluye la relación solo si existe
+      },
+      // Agregar inmuebles en ascenso
+      {
+        model: InmuebleDestacado, // Relación con ascensos
+        as: "inmueblesDestacados",
+        where: { codigoPeriodo: codigoPeriodo}, // Solo los que tienen el código requerido
+        required: false// Incluye la relación solo si existe
+      },
     ],
     where: {
       idCustomer: idCustomer

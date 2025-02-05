@@ -2,6 +2,8 @@
 Tambien se encarga de interactuar con otros servicios*/
 const Inmueble = require("../entities/Inmueble");
 const inmuebleRepository = require("../repositories/InmuebleRepository");
+const AscensoRepository = require("../../suscripciones/repositories/AscensoRepository");
+const SuscripcionRepo = require("../../suscripciones/repositories/SuscripcionRepository");
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const DetalleInmueble = require("../entities/DetalleInmueble");
 
@@ -104,10 +106,19 @@ const tieneZonas = (zonasInmueble, zonas) => {
 };
 
 // Traer inmuebles de un usuario
-const getInmueblesUsuario = async (datos) => {
-    const { idCustomer } = datos;
+const getInmueblesUsuario = async (datosCustomer) => {
+    const { idCustomer } = datosCustomer;
+
+    // Generar el código de los inmuebles destacados y en ascenso
+    let condiciones = { idCustomer: idCustomer, estado: "activa" }; 
+    let suscripcionesActivas = await SuscripcionRepo.getSuscripcionesPlan(condiciones);
+    if (suscripcionesActivas.length == 0) {
+        throw new ErrorNegocio("No cuenta con una suscripcion activa.");
+    }
+    let codigo = AscensoRepository.generarCodigoPeriodo(suscripcionesActivas[0].fechaInicioSuscripcion, suscripcionesActivas[0].idSuscripcion)
+
     if (idCustomer) {
-        return inmuebleRepository.getInmueblesUsuario(idCustomer);
+        return inmuebleRepository.getInmueblesUsuario(idCustomer, codigo);
     } else {
         throw new ErrorNegocio("Customer no colocado");
     }
