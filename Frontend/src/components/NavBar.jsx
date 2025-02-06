@@ -73,19 +73,21 @@ const Navbar = ({ token, setToken }) => {
   }, []);
 
   return (
-    <header className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: ["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan"].includes(location.pathname) ? "#FFFFFF" : "" }}>
+    <header className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: ["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil"].includes(location.pathname) ? "#FFFFFF" : "" }}>
       <div className="navbar-header" >
         <div className="navbar-logo">
           <Link to="/" className="highlight">
-            <img src={["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan"].includes(location.pathname) ? "img/logo-2.png" : "img/logo.png"} alt="Logo" className="logo" loading="lazy" style={["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan"].includes(location.pathname) ? { width: "63px", height: "45px" } : {}} />
+            <img src={["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil","/aliados","/servicios"].includes(location.pathname) ? "img/logo-2.png" : "img/logo.png"} alt="Logo" className="logo" loading="lazy" style={["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil","/aliados","/servicios"].includes(location.pathname) ? { width: "63px", height: "45px" } : {}} />
           </Link>
         </div>
-        {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan"].includes(location.pathname) ? (
+        {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil", "/aliados", "/servicios"].includes(location.pathname) ? (
           <div className="desktop-menu-nuevo-inmueble">
             <Link to="/publicar-nuevo-inmueble" className="highlight">Publicar nuevo inmueble</Link>
             <Link to="/mis-inmuebles" className="highlight">Mis inmuebles</Link>
             <Link to="/leads" className="highlight">Leads</Link>
             <Link to="/mi-plan" className="highlight">Mi plan</Link>
+            <Link to="/aliados" className="highlight">Aliados</Link>
+            <Link to="/servicios" className="highlight">Servicios</Link>
           </div>
         ) : (
           <div className="desktop-menu">
@@ -124,6 +126,7 @@ const Navbar = ({ token, setToken }) => {
                   <Link to="/otrosServicios" className="highlight">
                     Otros servicios
                   </Link>
+
                 </div>
               )}
             </div>
@@ -133,7 +136,7 @@ const Navbar = ({ token, setToken }) => {
           <button className="menu-toggle d-lg-none" onClick={toggleMenu}>
             {isOpen ? <span>&#10005;</span> : <i className="fas fa-bars"></i>}
           </button>
-          {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan"].includes(location.pathname) ? (
+          {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil","/aliados","/servicios"].includes(location.pathname) ? (
             <>
               <button className="btn btn-primary ms-2 " style={{ background: 'none', color: 'black', border: "none" }}>
                 <img
@@ -141,7 +144,9 @@ const Navbar = ({ token, setToken }) => {
                   alt="icon-ingresar"
                   loading="lazy"
                 />
-                <span>Editar Perfil</span>
+                <Link to="/editar-perfil" className="highlight" style={{textDecoration:"none", color:"black"}}>
+                  <span>Editar Perfil</span>
+                </Link>
               </button>
               <LogoutButton />
               <button className="menu-toggle d-lg-none" onClick={toggleMenu}>
@@ -175,53 +180,14 @@ const Navbar = ({ token, setToken }) => {
           <button className="close-button" onClick={toggleMenu}>
             <img src="/img/icons/xmark.svg" alt="exis" loading="lazy" />
           </button>
-          <a href="#" className="arriendo-link" style={{ paddingTop: "65px" }}
-            onClick={handleFilterClick({ purpose: "Rentar", category: "", city: null })}>
-            Arriendo</a>
-
-          <div className="submenu">
-            <button className="submenu-toggle" onClick={toggleSubmenuComprar}>
-              Comprar{" "}
-              <span>
-                <img src="/img/icons/Frame6.svg" alt="" loading="lazy" />
-              </span>
-            </button>
-            {submenuOpenComprar && (
-              <div className="submenu-content">
-                <TiposInmueblesBanner />
-                <Link to="/planes" className="highlight">
-                  Planes
-                </Link>
-              </div>
-            )}
-          </div>
-          <div className="submenu">
-            <button className="submenu-toggle" onClick={toggleSubmenuOtrosTramites}>
-              Otros trámites{" "}
-              <span>
-                <img src="/img/icons/Frame6.svg" alt="" loading="lazy" />
-              </span>
-            </button>
-            {submenuOpenOtrosTramites && (
-              <div className="submenu-content">
-                  {servicios && servicios.map((servicio, index) => (
-                    // Se pasa el indice o posicion en la lista
-                    <a key={index} onClick={handleServiceClick(index)} className="highlight" href="#">
-                      {servicio.titulo}
-                    </a>
-                  ))}
-                <Link to="/otrosServicios" className="highlight">
-                  Otros servicios
-                </Link>
-              </div>
-            )}
-          </div>
-          {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan"].includes(location.pathname) ? (
+          {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil", "/aliados", "/servicios"].includes(location.pathname) ? (
             <>
               <Link to="/publicar-nuevo-inmueble" className="highlight" style={{ color: "black", marginTop: "50px" }}>Publicar nuevo inmueble</Link>
               <Link to="/mis-inmuebles" className="highlight" style={{ color: "black" }}>Mis inmuebles</Link>
               <Link to="/leads" className="highlight" style={{ color: "black" }}>Leads</Link>
               <Link to="/mi-plan" className="highlight" style={{ color: "black" }}>Mi plan</Link>
+              <Link to="/aliados" className="highlight" style={{ color: "black" }}>Aliados</Link>
+              <Link to="/servicios" className="highlight" style={{ color: "black" }}>Servicios</Link>
             </>
           ) : (
             <>
@@ -282,5 +248,3 @@ const Navbar = ({ token, setToken }) => {
 };
 
 export default Navbar;
-
-

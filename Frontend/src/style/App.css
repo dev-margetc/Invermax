@@ -988,6 +988,7 @@ font-size: 18px;
   font-size: 16px;
 }
 
+
 .navbar-header {
   display: flex;
   width: 100%;
@@ -1032,7 +1033,7 @@ font-size: 18px;
   display: flex;
   gap: 50px;
   position: absolute;
-  left: 30%;
+  left: 37%;
   transform: translateX(-50%);
 }
 
