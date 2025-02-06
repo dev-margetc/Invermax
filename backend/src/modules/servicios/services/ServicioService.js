@@ -29,7 +29,10 @@ const registrarServicio = async (datosServicio) => {
         console.log(datosServicio);
         let servicio = await ServicioRepo.insertarServicio(datosServicio);
         if (servicio) {
-            return "Servicio " + servicio.idServicio + " Creado correctamente"
+            const msg = {};
+            msg.message = "Servicio creado corectamente";
+            msg.servicio = servicio.idServicio;
+            return msg;
         }
 
     } catch (error) {
@@ -58,8 +61,10 @@ const actualizarServicio = async (datosServicio) => {
 
         await ServicioRepo.actualizarServicio(datosServicio.idServicio, servicioData);
 
-
-        return "Datos actualizados del servicio " + datosServicio.idServicio;
+        const msg = {};
+        msg.message = "Datos actualizados del servicio ";
+        msg.servicio = datosServicio.idServicio;
+        return  msg;
     }
     catch (err) {
         throw err;

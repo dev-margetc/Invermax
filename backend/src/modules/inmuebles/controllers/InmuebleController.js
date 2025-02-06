@@ -31,7 +31,7 @@ const insertInmueble = async (req, res) => {
         }
         // Establecer el ID del usuario que inició sesion y asignarlo al cuerpo para crearlo
         req.body.inmueble.idCustomer = customer[0].dataValues.idCustomer;
-        msg = await inmuebleService.insertarInmueble(req.body);
+        const msg = await inmuebleService.insertarInmueble(req.body);
         res.status(201).json(msg); //Se retorna un mensaje
     } catch (error) {
         errorHandler.handleControllerError(res, error, "inmuebles");

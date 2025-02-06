@@ -71,8 +71,8 @@ const actualizarDetallesInmueble = async (listaDetalles, idInmueble, transaction
 
                 /*Agregar el id del proyecto si este es de ese tipo */
                 let inmueble = await inmuebleRepo.getInmuebleByID(idInmueble);
-                if(inmueble[0].proyecto){
-                    nuevosDatos.idProyecto = inmueble[0].proyecto.idProyecto;
+                if(inmueble.proyecto){
+                    nuevosDatos.idProyecto = inmueble.proyecto.idProyecto;
                     // Solo lo crea si es de tipo proyecto
                     await detalleRepo.insertDetalle(nuevosDatos, idDetalle, transaction);
                 }

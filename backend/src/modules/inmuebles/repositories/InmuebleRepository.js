@@ -56,9 +56,11 @@ const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
       }, { transaction });
     }
     await transaction.commit(); // Confirmar la transacción
-    msg = "Inmueble con detalles creado correctamente.";
+    let msg = {};
+    msg.message = "Inmueble con detalles creado correctamente.";
+    msg.inmueble = inmueble;
     if (isProyecto) {
-      msg = "Proyecto creado correctamente."
+      msg.message = "Proyecto creado correctamente."
     }
     return msg;
   } catch (error) {

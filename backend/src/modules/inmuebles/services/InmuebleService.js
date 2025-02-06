@@ -162,7 +162,12 @@ const actualizarInmuebleDetalles = async (datos, params) => {
         }
 
         await transaction.commit();
-        return "Actualizado";
+        // Retornar el inmueble actualizado
+        const inmuebleActualizado = await inmuebleRepository.getInmuebleByID(idInmueble);
+        const msg = {}
+        msg.inmueble = inmuebleActualizado;
+        msg.message = "Inmueble actualizado";
+        return msg;
     } catch (error) {
         console.log(error);
         await transaction.rollback();

@@ -34,7 +34,11 @@ const registrarAliado = async (datosAliado) => {
 
         let aliado = await AliadoRepo.insertarAliado(datosAliado);
         if (aliado) {
-            return "Aliado " + aliado.idAliado + " Creado correctamente"
+
+            const msg = {};
+            msg.message = "Aliado creado";
+            msg.aliado = aliado.idAliado;
+            return msg;
         }
 
     } catch (error) {
@@ -52,10 +56,10 @@ const actualizarAliado = async (datosAliado) => {
         const aliadoData = filtrarCampos(datosAliado, campos);
 
         /* Si los nuevos datos tienen la foto entonces se debe eliminar la anterior*/
-        if(aliadoData.logoAliado){
-            const aliados = await AliadoRepo.getAllAliados({idAliado: datosAliado.idAliado});
+        if (aliadoData.logoAliado) {
+            const aliados = await AliadoRepo.getAllAliados({ idAliado: datosAliado.idAliado });
             // Eliminar la foto si la tenia
-            if(aliados[0].logoAliado){
+            if (aliados[0].logoAliado) {
                 await deleteMultimediaServidor("fotos", aliados[0].logoAliado, "aliados");
             }
         }
@@ -63,8 +67,11 @@ const actualizarAliado = async (datosAliado) => {
         // Actualizar los datos
         await AliadoRepo.actualizarAliado(datosAliado.idAliado, aliadoData);
 
+        const msg = {};
+        msg.message = "Datos actualizados del aliado";
+        msg.aliado = datosAliado.idAliado;
 
-        return "Datos actualizados del aliado " + datosAliado.idAliado;
+        return msg;
     }
     catch (err) {
         console.log(err);
@@ -83,7 +90,7 @@ const eliminarAliado = async (idAliado) => {
         await AliadoRepo.eliminarAliado(idAliado);
 
         // Si el aliado tenia logo se elimina
-        if(aliado.logoAliado){
+        if (aliado.logoAliado) {
             await deleteMultimediaServidor("fotos", aliado.logoAliado, "aliados")
         }
 
