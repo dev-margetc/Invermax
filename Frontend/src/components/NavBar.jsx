@@ -53,15 +53,17 @@ const Navbar = ({ token, setToken }) => {
       <div className="navbar-header" >
         <div className="navbar-logo">
           <Link to="/" className="highlight">
-            <img src={["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil"].includes(location.pathname) ? "img/logo-2.png" : "img/logo.png"} alt="Logo" className="logo" loading="lazy" style={["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil"].includes(location.pathname) ? { width: "63px", height: "45px" } : {}} />
+            <img src={["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil","/aliados","/servicios"].includes(location.pathname) ? "img/logo-2.png" : "img/logo.png"} alt="Logo" className="logo" loading="lazy" style={["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil","/aliados","/servicios"].includes(location.pathname) ? { width: "63px", height: "45px" } : {}} />
           </Link>
         </div>
-        {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil"].includes(location.pathname) ? (
+        {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil", "/aliados", "/servicios"].includes(location.pathname) ? (
           <div className="desktop-menu-nuevo-inmueble">
             <Link to="/publicar-nuevo-inmueble" className="highlight">Publicar nuevo inmueble</Link>
             <Link to="/mis-inmuebles" className="highlight">Mis inmuebles</Link>
             <Link to="/leads" className="highlight">Leads</Link>
             <Link to="/mi-plan" className="highlight">Mi plan</Link>
+            <Link to="/aliados" className="highlight">Aliados</Link>
+            <Link to="/servicios" className="highlight">Servicios</Link>
           </div>
         ) : (
           <div className="desktop-menu">
@@ -103,13 +105,14 @@ const Navbar = ({ token, setToken }) => {
                   <Link to="/otrosServicios" className="highlight">
                     Otros servicios
                   </Link>
+
                 </div>
               )}
             </div>
           </div>
         )}
         <div className="navbar-right">
-          {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil"].includes(location.pathname) ? (
+          {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil","/aliados","/servicios"].includes(location.pathname) ? (
             <>
               <button className="btn btn-primary ms-2 " style={{ background: 'none', color: 'black', border: "none" }}>
                 <img
@@ -155,12 +158,14 @@ const Navbar = ({ token, setToken }) => {
           <button className="close-button" onClick={toggleMenu}>
             <img src="/img/icons/xmark.svg" alt="exis" loading="lazy" />
           </button>
-          {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil"].includes(location.pathname) ? (
+          {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil", "/aliados", "/servicios"].includes(location.pathname) ? (
             <>
               <Link to="/publicar-nuevo-inmueble" className="highlight" style={{ color: "black", marginTop: "50px" }}>Publicar nuevo inmueble</Link>
               <Link to="/mis-inmuebles" className="highlight" style={{ color: "black" }}>Mis inmuebles</Link>
               <Link to="/leads" className="highlight" style={{ color: "black" }}>Leads</Link>
               <Link to="/mi-plan" className="highlight" style={{ color: "black" }}>Mi plan</Link>
+              <Link to="/aliados" className="highlight" style={{ color: "black" }}>Aliados</Link>
+              <Link to="/servicios" className="highlight" style={{ color: "black" }}>Servicios</Link>
             </>
           ) : (
             <>

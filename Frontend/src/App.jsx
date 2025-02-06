@@ -24,6 +24,8 @@ import MisInmuebles from './pages/MisInmuebles';
 import Leads from './pages/Leads';
 import MiPlan from './pages/MiPlan';
 import EditarPerfil from './pages/EditarPerfil';
+import Aliados from './pages/Aliados';
+import Servicios from './pages/Servicios';
 
 function App() {
 
@@ -66,6 +68,8 @@ function App() {
           <Route path="/leads" element={<Leads />} />
           <Route path="/mi-plan" element={<MiPlan />} />
           <Route path="/editar-perfil" element={<EditarPerfil />} />
+          <Route path="/aliados" element={<Aliados/>} />
+          <Route path="/servicios" element={<Servicios/>} />
 
         </Routes>
       </div>
