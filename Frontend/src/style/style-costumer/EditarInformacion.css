@@ -1,0 +1,61 @@
+/* editarInformacion.css */
+
+.form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: white;
+    margin-bottom: 20px;
+  }
+
+
+  .form-container textarea{
+margin-bottom: 10px;
+  }
+  
+  .form-title {
+    text-align: center;
+    color: black;
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 40px;
+  }
+  
+  .form-container .form-control {
+    border: 1px solid black !important;
+    background-color: white;
+  }
+  
+  .form-container .form-control:focus {
+    border-color: black !important;
+    box-shadow: none !important;
+  }
+  
+  .form-container button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .form-container button:hover {
+    background-color: #333;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 10;
+      width: 100%;
+    }
+
+    .form-title {
+        text-align: center;
+        color: black;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 40px;
+      }
+  }
+  

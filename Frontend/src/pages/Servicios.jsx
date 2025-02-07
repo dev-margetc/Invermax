@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import servicioService from '../services/servicios/ServicioService.js'; 
 
 const Servicios = () => {
     const [servicios, setServicios] = useState([]);
@@ -85,7 +86,7 @@ const Servicios = () => {
         }
     };
 
-    const handleSaveServicio = () => {
+    const handleSaveServicio = async () => {
         // Validación de campos
         if (!currentServicio.codigoServicio.trim()) {
             Swal.fire({
@@ -99,7 +100,7 @@ const Servicios = () => {
             });
             return;
         }
-
+    
         if (!currentServicio.nombreServicio.trim()) {
             Swal.fire({
                 icon: 'error',
@@ -112,7 +113,7 @@ const Servicios = () => {
             });
             return;
         }
-
+    
         if (!currentServicio.precioServicio.trim() || isNaN(currentServicio.precioServicio) || parseFloat(currentServicio.precioServicio) <= 0) {
             Swal.fire({
                 icon: 'error',
@@ -125,7 +126,7 @@ const Servicios = () => {
             });
             return;
         }
-
+    
         if (!currentServicio.fotoServicio) {
             Swal.fire({
                 icon: 'error',
@@ -138,26 +139,72 @@ const Servicios = () => {
             });
             return;
         }
-
-        const updatedServicios = editIndex !== null
-            ? servicios.map((servicio, index) => (index === editIndex ? currentServicio : servicio))
-            : [...servicios, currentServicio];
-
-        setServicios(updatedServicios);
+    
+        try {
+            let savedServicio;
+            if (editIndex !== null) {
+                // Actualizar el servicio sin la foto
+                savedServicio = await servicioService.updateServicio(servicios[editIndex]._id, currentServicio);
+                setServicios(servicios.map((servicio, index) => (index === editIndex ? savedServicio : servicio)));
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Guardado',
+                    text: 'Servicio actualizado exitosamente',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            } else {
+                // Crear el servicio sin la foto
+                savedServicio = await servicioService.addServicio(currentServicio);
+                setServicios([...servicios, savedServicio]);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Guardado',
+                    text: 'Servicio agregado exitosamente',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            }
+    
+            // Paso 2: Subir la foto después de la creación del servicio
+            if (currentServicio.fotoServicio) {
+                const formData = new FormData();
+                formData.append('fotoServicio', currentServicio.fotoServicio);
+    
+                // Paso 3: Enviar la foto usando el ID del servicio
+                await servicioService.uploadFotoServicio(savedServicio._id, formData);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Foto cargada',
+                    text: 'Foto cargada exitosamente',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            }
+    
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al guardar el servicio',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        }
+    
         handleCloseModal();
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Guardado',
-            text: editIndex !== null ? 'Servicio actualizado exitosamente' : 'Servicio agregado exitosamente',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000
-        });
     };
+    
 
-    const handleDeleteServicio = (index) => {
+    const handleDeleteServicio = async (index) => {
         Swal.fire({
             title: '¿Estás seguro?',
             text: 'No podrás revertir esta acción',
@@ -165,23 +212,37 @@ const Servicios = () => {
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                const updatedServicios = servicios.filter((_, i) => i !== index);
-                setServicios(updatedServicios);
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Eliminado',
-                    text: 'Servicio eliminado exitosamente',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
+                try {
+                    const servicioId = servicios[index]._id;
+                    await servicioService.deleteServicio(servicioId); // Llamada a la API para eliminar el servicio
+                    const updatedServicios = servicios.filter((_, i) => i !== index);
+                    setServicios(updatedServicios);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Eliminado',
+                        text: 'Servicio eliminado exitosamente',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un error al eliminar el servicio',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
             }
         });
     };
+    
 
     // Funciones de paginación
     const totalPages = Math.ceil(servicios.length / serviciosPerPage);

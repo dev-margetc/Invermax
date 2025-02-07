@@ -26,6 +26,7 @@ import MiPlan from './pages/MiPlan';
 import EditarPerfil from './pages/EditarPerfil';
 import Aliados from './pages/Aliados';
 import Servicios from './pages/Servicios';
+import EditarInformacion from './pages/EditarInformacion';
 
 function App() {
 
@@ -70,6 +71,7 @@ function App() {
           <Route path="/editar-perfil" element={<EditarPerfil />} />
           <Route path="/aliados" element={<Aliados/>} />
           <Route path="/servicios" element={<Servicios/>} />
+          <Route path="/editar-informacion" element={<EditarInformacion/>} />
 
         </Routes>
       </div>

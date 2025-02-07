@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import aliadosServices from '../services/configuraciones/AliadoService.js'; 
 
 const Aliados = () => {
     const [aliados, setAliados] = useState([]);
@@ -16,6 +17,17 @@ const Aliados = () => {
     const indexOfLastAliado = currentPage * aliadosPerPage;
     const indexOfFirstAliado = indexOfLastAliado - aliadosPerPage;
     const currentAliados = aliados.slice(indexOfFirstAliado, indexOfLastAliado);
+
+    useEffect(() => {
+        // Traemos los aliados del backend al cargar el componente
+        const fetchAliados = async () => {
+            const aliadosData = await aliadosServices.getAliados();
+            if (aliadosData) {
+                setAliados(aliadosData);
+            }
+        };
+        fetchAliados();
+    }, []);
 
     const handleShowModal = (index = null) => {
         if (index !== null) {
@@ -73,8 +85,8 @@ const Aliados = () => {
         }
     };
 
-    const handleSaveAliado = () => {
-        // Validación del nombre
+    const handleSaveAliado = async () => {
+        // Validación de datos
         if (!currentAliado.nombreAliado.trim()) {
             Swal.fire({
                 icon: 'error',
@@ -87,8 +99,7 @@ const Aliados = () => {
             });
             return;
         }
-
-        // Validación de la URL
+    
         const urlPattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/i;
         if (!currentAliado.urlRedireccion.trim()) {
             Swal.fire({
@@ -102,7 +113,7 @@ const Aliados = () => {
             });
             return;
         }
-
+    
         if (currentAliado.urlRedireccion && !urlPattern.test(currentAliado.urlRedireccion)) {
             Swal.fire({
                 icon: 'error',
@@ -115,40 +126,71 @@ const Aliados = () => {
             });
             return;
         }
-
-        // Validación del logo
-        if (!currentAliado.logoAliado) {
+    
+        try {
+            let savedAliado;
+            if (editIndex !== null) {
+                // Editar aliado
+                savedAliado = await aliadosServices.editAliado(aliados[editIndex]._id, currentAliado);
+                setAliados(aliados.map((aliado, index) => (index === editIndex ? savedAliado : aliado)));
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Guardado',
+                    text: 'Aliado actualizado exitosamente',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            } else {
+                // Agregar aliado sin las fotos
+                savedAliado = await aliadosServices.addAliado(currentAliado);
+                setAliados([...aliados, savedAliado]);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Guardado',
+                    text: 'Aliado agregado exitosamente',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            }
+    
+            // Paso 2: Si hay fotos, enviarlas a la ruta correspondiente usando el ID
+            if (currentAliado.logoAliado) {
+                const formData = new FormData();
+                formData.append('logoAliado', currentAliado.logoAliado);
+    
+                // Paso 3: Enviar las fotos usando el ID del aliado
+                await aliadosServices.uploadLogoAliado(savedAliado._id, formData);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Foto cargada',
+                    text: 'Logo cargado exitosamente',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            }
+        } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Debes subir un logo',
+                text: 'Hubo un error al guardar el aliado',
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
                 timer: 3000
             });
-            return;
         }
-
-        const updatedAliados = editIndex !== null
-            ? aliados.map((aliado, index) => (index === editIndex ? currentAliado : aliado))
-            : [...aliados, currentAliado];
-
-        setAliados(updatedAliados);
+    
         handleCloseModal();
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Guardado',
-            text: editIndex !== null ? 'Aliado actualizado exitosamente' : 'Aliado agregado exitosamente',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000
-        });
     };
+    
 
-    const handleDeleteAliado = (index) => {
+    const handleDeleteAliado = async (idAliado) => {
         Swal.fire({
             title: '¿Estás seguro?',
             text: 'No podrás revertir esta acción',
@@ -156,20 +198,31 @@ const Aliados = () => {
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                const updatedAliados = aliados.filter((_, i) => i !== index);
-                setAliados(updatedAliados);
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Eliminado',
-                    text: 'Aliado eliminado exitosamente',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
+                try {
+                    await aliadosServices.deleteAliado(idAliado);
+                    setAliados(aliados.filter(aliado => aliado._id !== idAliado));
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Eliminado',
+                        text: 'Aliado eliminado exitosamente',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un error al eliminar el aliado',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
             }
         });
     };
@@ -203,8 +256,8 @@ const Aliados = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentAliados.map((aliado, index) => (
-                                    <tr key={index}>
+                                {currentAliados.map((aliado) => (
+                                    <tr key={aliado._id}>
                                         <td>{aliado.nombreAliado}</td>
                                         <td>
                                             {aliado.logoAliado ? (
@@ -215,10 +268,10 @@ const Aliados = () => {
                                         </td>
                                         <td>{aliado.urlRedireccion}</td>
                                         <td>
-                                            <Button variant="success" onClick={() => handleShowModal(index)} className="m-1">
+                                            <Button variant="success" onClick={() => handleShowModal(aliado)} className="m-1">
                                                 <FaEdit />
                                             </Button>
-                                            <Button variant="danger" onClick={() => handleDeleteAliado(index)} className="m-1">
+                                            <Button variant="danger" onClick={() => handleDeleteAliado(aliado._id)} className="m-1">
                                                 <FaTrashAlt />
                                             </Button>
                                         </td>
