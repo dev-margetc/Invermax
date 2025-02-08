@@ -1,6 +1,7 @@
 // Se interactua con la base de datos haciendo uso de sequelize o personalizadas
 const Aliado = require("../entities/Aliado");
 
+const ErrorNegocio = require('../../../utils/errores/ErrorNegocio');
 
 /* Metodos de consulta*/
 // Traer los aliados dadas unas condiciones

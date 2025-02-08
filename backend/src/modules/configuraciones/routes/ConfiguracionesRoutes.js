@@ -23,17 +23,18 @@ router.put('/aliados/:idAliado',
     AliadoController.actualizarAliado);
 
 router.put('/infoInvermax',
-   protegerRuta(['admin']),
+    protegerRuta(['admin']),
     ConfigController.updateInfoInvermax);
 
 /* Rutas de eliminación */
 router.delete('/aliados/:idAliado',
-  //  protegerRuta(['admin']),
+    protegerRuta(['admin']),
     AliadoController.eliminarAliado);
 
 /* Rutas de creacion */
 router.post('/aliados',
-    // protegerRuta(['admin']),
+    upload.none(),
+    protegerRuta(['admin']),
     AliadoController.registrarAliado);
 
 module.exports = router;
