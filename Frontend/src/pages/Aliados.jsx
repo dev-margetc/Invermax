@@ -7,7 +7,7 @@ import aliadosServices from '../services/configuraciones/AliadoService.js';
 const Aliados = () => {
     const [aliados, setAliados] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [currentAliado, setCurrentAliado] = useState({ nombreAliado: '', logoAliado: '', urlRedireccion: '' });
+    const [currentAliado, setCurrentAliado] = useState({ nombreAliado: '', urlRedireccion: '' });
     const [editIndex, setEditIndex] = useState(null);
 
     // Paginación
@@ -17,6 +17,11 @@ const Aliados = () => {
     const indexOfLastAliado = currentPage * aliadosPerPage;
     const indexOfFirstAliado = indexOfLastAliado - aliadosPerPage;
     const currentAliados = aliados.slice(indexOfFirstAliado, indexOfLastAliado);
+
+    useEffect(() => {
+        fetchAliados();
+    }, []);
+    
 
     useEffect(() => {
         // Traemos los aliados del backend al cargar el componente
@@ -30,11 +35,13 @@ const Aliados = () => {
     }, []);
 
     const handleShowModal = (index = null) => {
+        console.log(index);
         if (index !== null) {
-            setCurrentAliado(aliados[index]);
+            setCurrentAliado(index);
             setEditIndex(index);
+            
         } else {
-            setCurrentAliado({ nombreAliado: '', logoAliado: '', urlRedireccion: '' });
+            setCurrentAliado({ nombreAliado: '', urlRedireccion: '' });
             setEditIndex(null);
         }
         setShowModal(true);
@@ -77,16 +84,29 @@ const Aliados = () => {
                 });
                 return;
             }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setCurrentAliado({ ...currentAliado, logoAliado: reader.result });
-            };
-            reader.readAsDataURL(file);
+
+            setCurrentAliado({ ...currentAliado, logoAliado: file });
+            // const reader = new FileReader();
+            // reader.onloadend = () => {
+            //     setCurrentAliado({ ...currentAliado, logoAliado: reader.result });
+            // };
+            // reader.readAsDataURL(file);
         }
     };
 
+    const fetchAliados = async () => {
+        try {
+            const aliadosData = await aliadosServices.getAliados();
+            if (aliadosData && Array.isArray(aliadosData)) {
+                setAliados(aliadosData);
+            }
+        } catch (error) {
+            console.error("Error al obtener aliados:", error);
+        }
+    };
+    
+
     const handleSaveAliado = async () => {
-        // Validación de datos
         if (!currentAliado.nombreAliado.trim()) {
             Swal.fire({
                 icon: 'error',
@@ -101,24 +121,11 @@ const Aliados = () => {
         }
     
         const urlPattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/i;
-        if (!currentAliado.urlRedireccion.trim()) {
+        if (!currentAliado.urlRedireccion.trim() || !urlPattern.test(currentAliado.urlRedireccion)) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'La URL de redirección es obligatoria',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-            return;
-        }
-    
-        if (currentAliado.urlRedireccion && !urlPattern.test(currentAliado.urlRedireccion)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Por favor, ingresa una URL válida',
+                text: 'Ingresa una URL válida',
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -128,11 +135,8 @@ const Aliados = () => {
         }
     
         try {
-            let savedAliado;
             if (editIndex !== null) {
-                // Editar aliado
-                savedAliado = await aliadosServices.editAliado(aliados[editIndex]._id, currentAliado);
-                setAliados(aliados.map((aliado, index) => (index === editIndex ? savedAliado : aliado)));
+                await aliadosServices.editAliado(editIndex.idAliado, currentAliado);
                 Swal.fire({
                     icon: 'success',
                     title: 'Guardado',
@@ -143,9 +147,7 @@ const Aliados = () => {
                     timer: 3000
                 });
             } else {
-                // Agregar aliado sin las fotos
-                savedAliado = await aliadosServices.addAliado(currentAliado);
-                setAliados([...aliados, savedAliado]);
+                await aliadosServices.addAliado(currentAliado);
                 Swal.fire({
                     icon: 'success',
                     title: 'Guardado',
@@ -157,23 +159,7 @@ const Aliados = () => {
                 });
             }
     
-            // Paso 2: Si hay fotos, enviarlas a la ruta correspondiente usando el ID
-            if (currentAliado.logoAliado) {
-                const formData = new FormData();
-                formData.append('logoAliado', currentAliado.logoAliado);
-    
-                // Paso 3: Enviar las fotos usando el ID del aliado
-                await aliadosServices.uploadLogoAliado(savedAliado._id, formData);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Foto cargada',
-                    text: 'Logo cargado exitosamente',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-            }
+            await fetchAliados(); // 🔴 ACTUALIZA LA TABLA AUTOMÁTICAMENTE DESDE EL BACKEND
         } catch (error) {
             Swal.fire({
                 icon: 'error',
@@ -184,10 +170,12 @@ const Aliados = () => {
                 showConfirmButton: false,
                 timer: 3000
             });
+            console.log(error);
         }
     
         handleCloseModal();
     };
+    
     
 
     const handleDeleteAliado = async (idAliado) => {
@@ -202,7 +190,7 @@ const Aliados = () => {
             if (result.isConfirmed) {
                 try {
                     await aliadosServices.deleteAliado(idAliado);
-                    setAliados(aliados.filter(aliado => aliado._id !== idAliado));
+    
                     Swal.fire({
                         icon: 'success',
                         title: 'Eliminado',
@@ -212,6 +200,9 @@ const Aliados = () => {
                         showConfirmButton: false,
                         timer: 3000
                     });
+    
+                    await fetchAliados(); // 🔴 ACTUALIZA LA TABLA AUTOMÁTICAMENTE DESDE EL BACKEND
+    
                 } catch (error) {
                     Swal.fire({
                         icon: 'error',
@@ -226,6 +217,7 @@ const Aliados = () => {
             }
         });
     };
+    
 
     // Funciones de paginación
     const totalPages = Math.ceil(aliados.length / aliadosPerPage);
@@ -238,7 +230,7 @@ const Aliados = () => {
         <div className='container'>
             <h1 className='text-center m-4' style={{ fontWeight: 700 }}>ALIADOS</h1>
             <div className="d-flex justify-content-start">
-                <Button variant="primary" onClick={() => handleShowModal()}>Agregar Aliado</Button>
+                <Button variant="none" className='button-rojo-general' onClick={() => handleShowModal()}>Nuevo Aliado</Button>
             </div>
 
             <div className="content-container mt-4">
@@ -271,7 +263,7 @@ const Aliados = () => {
                                             <Button variant="success" onClick={() => handleShowModal(aliado)} className="m-1">
                                                 <FaEdit />
                                             </Button>
-                                            <Button variant="danger" onClick={() => handleDeleteAliado(aliado._id)} className="m-1">
+                                            <Button variant="danger" onClick={() => handleDeleteAliado(aliado.idAliado)} className="m-1">
                                                 <FaTrashAlt />
                                             </Button>
                                         </td>
@@ -312,6 +304,21 @@ const Aliados = () => {
                                 placeholder='Nombre del aliado'
                             />
                         </Form.Group>
+
+                        <Form.Group controlId="formUrlRedireccion">
+                            <Form.Label>URL de Redirección</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="urlRedireccion"
+                                value={currentAliado.urlRedireccion}
+                                onChange={handleInputChange}
+                                placeholder='URL de redirección'
+                            />
+                        </Form.Group>
+                        <input type="text" 
+                        name='tipoModulo'
+                        value='aliados'
+                        />
                         <Form.Group controlId="formLogoAliado">
                             <Form.Label>Logo del Aliado</Form.Label>
                             <Form.Control
@@ -325,21 +332,12 @@ const Aliados = () => {
                                 </div>
                             )}
                         </Form.Group>
-                        <Form.Group controlId="formUrlRedireccion">
-                            <Form.Label>URL de Redirección</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="urlRedireccion"
-                                value={currentAliado.urlRedireccion}
-                                onChange={handleInputChange}
-                                placeholder='URL de redirección'
-                            />
-                        </Form.Group>
+                        
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
-                    <Button variant="primary" onClick={handleSaveAliado}>
+                    <Button variant="none" className='button-negro-general-ali' onClick={handleCloseModal}>Cancelar</Button>
+                    <Button variant="none" className='button-rojo-general' onClick={handleSaveAliado}>
                         {editIndex !== null ? 'Guardar Cambios' : 'Agregar Aliado'}
                     </Button>
                 </Modal.Footer>
@@ -401,6 +399,45 @@ const Aliados = () => {
 
                 .pagination button {
                     margin: 0 5px;
+                }
+
+                                .button-rojo-general{
+                width: 120;
+                height: 30;
+                border-radius: 10px;
+                padding-top: 8px;
+                padding-right: 24px;
+                padding-bottom: 8px;
+                padding-left: 24px;
+                gap: 10px;
+                background-color: #FF0000;
+                border-color: #FF0000;
+                color: white;
+                }
+
+                .button-rojo-general:hover{
+                background-color: #FF0000;
+                border-color: #FF0000;
+                            }
+
+                .button-negro-general-ali{
+                width: 120;
+                height: 30;
+                border-radius: 10px;
+                padding-top: 8px;
+                padding-right: 24px;
+                padding-bottom: 8px;
+                padding-left: 24px;
+                gap: 10px;
+                background-color: #000000;
+                border-color: #000000;
+                 color: white;
+                }
+
+                .button-negro-general-ali:hover{
+                background-color: #000000;
+                border-color: #000000;
+                 color: white;
                 }
             `}</style>
         </div>

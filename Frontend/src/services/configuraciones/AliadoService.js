@@ -20,6 +20,7 @@ const getAliados = async () => {
 // Agregar un nuevo aliado
 const addAliado = async (nuevoAliado) => {
     let url = "/configuraciones/aliados";
+    console.log(nuevoAliado);
     try {
         const response = await api.post(url, nuevoAliado, {
             headers: {
@@ -33,6 +34,10 @@ const addAliado = async (nuevoAliado) => {
     } catch (error) {
         console.log(error);
     }
+
+    const data = await response.data;
+    console.log(data);
+    
 };
 
 // Función para cargar el logo del aliado
@@ -54,20 +59,53 @@ const uploadLogoAliado = async (idAliado, formData) => {
 // Editar un aliado
 const editAliado = async (idAliado, datosActualizados) => {
     let url = `/configuraciones/aliados/${idAliado}`;
+
+    // Imprimir los datos que vas a enviar
+    console.log('Datos a enviar al backend:', datosActualizados);
+    console.log('ID del aliado:', idAliado);
+    
+    // Asegúrate de que el tipo de módulo esté correctamente configurado
+    datosActualizados.tipoModulo = "aliados";
+
+
+    const formData = new FormData();
+
+// Primero, agrega todos los campos que NO sean archivos
+for (const key in datosActualizados) {
+    if (key !== "logoAliado") { // Evita agregar el archivo en este bucle
+        formData.append(key, datosActualizados[key]);
+    }
+}
+
+// Luego, agrega el archivo al final
+if (datosActualizados.logoAliado instanceof File) {
+    formData.append("logoAliado", datosActualizados.logoAliado);
+}
+
     try {
-        const response = await api.put(url, datosActualizados, {
+        // Imprimir la URL de la solicitud antes de hacer la petición
+        console.log('URL de la petición:', url);
+        
+        // Realiza la solicitud PUT
+        const response = await api.put(url, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data', // Si hay imágenes
             },
         });
+        
+        // Imprimir la respuesta para depuración
+        console.log('Respuesta del backend:', response);
+
         if (!response.data) {
             throw new Error("No se recibió confirmación al actualizar el aliado.");
         }
         return response.data;
     } catch (error) {
-        console.log(error);
+        // Imprimir el error en caso de que falle la solicitud
+        console.log('Error al actualizar el aliado:', error);
     }
 };
+
 
 // Eliminar un aliado
 const deleteAliado = async (idAliado) => {
@@ -87,5 +125,6 @@ export default {
     getAliados,
     addAliado,
     editAliado,
-    deleteAliado
+    deleteAliado,
+    uploadLogoAliado
 };

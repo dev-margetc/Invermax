@@ -22,6 +22,9 @@ import Cama from '../assets/icons/cama.svg';
 import { getIconByName } from '../services/inmuebles/IconsService'; // Importar el servicio de iconos
 import InmuebleService from '../services/inmuebles/InmuebleService';
 
+import ObtenerNumero from '../components/modules/inmuebles/ObtenerNumero';
+
+
 const Plantilla = () => {
   const [propertyData, setPropertyData] = useState(null);
   const [index, setIndex] = useState(0); // Estado para el índice del carrusel de imágenes
@@ -35,6 +38,9 @@ const Plantilla = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { idInmueble } = location.state || {};
+
+  const [modalContactoVisible, setModalContactoVisible] = useState(false);
+
 
   // Alterna entre abrir y cerrar la calculadora
   const toggleCalculadora = () => {
@@ -542,8 +548,11 @@ const Plantilla = () => {
                 </div>
 
                 <div className='btn-obtener-contacto'>
-                  <button className='btn btn-dark'>Obtener numero de contacto</button>
+                  <button className='btn btn-dark' onClick={() => setModalContactoVisible(true)}>
+                    Obtener número de contacto
+                  </button>
                 </div>
+
 
               </div>
             </div>
@@ -820,6 +829,12 @@ const Plantilla = () => {
         <div class="centered-line-plantilla-b mt-3 "></div>
         <CatalogoProductos showOnlyFour={true} />
       </div>
+
+      <ObtenerNumero 
+  show={modalContactoVisible} 
+  handleClose={() => setModalContactoVisible(false)} 
+/>
+
 
       {/* Modal de ampliación */}
       <Modal show={modalVisible} onHide={handleCloseModal} centered size="lg">

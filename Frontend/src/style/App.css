@@ -1031,9 +1031,9 @@ font-size: 18px;
 
 .desktop-menu-nuevo-inmueble {
   display: flex;
-  gap: 50px;
+  gap: 25px;
   position: absolute;
-  left: 37%;
+  left: 30%;
   transform: translateX(-50%);
 }
 

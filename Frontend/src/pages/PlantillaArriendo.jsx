@@ -16,6 +16,7 @@ import Bano from '../assets/icons/bano.svg';
 import Carro from '../assets/icons/carro.svg';
 import Area from '../assets/icons/area.svg';
 import Cama from '../assets/icons/cama.svg';
+import ObtenerNumero from '../components/modules/inmuebles/ObtenerNumero';
 
 import { getIconByName } from '../services/inmuebles/IconsService'; // Importar el servicio de iconos
 import InmuebleService from '../services/inmuebles/InmuebleService';
@@ -27,6 +28,7 @@ const Plantilla = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState("A");
   const [dynamicData, setDynamicData] = useState({});
+  const [modalContactoVisible, setModalContactoVisible] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -434,9 +436,10 @@ const Plantilla = () => {
                   </>
                 </div>
 
-                <div className='btn-obtener-contacto'>
-                  <button className='btn btn-dark'>Obtener numero de contacto</button>
-                </div>
+                <button className='btn btn-dark' onClick={() => setModalContactoVisible(true)}>
+                  Obtener número de contacto
+                </button>
+
               </div>
             </div>
           </div>
@@ -492,6 +495,12 @@ const Plantilla = () => {
         <div class="centered-line-plantilla-b mt-3 "></div>
         <CatalogoProductos showOnlyFour={true} />
       </div>
+
+      <ObtenerNumero 
+      show={modalContactoVisible} 
+      handleClose={() => setModalContactoVisible(false)} 
+    />
+
 
 
 

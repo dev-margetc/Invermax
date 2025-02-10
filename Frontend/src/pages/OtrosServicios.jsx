@@ -29,6 +29,7 @@ const OtrosServicios = () => {
       try {
         const data = await servicioService.getServicios();
         setServicios(data); // Los datos ya están formateados
+        console.log("Planes cargados:", data);
       } catch (error) {
         console.error("Error al cargar los planes:", error);
       }
@@ -103,42 +104,46 @@ const OtrosServicios = () => {
             un libro de textos especimen.
           </p>
 
+
+          {servicios.length > 0 ? (
           <Accordion activeKey={activeKey} onSelect={(key)=>setActiveKey(key)}>
-            {servicios.map((servicio, index) => (
-              <Accordion.Item eventKey={index.toString()} key={servicio.id}>
-                <Accordion.Header>{servicio.titulo}</Accordion.Header>
-                <Accordion.Body>
-                  {servicio.imagen && (
-                    <Row>
-                      <Col md={4}>
-                        <img
-                          src={servicio?.imagen}
-                          alt={servicio.titulo}
-                          className="img-fluid"
-                        />
-                      </Col>
-                      <Col md={8}>
-                        <p className="descripcion-item">{servicio.descripcion}</p>
-                        {servicio.precio && (
-                          <p className="precio-item">
-                            <strong>{servicio.precio}</strong>
-                          </p>
-                        )}
-                        {servicio.boton && (
-                          <button className="btn btn-dark btn-asesor">
-                            {servicio.boton}
-                          </button>
-                        )}
-                      </Col>
-                    </Row>
-                  )}
-                  {!servicio.imagen && (
-                    <p className="descripcion-item">{servicio.descripcion}</p>
-                  )}
-                </Accordion.Body>
-              </Accordion.Item>
-            ))}
-          </Accordion>
+          {servicios.map((servicio, index) => (
+            <Accordion.Item eventKey={index.toString()} key={servicio.id}>
+              <Accordion.Header>{servicio.titulo}</Accordion.Header>
+              <Accordion.Body>
+                {servicio.imagen && (
+                  <Row>
+                    <Col md={4}>
+                      <img
+                        src={servicio?.imagen}
+                        alt={servicio.titulo}
+                        className="img-fluid"
+                      />
+                    </Col>
+                    <Col md={8}>
+                      <p className="descripcion-item">{servicio.descripcion}</p>
+                      {servicio.precio && (
+                        <p className="precio-item">
+                          <strong>{servicio.precio}</strong>
+                        </p>
+                      )}
+                      {servicio.boton && (
+                        <button className="btn btn-dark btn-asesor">
+                          {servicio.boton}
+                        </button>
+                      )}
+                    </Col>
+                  </Row>
+                )}
+                {!servicio.imagen && (
+                  <p className="descripcion-item">{servicio.descripcion}</p>
+                )}
+              </Accordion.Body>
+            </Accordion.Item>
+          ))}
+        </Accordion>
+          ):(<p></p>)}
+
         </div>
       </Container>
     </div>

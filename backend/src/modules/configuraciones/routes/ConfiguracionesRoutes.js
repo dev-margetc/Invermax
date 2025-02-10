@@ -9,7 +9,7 @@ const ConfigController = require("../controllers/ConfiguracionesController");
 const AliadoController = require("../controllers/AliadoController");
 /* Rutas de consulta*/
 
-// Traer info de invermax
+// Traer info de invermax..
 router.get('/infoInvermax', ConfigController.getInfoInvermax);
 
 // Traer los aliados

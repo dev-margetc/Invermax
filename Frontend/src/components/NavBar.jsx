@@ -133,9 +133,9 @@ const Navbar = ({ token, setToken }) => {
           </div>
         )}
         <div className="navbar-right">
-          <button className="menu-toggle d-lg-none" onClick={toggleMenu}>
-            {isOpen ? <span>&#10005;</span> : <i className="fas fa-bars"></i>}
-          </button>
+          {/* <button className="menu-toggle d-lg-none" onClick={toggleMenu}>
+            {isOpen ? <span>&#10005;</span> : <i className="fas fa-bars">www</i>}
+          </button> */}
           {["/Nuevo-Inmueble", "/publicar-nuevo-inmueble", "/mis-inmuebles", "/leads", "/mi-plan", "/editar-perfil","/aliados","/servicios"].includes(location.pathname) ? (
             <>
               <button className="btn btn-primary ms-2 " style={{ background: 'none', color: 'black', border: "none" }}>

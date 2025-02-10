@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
-import servicioService from '../services/servicios/ServicioService.js'; 
+import servicioService from '../services/servicios/ServicioService.js';
+
 
 const Servicios = () => {
     const [servicios, setServicios] = useState([]);
@@ -16,13 +17,20 @@ const Servicios = () => {
     });
     const [editIndex, setEditIndex] = useState(null);
 
-    // Paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const serviciosPerPage = 5;
+    const fetchServicios = async () => {
+        try {
+            const data = await servicioService.getServicios();
+            if (data && Array.isArray(data)) {
+                setServicios(data);
+            }
+        } catch (error) {
+            console.error('Error al obtener los servicios:', error);
+        }
+    };
 
-    const indexOfLastServicio = currentPage * serviciosPerPage;
-    const indexOfFirstServicio = indexOfLastServicio - serviciosPerPage;
-    const currentServicios = servicios.slice(indexOfFirstServicio, indexOfLastServicio);
+    useEffect(() => {
+        fetchServicios();
+    }, []);
 
     const handleShowModal = (index = null) => {
         if (index !== null) {
@@ -52,6 +60,7 @@ const Servicios = () => {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
+    
         if (file) {
             const fileType = file.type.split('/')[0];
             if (fileType !== 'image') {
@@ -66,6 +75,7 @@ const Servicios = () => {
                 });
                 return;
             }
+    
             if (file.size > 5 * 1024 * 1024) { // 5MB
                 Swal.fire({
                     icon: 'error',
@@ -78,60 +88,62 @@ const Servicios = () => {
                 });
                 return;
             }
+    
             const reader = new FileReader();
             reader.onloadend = () => {
-                setCurrentServicio({ ...currentServicio, fotoServicio: reader.result });
+                setCurrentServicio((prev) => ({
+                    ...prev,
+                    fotoServicio: reader.result // 🔴 GUARDA LA IMAGEN EN BASE64 PARA PREVISUALIZAR
+                }));
             };
             reader.readAsDataURL(file);
         }
     };
+    
+
+    const handleDeleteServicio = async (idServicio) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'No podrás revertir esta acción',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await servicioService.deleteServicio(idServicio);
+                    setServicios(servicios.filter(servicio => servicio.idServicio !== idServicio));
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Eliminado',
+                        text: 'Trámite eliminado exitosamente',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un error al eliminar el trámite',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+            }
+        });
+    };
 
     const handleSaveServicio = async () => {
-        // Validación de campos
-        if (!currentServicio.codigoServicio.trim()) {
+        if (!currentServicio.codigoServicio.trim() || !currentServicio.nombreServicio.trim() || !currentServicio.precioServicio.trim()) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'El código del servicio es obligatorio',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-            return;
-        }
-    
-        if (!currentServicio.nombreServicio.trim()) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'El nombre del servicio es obligatorio',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-            return;
-        }
-    
-        if (!currentServicio.precioServicio.trim() || isNaN(currentServicio.precioServicio) || parseFloat(currentServicio.precioServicio) <= 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Por favor, ingresa un precio válido',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-            return;
-        }
-    
-        if (!currentServicio.fotoServicio) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Debes subir una foto del servicio',
+                text: 'Todos los campos son obligatorios',
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -143,51 +155,34 @@ const Servicios = () => {
         try {
             let savedServicio;
             if (editIndex !== null) {
-                // Actualizar el servicio sin la foto
-                savedServicio = await servicioService.updateServicio(servicios[editIndex]._id, currentServicio);
-                setServicios(servicios.map((servicio, index) => (index === editIndex ? savedServicio : servicio)));
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Guardado',
-                    text: 'Servicio actualizado exitosamente',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
+                // 🔴 Si no se ha cambiado la imagen, mantener la anterior
+                const servicioActual = servicios[editIndex];
+                const servicioAEnviar = {
+                    ...currentServicio,
+                    fotoServicio: currentServicio.fotoServicio || servicioActual.fotoServicio
+                };
+    
+                // Actualizar servicio
+                savedServicio = await servicioService.updateServicio(servicioActual.idServicio, servicioAEnviar);
             } else {
-                // Crear el servicio sin la foto
+                // Crear nuevo servicio
                 savedServicio = await servicioService.addServicio(currentServicio);
-                setServicios([...servicios, savedServicio]);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Guardado',
-                    text: 'Servicio agregado exitosamente',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
             }
     
-            // Paso 2: Subir la foto después de la creación del servicio
-            if (currentServicio.fotoServicio) {
-                const formData = new FormData();
-                formData.append('fotoServicio', currentServicio.fotoServicio);
+            // Actualizar la lista de servicios
+            await fetchServicios();
     
-                // Paso 3: Enviar la foto usando el ID del servicio
-                await servicioService.uploadFotoServicio(savedServicio._id, formData);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Foto cargada',
-                    text: 'Foto cargada exitosamente',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-            }
+            Swal.fire({
+                icon: 'success',
+                title: editIndex !== null ? 'Servicio actualizado' : 'Servicio agregado',
+                text: editIndex !== null ? 'El servicio fue actualizado correctamente' : 'El servicio fue agregado correctamente',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
     
+            handleCloseModal(); // Cerrar el modal después de guardar
         } catch (error) {
             Swal.fire({
                 icon: 'error',
@@ -199,68 +194,20 @@ const Servicios = () => {
                 timer: 3000
             });
         }
-    
-        handleCloseModal();
     };
     
-
-    const handleDeleteServicio = async (index) => {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: 'No podrás revertir esta acción',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const servicioId = servicios[index]._id;
-                    await servicioService.deleteServicio(servicioId); // Llamada a la API para eliminar el servicio
-                    const updatedServicios = servicios.filter((_, i) => i !== index);
-                    setServicios(updatedServicios);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Eliminado',
-                        text: 'Servicio eliminado exitosamente',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-                } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un error al eliminar el servicio',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-                }
-            }
-        });
-    };
-    
-
-    // Funciones de paginación
-    const totalPages = Math.ceil(servicios.length / serviciosPerPage);
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
 
     return (
         <div className='container'>
-            <h1 className='text-center m-4' style={{ fontWeight: 700 }}>SERVICIOS</h1>
+            <h1 className='text-center m-4' style={{ fontWeight: 700 }}>OTROS TRÁMITES</h1>
             <div className="d-flex justify-content-start">
-                <Button variant="primary" onClick={() => handleShowModal()}>Agregar Servicio</Button>
+                <Button variant="none" className='button-rojo-general'  onClick={() => handleShowModal()}>Nuevo Trámite</Button>
             </div>
+
 
             <div className="content-container mt-4">
                 {servicios.length === 0 ? (
-                    <p className="no-data-message">No hay servicios disponibles.</p>
+                    <p className="no-data-message">No hay trámites disponibles.</p>
                 ) : (
                     <div className="table-responsive mt-4">
                         <table className="table table-bordered text-center">
@@ -270,29 +217,30 @@ const Servicios = () => {
                                     <th>Nombre</th>
                                     <th>Descripción</th>
                                     <th>Precio</th>
-                                    <th>Foto</th>
+                                    <th>Imagen</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentServicios.map((servicio, index) => (
-                                    <tr key={index}>
+                                {servicios.map((servicio, index) => (
+                                    <tr key={servicio.idServicio}>
                                         <td>{servicio.codigoServicio}</td>
                                         <td>{servicio.nombreServicio}</td>
                                         <td>{servicio.descripcionServicio}</td>
                                         <td>{servicio.precioServicio}</td>
                                         <td>
                                             {servicio.fotoServicio ? (
-                                                <img src={servicio.fotoServicio} alt="Foto Servicio" width="100" />
+                                                <img src={servicio.fotoServicio} alt="Servicio" width="100" />
                                             ) : (
                                                 <span>No disponible</span>
                                             )}
                                         </td>
+
                                         <td>
                                             <Button variant="success" onClick={() => handleShowModal(index)} className="m-1">
                                                 <FaEdit />
                                             </Button>
-                                            <Button variant="danger" onClick={() => handleDeleteServicio(index)} className="m-1">
+                                            <Button variant="danger" onClick={() => handleDeleteServicio(servicio.idServicio)} className="m-1">
                                                 <FaTrashAlt />
                                             </Button>
                                         </td>
@@ -300,94 +248,91 @@ const Servicios = () => {
                                 ))}
                             </tbody>
                         </table>
-                        {/* Paginación */}
-                        <div className="pagination">
-                            {Array.from({ length: totalPages }, (_, index) => (
-                                <Button
-                                    key={index}
-                                    variant="outline-secondary"
-                                    onClick={() => handlePageChange(index + 1)}
-                                    className="m-1"
-                                >
-                                    {index + 1}
-                                </Button>
-                            ))}
-                        </div>
                     </div>
                 )}
             </div>
 
+            {/* Modal */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{editIndex !== null ? 'Editar Servicio' : 'Agregar Servicio'}</Modal.Title>
+                    <Modal.Title>{editIndex !== null ? 'Editar Trámite' : 'Agregar Trámite'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form>
-                        <Form.Group controlId="formCodigoServicio">
-                            <Form.Label>Código del Servicio</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="codigoServicio"
-                                value={currentServicio.codigoServicio}
-                                onChange={handleInputChange}
-                                placeholder='Código del servicio'
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formNombreServicio">
-                            <Form.Label>Nombre del Servicio</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="nombreServicio"
-                                value={currentServicio.nombreServicio}
-                                onChange={handleInputChange}
-                                placeholder='Nombre del servicio'
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formDescripcionServicio">
-                            <Form.Label>Descripción del Servicio</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                name="descripcionServicio"
-                                value={currentServicio.descripcionServicio}
-                                onChange={handleInputChange}
-                                placeholder='Descripción del servicio'
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formPrecioServicio">
-                            <Form.Label>Precio del Servicio</Form.Label>
-                            <Form.Control
-                                type="number"
-                                step="0.01"
-                                name="precioServicio"
-                                value={currentServicio.precioServicio}
-                                onChange={handleInputChange}
-                                placeholder='Precio del servicio'
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formFotoServicio">
-                            <Form.Label>Foto del Servicio</Form.Label>
-                            <Form.Control
-                                type="file"
-                                name="fotoServicio"
-                                onChange={handleFileChange}
-                            />
-                            {currentServicio.fotoServicio && (
-                                <div className="mt-2">
-                                    <img src={currentServicio.fotoServicio} alt="Foto Previa" width="100" />
-                                </div>
-                            )}
-                        </Form.Group>
-                    </Form>
+                <Form>
+    <Form.Group className='mb-3'>
+        <Form.Label>Código del Trámite</Form.Label>
+        <Form.Control
+            type="text"
+            name="codigoServicio"
+            value={currentServicio.codigoServicio}
+            placeholder='Ingrese el código del servicio'
+            onChange={handleInputChange}
+        />
+    </Form.Group>
+
+    <Form.Group className='mb-3'>
+        <Form.Label>Nombre del Trámite</Form.Label>
+        <Form.Control
+            type="text"
+            name="nombreServicio"
+            placeholder='Ingrese el nombre del servicio'
+            value={currentServicio.nombreServicio}
+            onChange={handleInputChange}
+        />
+    </Form.Group>
+
+    <Form.Group className='mb-3'>
+        <Form.Label>Descripción del Trámite</Form.Label>
+        <Form.Control
+            as="textarea"
+            name="descripcionServicio"
+            placeholder='Ingrese la descripción del servicio'
+            value={currentServicio.descripcionServicio}
+            onChange={handleInputChange}
+        />
+    </Form.Group>
+
+    <Form.Group className='mb-3'>
+        <Form.Label>Precio del Trámite</Form.Label>
+        <Form.Control
+            type="number"
+            name="precioServicio"
+            placeholder='Ingrese el precio del servicio'
+            value={currentServicio.precioServicio}
+            onChange={handleInputChange}
+        />
+    </Form.Group>
+
+    {/* 🔴 Agregar el campo tipoModulo igual que en Aliados */}
+    <Form.Group className='mb-3'>
+        <Form.Control 
+            type="hidden" 
+            name="tipoModulo" 
+            value="servicios" 
+        />
+    </Form.Group>
+
+    {/* Manejo de la imagen igual que en Aliados */}
+    <Form.Group className='mb-3'>
+        <Form.Label>Foto del Trámite</Form.Label>
+        <Form.Control type="file" onChange={handleFileChange} />
+        {currentServicio.fotoServicio && (
+            <div className="mt-2">
+                <img src={currentServicio.fotoServicio} alt="Vista previa" width="100" />
+            </div>
+        )}
+    </Form.Group>
+</Form>
+
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
-                    <Button variant="primary" onClick={handleSaveServicio}>
-                        {editIndex !== null ? 'Guardar Cambios' : 'Agregar Servicio'}
+                    <Button variant="none" className='button-negro-general-ser' onClick={handleCloseModal}>Cancelar</Button>
+                    <Button variant="none" className='button-rojo-general'  onClick={handleSaveServicio}>
+                        {editIndex !== null ? 'Guardar Cambios' : 'Agregar Trámite'}
                     </Button>
                 </Modal.Footer>
             </Modal>
 
-            {/* Estilos CSS */}
             <style jsx>{`
                 .form-control {
                     border: 1px solid black !important;
@@ -444,7 +389,46 @@ const Servicios = () => {
                 .pagination button {
                     margin: 0 5px;
                 }
-            `}</style>
+
+                .button-rojo-general{
+                width: 120;
+                height: 30;
+                border-radius: 10px;
+                padding-top: 8px;
+                padding-right: 24px;
+                padding-bottom: 8px;
+                padding-left: 24px;
+                gap: 10px;
+                background-color: #FF0000;
+                border-color: #FF0000;
+                color: white;
+                }
+
+                .button-rojo-general:hover{
+                background-color: #FF0000;
+                border-color: #FF0000;
+                            }
+
+                .button-negro-general-ser{
+                width: 120;
+                height: 30;
+                border-radius: 10px;
+                padding-top: 8px;
+                padding-right: 24px;
+                padding-bottom: 8px;
+                padding-left: 24px;
+                gap: 10px;
+                background-color: #000000;
+                border-color: #000000;
+                 color: white;
+                }
+
+                .button-negro-general-ser:hover{
+                background-color: #000000;
+                border-color: #000000;
+                 color: white;
+                }
+           `}</style>
         </div>
     );
 };
