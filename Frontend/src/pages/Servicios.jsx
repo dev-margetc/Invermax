@@ -3,9 +3,31 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import servicioService from '../services/servicios/ServicioService.js';
+import UsuarioService from '../services/usuarios/UsuarioService.js';
+import { useNavigate } from 'react-router-dom';
 
 
 const Servicios = () => {
+
+    const navigate = useNavigate(); // ✅ Hook para redirección
+
+    useEffect(() => {
+        const verificarYRedirigir = async () => {
+            try {
+                const verificar = await UsuarioService.verificarAutenticacion(["admin"]); // ✅ Verificar autenticación
+
+                if (!verificar) {
+                    alert("No tienes permisos para ver esta página."); // ✅ Mostrar alerta
+                    navigate("/"); // ✅ Redirigir al Home
+                }
+            } catch (error) {
+                console.error("Error verificando autenticación:", error);
+            }
+        };
+
+        verificarYRedirigir();
+    }, [navigate]); // ✅ Dependencia `navigate` para evitar múltiples ejecuciones
+
     const [servicios, setServicios] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [currentServicio, setCurrentServicio] = useState({
@@ -88,15 +110,17 @@ const Servicios = () => {
                 });
                 return;
             }
+
+            setCurrentServicio({ ...currentServicio, fotoServicio: file });
     
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setCurrentServicio((prev) => ({
-                    ...prev,
-                    fotoServicio: reader.result // 🔴 GUARDA LA IMAGEN EN BASE64 PARA PREVISUALIZAR
-                }));
-            };
-            reader.readAsDataURL(file);
+            // const reader = new FileReader();
+            // reader.onloadend = () => {
+            //     setCurrentServicio((prev) => ({
+            //         ...prev,
+            //         fotoServicio: reader.result // 🔴 GUARDA LA IMAGEN EN BASE64 PARA PREVISUALIZAR
+            //     }));
+            // };
+            // reader.readAsDataURL(file);
         }
     };
     
@@ -315,7 +339,7 @@ const Servicios = () => {
     {/* Manejo de la imagen igual que en Aliados */}
     <Form.Group className='mb-3'>
         <Form.Label>Foto del Trámite</Form.Label>
-        <Form.Control type="file" onChange={handleFileChange} />
+        <Form.Control type="file" name="fotoServicio" onChange={handleFileChange} />
         {currentServicio.fotoServicio && (
             <div className="mt-2">
                 <img src={currentServicio.fotoServicio} alt="Vista previa" width="100" />

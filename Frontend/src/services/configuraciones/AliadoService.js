@@ -1,5 +1,6 @@
 // Ejecuta las peticiones donde los aliados son el objeto principal de la relacion
 import { api } from "../api";
+import AuthService from "../usuarios/AuthService";
 
 // Traer las configuraciones de informacion de invermax
 const getAliados = async () => {
@@ -20,16 +21,29 @@ const getAliados = async () => {
 // Agregar un nuevo aliado
 const addAliado = async (nuevoAliado) => {
     let url = "/configuraciones/aliados";
+    // Traer el token
+    const token = await AuthService.getToken();
     console.log(nuevoAliado);
     try {
+        const logoAliado = nuevoAliado.logoAliado;
+        nuevoAliado.logoAliado = null;
         const response = await api.post(url, nuevoAliado, {
             headers: {
-                'Content-Type': 'multipart/form-data', // Si hay imágenes
+                'Content-Type': 'multipart/form-data', 
+                'Authorization': `Bearer ${token}`,
+                
             },
         });
-        if (!response.data) {
-            throw new Error("No se recibió confirmación al agregar el aliado.");
+
+        if (logoAliado) {
+            const formData = {};
+            formData.logoAliado = logoAliado;
+            const responseLogo = await editAliado(response.data.aliado, formData);
         }
+
+        // if (!response.data) {
+        //     throw new Error("No se recibió confirmación al agregar el aliado.");
+        // }
         return response.data;
     } catch (error) {
         console.log(error);
@@ -39,6 +53,10 @@ const addAliado = async (nuevoAliado) => {
     console.log(data);
     
 };
+
+
+
+
 
 // Función para cargar el logo del aliado
 const uploadLogoAliado = async (idAliado, formData) => {
@@ -59,6 +77,8 @@ const uploadLogoAliado = async (idAliado, formData) => {
 // Editar un aliado
 const editAliado = async (idAliado, datosActualizados) => {
     let url = `/configuraciones/aliados/${idAliado}`;
+    // Traer el token
+    const token = await AuthService.getToken();
 
     // Imprimir los datos que vas a enviar
     console.log('Datos a enviar al backend:', datosActualizados);
@@ -90,6 +110,7 @@ if (datosActualizados.logoAliado instanceof File) {
         const response = await api.put(url, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data', // Si hay imágenes
+                'Authorization': `Bearer ${token}`,
             },
         });
         

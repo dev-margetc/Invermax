@@ -3,8 +3,34 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import aliadosServices from '../services/configuraciones/AliadoService.js'; 
+import UsuarioService from '../services/usuarios/UsuarioService.js';
+import { useNavigate } from 'react-router-dom';
+
+
+
 
 const Aliados = () => {
+
+    const navigate = useNavigate(); // ✅ Hook para redirección
+
+    useEffect(() => {
+        const verificarYRedirigir = async () => {
+            try {
+                const verificar = await UsuarioService.verificarAutenticacion(["admin"]);
+
+                if (!verificar) {
+                    alert("No tienes permisos para ver esta página."); // ✅ Mostrar alerta
+                    navigate("/"); // ✅ Redirigir al Home
+                }
+            } catch (error) {
+                console.error("Error verificando autenticación:", error);
+            }
+        };
+
+        verificarYRedirigir();
+    }, [navigate]); // ✅ Dependencia `navigate` para evitar múltiples ejecuciones
+
+
     const [aliados, setAliados] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [currentAliado, setCurrentAliado] = useState({ nombreAliado: '', urlRedireccion: '' });
@@ -319,6 +345,8 @@ const Aliados = () => {
                         name='tipoModulo'
                         value='aliados'
                         />
+
+
                         <Form.Group controlId="formLogoAliado">
                             <Form.Label>Logo del Aliado</Form.Label>
                             <Form.Control
@@ -332,6 +360,9 @@ const Aliados = () => {
                                 </div>
                             )}
                         </Form.Group>
+
+
+
                         
                     </Form>
                 </Modal.Body>
