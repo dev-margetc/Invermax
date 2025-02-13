@@ -8,25 +8,39 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Servicios = () => {
-
     const navigate = useNavigate(); // ✅ Hook para redirección
-
+    const [isVerified, setIsVerified] = useState(false); // Estado para controlar la verificación
+    const [previewLogo, setPreviewLogo] = useState(null);
+  
+  
     useEffect(() => {
-        const verificarYRedirigir = async () => {
-            try {
-                const verificar = await UsuarioService.verificarAutenticacion(["admin"]); // ✅ Verificar autenticación
-
-                if (!verificar) {
-                    alert("No tienes permisos para ver esta página."); // ✅ Mostrar alerta
-                    navigate("/"); // ✅ Redirigir al Home
-                }
-            } catch (error) {
-                console.error("Error verificando autenticación:", error);
-            }
-        };
-
+      const verificarYRedirigir = async () => {
+        try {
+          const verificar = await UsuarioService.verificarAutenticacion(["admin"]);
+  
+          if (!verificar) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Acceso denegado',
+              html: "No tienes permisos para esta pagina", // ✅ Mostrar alerta personalizada
+              showConfirmButton: true,
+              confirmButtonText: 'Entiendo',
+              preConfirm: () => {
+                navigate("/"); // ✅ Redirigir al Home
+              }
+            });
+          } else {
+            setIsVerified(true); // Marcar como verificado solo si la autenticación es exitosa
+          }
+        } catch (error) {
+          console.error("Error verificando autenticación:", error);
+        }
+      };
+  
+      if (!isVerified) {
         verificarYRedirigir();
-    }, [navigate]); // ✅ Dependencia `navigate` para evitar múltiples ejecuciones
+      }
+    }, [navigate, isVerified]);
 
     const [servicios, setServicios] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -38,6 +52,13 @@ const Servicios = () => {
         fotoServicio: ''
     });
     const [editIndex, setEditIndex] = useState(null);
+
+    // Paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const ServiciosPerPage = 5; 
+    const indexOfLastServicio = currentPage * ServiciosPerPage;
+    const indexOfFirstServicio = indexOfLastServicio - ServiciosPerPage;
+    const currentServicios = servicios.slice(indexOfFirstServicio, indexOfLastServicio);
 
     const fetchServicios = async () => {
         try {
@@ -54,10 +75,16 @@ const Servicios = () => {
         fetchServicios();
     }, []);
 
-    const handleShowModal = (index = null) => {
-        if (index !== null) {
-            setCurrentServicio(servicios[index]);
-            setEditIndex(index);
+    const handleShowModal = (servicio = null) => {
+        if (servicio !== null) {
+            setCurrentServicio({ ...servicio }); // ✅ Clonamos el objeto para evitar referencias directas
+            setEditIndex(servicio.idServicio);
+    
+            if (servicio.fotoServicio) {
+                setPreviewLogo(servicio.fotoServicio);
+            } else {
+                setPreviewLogo(null);
+            }
         } else {
             setCurrentServicio({
                 codigoServicio: '',
@@ -67,9 +94,12 @@ const Servicios = () => {
                 fotoServicio: ''
             });
             setEditIndex(null);
+            setPreviewLogo(null);
         }
         setShowModal(true);
     };
+    
+    
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -85,44 +115,25 @@ const Servicios = () => {
     
         if (file) {
             const fileType = file.type.split('/')[0];
+    
             if (fileType !== 'image') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Por favor, selecciona un archivo de imagen',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Por favor, selecciona un archivo de imagen' });
                 return;
             }
     
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'El archivo es demasiado grande. Máximo 5MB',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
+            if (file.size > 5 * 1024 * 1024) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'El archivo es demasiado grande. Máximo 5MB' });
                 return;
             }
-
+    
+            const imageURL = URL.createObjectURL(file); // ✅ Crea la URL de previsualización
+            setPreviewLogo(imageURL); // ✅ Ahora sí previsualiza la imagen seleccionada
+    
             setCurrentServicio({ ...currentServicio, fotoServicio: file });
-    
-            // const reader = new FileReader();
-            // reader.onloadend = () => {
-            //     setCurrentServicio((prev) => ({
-            //         ...prev,
-            //         fotoServicio: reader.result // 🔴 GUARDA LA IMAGEN EN BASE64 PARA PREVISUALIZAR
-            //     }));
-            // };
-            // reader.readAsDataURL(file);
         }
     };
+    
+    
     
 
     const handleDeleteServicio = async (idServicio) => {
@@ -179,19 +190,17 @@ const Servicios = () => {
         try {
             let savedServicio;
             if (editIndex !== null) {
-                // 🔴 Si no se ha cambiado la imagen, mantener la anterior
-                const servicioActual = servicios[editIndex];
+                const servicioActual = servicios.find(serv => serv.idServicio === editIndex); // ✅ Encuentra el servicio por ID
                 const servicioAEnviar = {
                     ...currentServicio,
-                    fotoServicio: currentServicio.fotoServicio || servicioActual.fotoServicio
+                    fotoServicio: currentServicio.fotoServicio || servicioActual?.fotoServicio
                 };
-    
-                // Actualizar servicio
-                savedServicio = await servicioService.updateServicio(servicioActual.idServicio, servicioAEnviar);
+            
+                savedServicio = await servicioService.updateServicio(editIndex, servicioAEnviar);
             } else {
-                // Crear nuevo servicio
                 savedServicio = await servicioService.addServicio(currentServicio);
             }
+            
     
             // Actualizar la lista de servicios
             await fetchServicios();
@@ -219,7 +228,12 @@ const Servicios = () => {
             });
         }
     };
-    
+      // Funciones de paginación
+  const totalPages = Math.ceil(servicios.length / ServiciosPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
     return (
         <div className='container'>
@@ -246,7 +260,7 @@ const Servicios = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {servicios.map((servicio, index) => (
+                            {currentServicios.map((servicio,index) => (
                                     <tr key={servicio.idServicio}>
                                         <td>{servicio.codigoServicio}</td>
                                         <td>{servicio.nombreServicio}</td>
@@ -261,9 +275,10 @@ const Servicios = () => {
                                         </td>
 
                                         <td>
-                                            <Button variant="success" onClick={() => handleShowModal(index)} className="m-1">
-                                                <FaEdit />
-                                            </Button>
+                                        <Button variant="success" onClick={() => handleShowModal(servicio)} className="m-1">
+    <FaEdit />
+</Button>
+
                                             <Button variant="danger" onClick={() => handleDeleteServicio(servicio.idServicio)} className="m-1">
                                                 <FaTrashAlt />
                                             </Button>
@@ -272,6 +287,19 @@ const Servicios = () => {
                                 ))}
                             </tbody>
                         </table>
+                                    {/* Paginación */}
+                                    <div className="pagination">
+                                      {Array.from({ length: totalPages }, (_, index) => (
+                                        <Button
+                                          key={index}
+                                          variant="outline-secondary"
+                                          onClick={() => handlePageChange(index + 1)}
+                                          className="m-1"
+                                        >
+                                          {index + 1}
+                                        </Button>
+                                      ))}
+                                    </div>
                     </div>
                 )}
             </div>

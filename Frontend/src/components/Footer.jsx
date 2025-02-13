@@ -38,14 +38,14 @@ const Footer = () => {
   }
 
   return (
-    <footer class="footer">
-      <div class="footer-content">
-        <div class="footer-section logo-section">
+    <footer className="footer">
+      <div className="footer-content">
+        <div className="footer-section logo-section">
           <img src="img/logo-footer.png" alt="Logo" className="footer-logo" loading="lazy" />
           <p>Hogares felices, propiedades rentables</p>
         </div>
 
-        <div class="footer-section">
+        <div className="footer-section">
           <h5>Legales</h5>
           <ul>
             <li><a href="#">Términos y condiciones</a></li>
@@ -53,7 +53,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        <div class="footer-section">
+        <div className="footer-section">
           <h5>Otros trámites</h5>
           <ul>
             {servicios && servicios.map((servicio, index) => (
@@ -63,7 +63,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        <div class="footer-section">
+        <div className="footer-section">
           <h5>Contacto</h5>
           <p>{info.contactInfo?.direccion || "Dirección no disponible"}</p>
           <p>Móvil <strong>{info.contactInfo?.movil || "Movil no disponible"}</strong></p>
@@ -77,28 +77,28 @@ const Footer = () => {
         </div>
       </div>
 
-      <div class="footer-social">
-        <div class="social-icons">
+      <div className="footer-social">
+        <div className="social-icons">
           {info.socialInfo?.url_facebook && info.socialInfo?.url_facebook != "" && (
-            <a href={info.socialInfo.url_facebook}><i class="fab fa-facebook-f"></i></a>
+            <a href={info.socialInfo.url_facebook}><i className="fab fa-facebook-f"></i></a>
           )}
           {info.socialInfo?.url_twitter && info.socialInfo?.url_twitter != "" && (
-            <a href={info.socialInfo?.url_twitter}><i class="fab fa-twitter"></i></a>
+            <a href={info.socialInfo?.url_twitter}><i className="fab fa-twitter"></i></a>
           )}
 
           {info.socialInfo?.url_instagram && info.socialInfo?.url_instagram != "" && (
-            <a href={info.socialInfo?.url_instagram}><i class="fab fa-instagram"></i></a>
+            <a href={info.socialInfo?.url_instagram}><i className="fab fa-instagram"></i></a>
           )}
           {info.socialInfo?.url_youtube && info.socialInfo?.url_youtube != "" && (
 
-            <a href={info.socialInfo?.url_youtube}><i class="fab fa-youtube"></i></a>
+            <a href={info.socialInfo?.url_youtube}><i className="fab fa-youtube"></i></a>
           )}
 
           {info.socialInfo?.url_linkedin && info.socialInfo?.url_linkedin != "" && (
-            <a href={info.socialInfo?.url_linkedin}><i class="fab fa-linkedin-in"></i></a>
+            <a href={info.socialInfo?.url_linkedin}><i className="fab fa-linkedin-in"></i></a>
           )}
           {info.socialInfo?.url_tiktok && info.socialInfo?.url_tiktok != "" && (
-            <a href={info.socialInfo.url_tiktok}><i class="fab fa-tiktok"></i></a>
+            <a href={info.socialInfo.url_tiktok}><i className="fab fa-tiktok"></i></a>
           )}
 
         </div>

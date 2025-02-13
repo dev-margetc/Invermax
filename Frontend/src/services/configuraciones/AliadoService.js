@@ -131,8 +131,17 @@ if (datosActualizados.logoAliado instanceof File) {
 // Eliminar un aliado
 const deleteAliado = async (idAliado) => {
     let url = `/configuraciones/aliados/${idAliado}`;
+
+    // Traer el token
+    const token = await AuthService.getToken();
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+    };
+
     try {
-        const response = await api.delete(url);
+        const response = await api.delete(url, { headers }); 
         if (!response.data) {
             throw new Error("No se recibió confirmación al eliminar el aliado.");
         }

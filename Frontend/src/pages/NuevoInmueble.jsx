@@ -4,6 +4,7 @@ import flechaAbajo from "../assets/icons/flechaAbajo.svg";
 import MultiSelectExample from "../components/modules/costumer/MultiSekectExample";
 import fondoAddFoto from '/img/icons/fondo-add-foto.svg';
 import AgregarOtroTipoInmueble from "../components/modules/costumer/AgregarOtroTipoInmueble";
+import InmuebleServices from "../services/inmuebles/InmuebleService";
 
 const NuevoInmueble = () => {
   const [selectedEstado, setSelectedEstado] = useState(null);
@@ -18,7 +19,6 @@ const NuevoInmueble = () => {
   const opcionesEstado = ["Nuevo", "Usado"];
   const opcionesTipo = ["Apartamento", "Apartaestudio","Oficina / Local", "Proyecto","Casa"];
   const ciudades = ["Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena"];
-  const zonasEjemplo = ["Parque", "Piscina", "Gimnasio", "Zona BBQ", "Salón Social"];
   const dataZonasCercanas = ["Parque", "Piscina", "Gimnasio", "Zona BBQ", "Universidad"];
   const dataZonasComunes = ["Parque", "Piscina", "Gimnasio", "Zona BBQ", "Salón Social"];
 
@@ -27,8 +27,34 @@ const NuevoInmueble = () => {
 
   const [isYears, setIsYears] = useState(true);
 
+  const [codigoInmueble, setCodigoInmueble] = useState("");
+  const [estadoInmueble, setEstadoInmueble] = useState("");
+  const [modalidadInmueble, setModalidadInmueble] = useState("");
+  const [tituloInmueble, setTituloInmueble] = useState("");
+  const [ubicacionInmueble, setUbicacionInmueble] = useState("");
+  const [estrato, setEstrato] = useState("");
+  const [administracion, setAdministracion] = useState("");
+  const [tipoVivienda, setTipoVivienda] = useState("No VIS"); 
+  const [codigoCiudad, setCodigoCiudad] = useState("");
+  const [idTipoInmueble, setIdTipoInmueble] = useState("");
+  const [frameMaps, setFrameMaps] = useState("");
+  const [descripcionInmueble, setDescripcionInmueble] = useState("");
+  const [fechaEntregaProyecto, setFechaEntregaProyecto] = useState("");
+  const [zonas, setZonas] = useState([]);
+  const [detalles, setDetalles] = useState([
+    {
+      valorInmueble: "",
+      area: "",
+      frameRecorrido: "",
+      cantidadHabitaciones: "",
+      cantidadBaños: "",
+      parqueadero: "",
+      amoblado: ""
+    }
+  ]);
+
   const toggleSwitch = () => {
-    setIsYears(!isYears);
+    setTipoVivienda((prevTipoVivienda) => (prevTipoVivienda === "No VIS" ? "VIS" : "No VIS"));
   };
 
   const handleAddPhoto = (e) => {
@@ -69,6 +95,14 @@ const NuevoInmueble = () => {
     setZonasInteres(zonasInteres.filter((z) => z !== zona));
   };
 
+  const handleZonasComunesChange = (selectedOptions) => {
+    setZonasComunes(selectedOptions);
+  };
+  
+  const handleZonasInteresChange = (selectedOptions) => {
+    setZonasInteres(selectedOptions);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = {
@@ -80,6 +114,21 @@ const NuevoInmueble = () => {
       photos,
       videos,
       isYears,
+      codigoInmueble,
+      estadoInmueble,
+      modalidadInmueble,
+      tituloInmueble,
+      ubicacionInmueble,
+      estrato,
+      administracion,
+      tipoVivienda,
+      codigoCiudad,
+      idTipoInmueble,
+      frameMaps,
+      descripcionInmueble,
+      fechaEntregaProyecto,
+      zonas,
+      detalles
     };
     alert(JSON.stringify(formData, null, 2));
   };
@@ -105,7 +154,7 @@ const NuevoInmueble = () => {
                           <input
                             type="radio"
                             id={`estado-${estado}`}
-                            name="estado"
+                            name="estadoInmueble"
                             value={estado.toLowerCase()}
                             checked={selectedEstado === estado}
                             onChange={() => setSelectedEstado(estado)}
@@ -132,7 +181,7 @@ const NuevoInmueble = () => {
                           <input
                             type="radio"
                             id={`tipo-${tipo}`}
-                            name="tipo"
+                            name="tipoInmueble"
                             value={tipo.toLowerCase()}
                             checked={selectedTipo === tipo}
                             onChange={() => setSelectedTipo(tipo)}
@@ -150,7 +199,11 @@ const NuevoInmueble = () => {
                   <div className="medio-inpus">
                     <div className="field-group">
                       <label>Ciudad</label>
-                      <select value={selectedCiudad} onChange={(e) => setSelectedCiudad(e.target.value)} required>
+                      <select 
+                        value={selectedCiudad} 
+                        onChange={(e) => setSelectedCiudad(e.target.value)} 
+                        name="ubicacionInmueble"
+                        required>
                         <option value="">Selecciona...</option>
                         {ciudades.map((ciudad) => (
                           <option key={ciudad} value={ciudad}>
@@ -162,46 +215,73 @@ const NuevoInmueble = () => {
 
                     <div className="field-group">
                       <label>Código del inmueble</label>
-                      <input type="text" placeholder="..." required />
+                      <input 
+                        type="text" 
+                        placeholder="..." 
+                        value={codigoInmueble} 
+                        name="codigoInmueble"
+                        onChange={(e) => setCodigoInmueble(e.target.value)} 
+                        required />
                     </div>
 
                     <div className="field-group">
                       <label>Título del Inmueble</label>
-                      <input type="text" placeholder="..." required />
+                      <input 
+                        type="text" 
+                        placeholder="..." 
+                        value={tituloInmueble} 
+                        name="tituloInmueble"
+                        onChange={(e) => setTituloInmueble(e.target.value)} 
+                        required />
                     </div>
 
                     <div className="field-group">
                       <label>Tipo de vivienda</label>
                       <div className="unique-toggle-switch-container-nuevo-inmueble">
-                        <span className={isYears ? "unique-active" : ""}>No Vis</span>
+                        <span className={tipoVivienda === "No VIS" ? "unique-active" : ""}>No VIS</span>
                         <div className="unique-toggle-switch" onClick={toggleSwitch}>
-                          <div className={`unique-toggle-knob ${isYears ? "unique-left" : "unique-right"}`}></div>
+                          <div className={`unique-toggle-knob ${tipoVivienda === "No VIS" ? "unique-left" : "unique-right"}`}></div>
                         </div>
-                        <span className={!isYears ? "unique-active" : ""}>Vis</span>
+                        <span className={tipoVivienda === "VIS" ? "unique-active" : ""}>VIS</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="field-group">
                     <label>Descripción del Inmueble</label>
-                    <textarea placeholder="..." required />
+                    <textarea 
+                      placeholder="..." 
+                      required
+                      value={descripcionInmueble} 
+                      name="descripcionInmueble"
+                      onChange={(e) => setDescripcionInmueble(e.target.value)} 
+                    />
                   </div>
 
                   <div className="field-group">
                     <label className="sub-label">Selecciona zonas comunes (Para proyectos y zonas residenciales)</label>
                   </div>
-                  <MultiSelectExample data={dataZonasComunes} />
+                  <MultiSelectExample 
+                      data={dataZonasComunes} 
+                      onSelectionChange={handleZonasComunesChange} 
+                    />
 
                   <div className="field-group">
                     <label className="sub-label">Selecciona zonas de interés cercanas</label>
-                  </div>
-                  <MultiSelectExample data={dataZonasCercanas} />
+                        </div>
+                        <MultiSelectExample 
+                        data={dataZonasCercanas} 
+                        onSelectionChange={handleZonasInteresChange} 
+                      />
                   <p className="mt-3"></p>
 
                   <div className="field-group">
                     <div className="field-group">
                       <label>Valor del Inmueble</label>
-                      <input type="text" placeholder="..." required />
+                      <input 
+                        type="text" 
+                        placeholder="..." 
+                        required />
                     </div>
                   </div>
                 </>
@@ -228,7 +308,12 @@ const NuevoInmueble = () => {
                         {photos.length < 20 && (
                           <div className="add-photo" style={{ backgroundImage: `url(${fondoAddFoto})` }}>
                             <label className="upload-label">
-                              <input type="file" accept="image/*" onChange={handleAddPhoto} hidden required />
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                onChange={handleAddPhoto} 
+                                hidden 
+                                required />
                               <span>+</span>
                             </label>
                           </div>
@@ -248,7 +333,11 @@ const NuevoInmueble = () => {
                         {videos.length < 3 && (
                           <div className="add-video">
                             <label className="upload-label">
-                              <input type="file" accept="video/*" onChange={handleAddVideo} required />
+                              <input 
+                                type="file" 
+                                accept="video/*" 
+                                onChange={handleAddVideo} 
+                                required />
                               <span>+</span>
                             </label>
                           </div>
@@ -286,7 +375,9 @@ const NuevoInmueble = () => {
                     <div className="field-row">
                       <div className="field">
                         <label>Cantidad habitaciones</label>
-                        <select style={{ width: "100%", boxShadow: "none" }} required>
+                        <select 
+                          style={{ width: "100%", boxShadow: "none" }} 
+                          required>
                           <option value="">Selecciona...</option>
                           <option value="1">1</option>
                           <option value="2">2</option>

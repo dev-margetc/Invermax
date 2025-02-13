@@ -115,18 +115,42 @@ const uploadFotoServicio = async (idServicio, formData) => {
 };
 
 
+// const deleteServicio = async (idServicio) => {
+//     let url = `/Servicios/${idServicio}`;
+//     try {
+//         const response = await api.delete(url);
+//         if (!response.data) {
+//             throw new Error("No se recibió confirmación al eliminar el aliado.");
+//         }
+//         return response.data;
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
+
 const deleteServicio = async (idServicio) => {
     let url = `/Servicios/${idServicio}`;
+
+    // Traer el token
+    const token = await AuthService.getToken();
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+    };
+
     try {
-        const response = await api.delete(url);
+        const response = await api.delete(url, { headers });  
+        
         if (!response.data) {
-            throw new Error("No se recibió confirmación al eliminar el aliado.");
+            throw new Error("No se recibió confirmación al eliminar el servicio.");
         }
         return response.data;
     } catch (error) {
-        console.log(error);
+        console.log("Error al eliminar el servicio:", error);
     }
 };
+
 
 export default {
     getServicios,

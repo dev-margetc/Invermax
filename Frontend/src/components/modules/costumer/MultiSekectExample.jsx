@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MultiSelectExample.css';
-import flechaAbajo from "../../../assets/icons/flechaAbajo.svg";
 import lupa2 from "../../../assets/icons/lupa2.svg";
 
-const MultiSelectExample = ({ data }) => {
+const MultiSelectExample = ({ data, onSelectionChange }) => {
   const [search, setSearch] = useState("");
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleCheckboxChange = (option) => {
     setSelectedOptions((prevSelected) => {
-      if (prevSelected.includes(option)) {
-        return prevSelected.filter((item) => item !== option);
-      } else {
-        return [...prevSelected, option];
-      }
+      const newSelected = prevSelected.includes(option)
+        ? prevSelected.filter((item) => item !== option)
+        : [...prevSelected, option];
+      onSelectionChange(newSelected); // Llamar a la función de devolución de llamada
+      return newSelected;
     });
   };
 
   const handleRemove = (option) => {
-    setSelectedOptions((prevSelected) => prevSelected.filter((item) => item !== option));
+    setSelectedOptions((prevSelected) => {
+      const newSelected = prevSelected.filter((item) => item !== option);
+      onSelectionChange(newSelected); // Llamar a la función de devolución de llamada
+      return newSelected;
+    });
   };
 
   const filteredOptions = data.filter((option) =>
@@ -44,7 +47,7 @@ const MultiSelectExample = ({ data }) => {
                 onChange={(e) => setSearch(e.target.value)}
                 className="search-input"
               />
-              <span className="search-icon"><img src={lupa2} alt="" srcset=""  loading='lazy'/></span>
+              <span className="search-icon"><img src={lupa2} alt="" loading='lazy'/></span>
             </div>
             <div className="options">
               {filteredOptions.map((option, index) => (
@@ -55,10 +58,7 @@ const MultiSelectExample = ({ data }) => {
                       value={option}
                       checked={selectedOptions.includes(option)}
                       onChange={() => handleCheckboxChange(option)}
-
-                      style={{accentColor: 'red'}}
-
-                    
+                      style={{ accentColor: 'red' }}
                     />
                     {option}
                   </label>
@@ -73,9 +73,7 @@ const MultiSelectExample = ({ data }) => {
         {selectedOptions.map((option, index) => (
           <div key={index} className="selected-option">
             {option}
-            <div className='remove-option-icon-container'
-              onClick={() => handleRemove(option)}
-            >
+            <div className='remove-option-icon-container' onClick={() => handleRemove(option)}>
               X
             </div>
           </div>

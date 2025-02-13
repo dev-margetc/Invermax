@@ -153,11 +153,55 @@ const getConfiguracionCreacion = async () => {
         console.log(err);
     }
 }
+
+
+const registrarInmueble = async (formData, estado, navigate) => {
+    try {
+        const token = await AuthService.getToken();
+        if (!token) {
+            alert("⚠️ Inicie sesión para continuar.");
+            return;
+        }
+
+        // Asegurar que los datos estén dentro del objeto `inmueble`
+        const inmuebleData = {
+            inmueble: {
+                ...formData, // Datos generales del inmueble
+                estadoInmueble: estado, // Agregar estado (publicado o borrador)
+                detalles: formData.detalles || [], // Asegurar que detalles es una lista
+                zonas: formData.zonas || [] // Asegurar que zonas es una lista
+            }
+        };
+
+        console.log("📌 Enviando inmueble al backend:", JSON.stringify(inmuebleData, null, 2));
+
+        const response = await api.post("/inmuebles", inmuebleData, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status === 201 || response.status === 200) {
+            alert(`✅ Inmueble ${estado === "publicado" ? "publicado" : "guardado como borrador"} exitosamente.`);
+            navigate("/mis-inmuebles");
+        } else {
+            alert("⚠️ Hubo un problema al guardar el inmueble.");
+        }
+    } catch (error) {
+        console.error("❌ Error al guardar el inmueble:", error);
+        alert("❌ Ocurrió un error. Inténtalo de nuevo.");
+    }
+};
+
+
+
 export default {
     getInmueblesPublicados,
     getInmueblesDestacados,
     getInmueblesDemanda,
     getInmuebleByIDCode,
     getConfiguracionCreacion,
-    handleNavigate
+    handleNavigate,
+    registrarInmueble
 };
