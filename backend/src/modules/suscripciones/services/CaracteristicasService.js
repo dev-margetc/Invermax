@@ -192,9 +192,7 @@ const getValorCaracteristica = async (idCustomer, claveCaracteristica) => {
             claveCaracteristica: claveCaracteristica,
         });
 
-        throw new ErrorNegocio(
-            `La suscripción activa no permite realizar la acción: ${caracteristica[0]?.nombreCaracteristica || 'característica desconocida'}.`
-        );
+        return null;
     }
     // Retornar el resultado
     return resultado.saldosCaracteristicas[0].capacidadDisponible;

@@ -5,6 +5,7 @@ const CustomerService = require('../../usuarios/services/CustomerService');
 const filtroInmueble = require('../services/FiltrosInmuebleService');
 const zonasInmueblesService = require('../services/ZonasInmueblesService');
 const TipoInmueblePerfilService = require('../services/TipoInmueblePerfilService');
+const CaracteristicaService = require('../../suscripciones/services/CaracteristicasService');
 const ZonaService = require('../services/ZonaService');
 const errorHandler = require('../../../utils/ErrorHandler');
 
@@ -32,6 +33,7 @@ const insertInmueble = async (req, res) => {
         // Establecer el ID del usuario que inició sesion y asignarlo al cuerpo para crearlo
         req.body.inmueble.idCustomer = customer[0].dataValues.idCustomer;
         const msg = await inmuebleService.insertarInmueble(req.body);
+          
         res.status(201).json(msg); //Se retorna un mensaje
     } catch (error) {
         errorHandler.handleControllerError(res, error, "inmuebles");
@@ -129,8 +131,6 @@ const getInteresadosInmueble = async (req, res) => {
         const token = await traerToken(req);
         const { idInmueble } = req.params;
         const isDueño = await inmuebleService.isUsuarioDueño(token.idUsuario, idInmueble);
-        console.log(token.idUsuario);
-        console.log(idInmueble);
         // Verificar que el que inició sesión sea el dueño  
         if (isDueño) {
             interesados = await inmuebleService.traerInteresados(req.params);
@@ -149,15 +149,23 @@ const getInfoCreacion = async(req, res) =>{
     try {
         const data = {};
         const token = await traerToken(req);
-
         /* Generar datos asociados al usuario */
         const customerList = await CustomerService.getAllCustomers({idUsuario: token.idUsuario});
-        console.log(customerList);
+
         // Traer tipos de inmueble segun el perfil
         data.tiposInmueble = await TipoInmueblePerfilService.getInmueblesPerfil(null, customerList[0].perfil.idPerfil);
 
         // Traer las zonas
         data.zonas = await ZonaService.getAllZonas();
+
+        /* Traer las caracteristicas relevantes */
+        // Cantidad de fotos por tipo (detalle) de inmueble
+        data.cantidadFotos = await CaracteristicaService.getValorCaracteristica(customerList[0].idCustomer, "fotos_tipo_inmueble");
+        // Cantidad de videos por tipo (detalle) de inmueble
+        data.cantidadVideos = await CaracteristicaService.getValorCaracteristica(customerList[0].idCustomer, "videos_tipo_inmueble");
+        // Uso de iFrame
+        data.usoFrame = await CaracteristicaService.getValorCaracteristica(customerList[0].idCustomer, "uso_iframe");
+        
         console.log(data);
         res.status(201).json(data); //Se retorna un mensaje si se encuentra un error
     }catch(err){

@@ -15,15 +15,21 @@ router.get('/', ServicioController.getServicios);
 /* Rutas creacion*/
 
 // Ruta para crear un servicio
-router.post('/', ServicioController.registrarServicio);
+router.post('/', 
+protegerRuta(['admin']),
+ServicioController.registrarServicio);
 
 /* Rutas actualizacion*/
 
 // Ruta para actualizar un servicio
-router.put('/:idServicio', protegerRuta(['admin']),upload.array('multimedia',1), ServicioController.actualizarServicio);
+router.put('/:idServicio', 
+    protegerRuta(['admin']),
+    upload.array('fotoServicio',1), ServicioController.actualizarServicio);
 
 /* Rutas borrado*/
 // Ruta para actualizar un servicio
-router.delete('/:idServicio', protegerRuta(['admin']), ServicioController.eliminarServicio);
+router.delete('/:idServicio', 
+    protegerRuta(['admin']), 
+    ServicioController.eliminarServicio);
 
 module.exports = router;

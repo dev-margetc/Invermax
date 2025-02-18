@@ -15,71 +15,57 @@ const InmuebleAscenso = require("../entities/InmuebleAscenso");
 
 // Traer todos los inmuebles en ascenso con informacion de inmueble, se pueden especificar condiciones
 const traerInmueblesAscenso = async (condiciones = null, whereInmueble = null, atributosInmueble = null) => {
-    const filtro = { ...condiciones || {} } // Combinar condiciones extra
-
-    // Si atributosInmueble existe, construir el filtro de atributos
-    let atributos;
-    if (atributosInmueble) {
-        atributos = {
-            include: [
-                ...atributosInmueble, // Atributos adicionales especificados
-            ],
-            exclude: ['id_customer', 'idCustomer', 'codigoCiudad', 'cod_ciudad', 'idTipoInmueble', 'id_tipo_inmueble'] // Exclusiones    
-        }
-    }
-
-    // Construir include dinámico para inmueble
-    const includeInmueble = whereInmueble || atributos // Si where o atributos existe
-        ? {
-            model: Inmueble,
-            as: "inmueble",
-            where: whereInmueble || undefined, // Solo aplica el where si existe
-            attributes: atributos ? atributos : undefined, // Si no hay atributos, se deja undefined
-            //Incluir los detalles
-            include: [
+    try {
+        // Includes para consultas sencillas
+        const includes = [
+            {
+                model: InmuebleAscenso,
+                as: "inmueblesAscenso",
+                attributes: ["idAscenso", "fechaInicio", "estadoAscenso", "tiempoAcumulado", "codigoPeriodo", "idInmueble"],
+                where: { ...condiciones }, // Filtrar
+                required: true // Asegura que solo se traen inmuebles con ascenso activos
+            },
+            {
+                model: Customer,
+                as: "customer",
+                attributes: ['nombreCustomer']
+            }
+        ];
+        // Si se necesita informacion del inmueble se agregan los demas include
+        if (atributosInmueble) {
+            includes.push(
                 {
                     model: DetalleInmueble,
                     as: "detalles",
-                    attributes: ["parqueadero", "amoblado",]
+                    attributes: ["parqueadero", "amoblado"]
                 },
-                { // Incluir el tipo
+                {
                     model: TipoInmueble,
                     as: "tipoInmueble",
                     attributes: ["tipoInmueble"]
                 },
-                // Incluir zonas
                 {
                     model: Zona,
                     as: "zonas",
                     attributes: ['idZona'],
-                    through: { attributes: [] }, // Excluir los atributos de la tabla pivote
-                },
-                // Incluir el customer
-                {
-                    model: Customer,
-                    as: "customer",
-                    attributes: ['nombreCustomer']
+                    through: { attributes: [] } // Excluir los atributos de la tabla pivote
                 },
                 {
-                    as: 'ciudad', // Se usa el alias definido en la relacion
+                    as: 'ciudad',
                     model: Ciudad,
-                    attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
+                    attributes: ['nombreCiudad']
                 }
-            ]
+            )
         }
-        : null;
+        return await Inmueble.findAll({
+            attributes: atributosInmueble
+                ? { include: atributosInmueble }
+                : { exclude: ['idCustomer', 'codigoCiudad', 'idTipoInmueble'] }, // Excluir algunos atributos por defecto
+            where: whereInmueble, // Filtro para inmuebles
 
-    try {
-        let inmueblesAscenso = await InmuebleAscenso.findAll({
-            where: filtro,
-            attributes: {
-                exclude: ["id_inmueble"]
-            },
-            include: includeInmueble ? [includeInmueble] : [], // Agregar el include si existe
-            group:'idAscenso'
-        })
-
-        return inmueblesAscenso;
+            include: includes,
+            group: ['idInmueble']
+        });
     } catch (err) {
         throw err;
     }

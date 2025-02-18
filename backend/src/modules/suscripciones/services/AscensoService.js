@@ -12,27 +12,6 @@ const { construirCondiciones } = require("../../../utils/utils");
 
 /* Metodos GET */
 
-// Trae una lista InmuebleAscenso segun su idInmueble o codigoPeriodo
-const getAscensoInmueble = async (idInmueble = null, codigoPeriodo = null) => {
-    try {
-
-        let cond = construirCondiciones({ idInmueble, codigoPeriodo });
-        let ascenso = await ascensoRepo.traerInmueblesAscenso(cond);
-
-        // Calcular minutos restantes para cada ascenso
-        const ascendidosConTiempo = ascenso.map(ascenso => {
-            const plano = ascenso.get({ plain: true }); // Convertir el objeto a formato plano
-            const minutosRestantes = calcularMinutosRestantes(ascenso);
-            return { ...plano, minutosRestantes }; // Crear un nuevo objeto con el campo adicional
-        });
-
-        return ascendidosConTiempo;
-    } catch (err) {
-        console.log(err);
-        throw err;
-    }
-}
-
 // Traer inmuebles en ascenso segun idCustomer o estado (0 o 1), se puede especificar si traer info especifica de inmueble
 const getAscensoCustomerEstado = async (estado = null, idCustomer = null, infoInmueble = null) => {
     try {
@@ -49,11 +28,12 @@ const getAscensoCustomerEstado = async (estado = null, idCustomer = null, infoIn
             atributosInmueble = [];
         }
 
-        let inmueblesAscenso = await ascensoRepo.traerInmueblesAscenso(whereAscenso, whereInmueble, atributosInmueble);
+        let inmueblesAscensoActivos = await ascensoRepo.traerInmueblesAscenso(whereAscenso, whereInmueble, atributosInmueble);
+
         // Calcular minutos restantes para cada ascenso
-        const ascendidosConTiempo = inmueblesAscenso.map(ascenso => {
+        const ascendidosConTiempo = inmueblesAscensoActivos.map(ascenso => {
             const plano = ascenso.get({ plain: true }); // Convertir el objeto a formato plano
-            const minutosRestantes = calcularMinutosRestantes(ascenso);
+            const minutosRestantes = calcularMinutosRestantes(ascenso.inmueblesAscenso[0]);
             return { ...plano, minutosRestantes }; // Crear un nuevo objeto con el campo adicional
         });
         return ascendidosConTiempo;
@@ -96,8 +76,13 @@ const manejarRegistroAscenso = async (idInmueble) => {
             }
             let codigo = ascensoRepo.generarCodigoPeriodo(suscripcionesActivas[0].fechaInicioSuscripcion, suscripcionesActivas[0].idSuscripcion)
 
-            let cond = construirCondiciones({ idInmueble, codigoPeriodo:codigo });
-            let ascenso = await ascensoRepo.traerInmueblesAscenso(cond);
+            let cond = construirCondiciones({ idInmueble, codigoPeriodo: codigo });
+
+            let inmueblesAscenso = await ascensoRepo.traerInmueblesAscenso(cond);
+            const ascenso = [];
+            for (const inmueble of inmueblesAscenso) {
+                destacadosActivos.push(inmueble.inmueblesAscenso[0])
+            }
 
             // Si existe cambiar el estado por el inverso al que tiene
             if (ascenso && ascenso.length > 0) {
@@ -170,7 +155,12 @@ const actualizarAscendidosActivos = async () => {
     try {
         /** 1. Traer todos los ascendidos activos **/
         let condiciones = { estadoAscenso: 1 }
-        let ascendidosActivos = await ascensoRepo.traerInmueblesAscenso(condiciones);
+
+        let inmueblesAscendidosActivos = await ascensoRepo.traerInmueblesAscenso(condiciones);
+        const ascendidosActivos = [];
+        for (const inmueble of inmueblesAscendidosActivos) {
+            ascendidosActivos.push(inmueble.inmueblesAscenso[0])
+        }
 
         if (ascendidosActivos.length === 0) {
             console.log("No hay ascendidos activos para procesar.");
@@ -209,7 +199,12 @@ const actualizarAscendidosActivos = async () => {
 // Desactivar ascendidos con un codigo ya no valido pues el mes de su suscripcion ya no sirve
 const reiniciarAscendidosPorMes = async () => {
     // Obtener todos los ascendidos (con su códigoPeriodo) activos
-    let ascendidosActivos = await ascensoRepo.traerInmueblesAscenso({ estadoAscenso: 1 });
+
+    let inmueblesAscendidosActivos = await ascensoRepo.traerInmueblesAscenso({ estadoAscenso: 1 });
+    const ascendidosActivos = [];
+    for (const inmueble of inmueblesAscendidosActivos) {
+        ascendidosActivos.push(inmueble.inmueblesAscenso[0])
+    }
 
     // Obtener todas las suscripciones necesarias de una sola vez
     const idSuscripciones = ascendidosActivos.map(ascendido => ascendido.codigoPeriodo.split('-')[0]); // Obtener la parte de idSuscripcion
@@ -240,7 +235,7 @@ const reiniciarAscendidosPorMes = async () => {
         if (mesPeriodo < nuevoMes) {
             let acumulado = calcularMinutosTranscurridos(ascendido);
             console.log(`Desactivando ascendido ${ascendido.idAscenso} (mes anterior)`);
-        await ascensoRepo.modificarAscenso({ estadoAscenso: 0, fechaInicio: null, tiempoAcumulado:acumulado },
+            await ascensoRepo.modificarAscenso({ estadoAscenso: 0, fechaInicio: null, tiempoAcumulado: acumulado },
                 ascendido.idAscenso);
         }
     }
@@ -250,7 +245,12 @@ const reiniciarAscendidosPorMes = async () => {
 const desactivarAscendidosVencidos = async () => {
     /** 1. Traer todos los ascendidos activos **/
     let condiciones = { estadoAscenso: 1 }
-    let ascensoActivos = await ascensoRepo.traerInmueblesAscenso(condiciones);
+
+    let inmueblesAscendidosActivos = await ascensoRepo.traerInmueblesAscenso(condiciones);
+    const ascensoActivos = [];
+    for (const inmueble of inmueblesAscendidosActivos) {
+        ascensoActivos.push(inmueble.inmueblesAscenso[0])
+    }
 
     // Obtener todas las suscripciones inactivas de una sola vez
     const idSuscripciones = ascensoActivos.map(ascenso => ascenso.codigoPeriodo.split('-')[0]); // Obtener la parte de idSuscripcion
@@ -279,7 +279,7 @@ const desactivarAscendidosVencidos = async () => {
             let acumulado = calcularMinutosTranscurridos(inmuebleAscenso);
             console.log(acumulado);
             // Actualizar ascendido
-          await ascensoRepo.modificarAscenso({
+            await ascensoRepo.modificarAscenso({
                 fechaInicio: null,
                 estadoAscenso: 0,
                 tiempoAcumulado: acumulado
@@ -293,7 +293,7 @@ const desactivarAscendidosVencidos = async () => {
  teniendo en cuenta la fecha de inicio y el acumulado de un ascendido */
 function calcularMinutosTranscurridos(inmuebleAscenso) {
     // Si está desactivado como ascenso retornar 0
-    if(inmuebleAscenso.estadoAscenso == 0){
+    if (inmuebleAscenso.estadoAscenso == 0) {
         return 0;
     }
     const ahora = new Date();
@@ -306,15 +306,20 @@ function calcularMinutosTranscurridos(inmuebleAscenso) {
 // teniendo en cuenta la fecha de inicio y el acumulado de la BD
 function calcularMinutosRestantes(inmuebleAscenso) {
     const LIMITE_MINUTOS = process.env.TIEMPO_MAX_ASCENSO; // Límite 
-
+    let tiempoAcumulado = 0;
+    console.log(inmuebleAscenso.tiempoAcumulado);
+    if (inmuebleAscenso.tiempoAcumulado) {
+        tiempoAcumulado = inmuebleAscenso.tiempoAcumulado;
+    } else if (inmuebleAscenso.inmueblesAscenso && inmuebleAscenso.inmueblesAscenso.length > 0) {
+        tiempoAcumulado = destacado.inmueblesAscenso[0].tiempoAcumulado;
+    }
     let minutosTranscurridos = calcularMinutosTranscurridos(inmuebleAscenso);
-    const minutosRestantes = LIMITE_MINUTOS - (inmuebleAscenso.tiempoAcumulado + minutosTranscurridos);
+    const minutosRestantes = LIMITE_MINUTOS - (tiempoAcumulado + minutosTranscurridos);
     return Math.max(minutosRestantes, 0);
 }
 
 
 module.exports = {
-    getAscensoInmueble,
     manejarRegistroAscenso,
     getAscensoCustomerEstado,
     desactivarAscendidosVencidos,

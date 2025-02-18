@@ -38,8 +38,8 @@ const actualizarAliado = async (req, res) => {
         const { idAliado } = req.params;
         // Verifica si se subió uno o mas archivos
         if (req.files && req.files.length > 0) {
-           // Asignar el nombre
-           req.body.logoAliado = req.files[0].filename;
+            // Asignar el nombre
+            req.body.logoAliado = req.files[0].filename;
         }
 
         req.body.idAliado = idAliado;

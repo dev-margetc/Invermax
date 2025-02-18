@@ -24,7 +24,7 @@ const DetalleInmueble = sequelize.define('DetalleInmueble', {
     field: 'area'
   },
   frameRecorrido: {
-    type: DataTypes.DECIMAL(12, 2),
+    type: DataTypes.STRING,
     allowNull: true,
     field: 'iframe_recorrido'
   },

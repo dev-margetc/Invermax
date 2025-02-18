@@ -18,7 +18,7 @@ router.get('/aliados', AliadoController.getAliados);
 /* Rutas de actualizacion*/
 
 router.put('/aliados/:idAliado',
-    protegerRuta(['admin']),
+   protegerRuta(['admin']),
     upload.array('logoAliado', 1),
     AliadoController.actualizarAliado);
 

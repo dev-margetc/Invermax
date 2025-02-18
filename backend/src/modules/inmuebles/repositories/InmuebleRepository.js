@@ -27,8 +27,8 @@ const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
     }, { transaction });
 
     // Si hay zonas se agregan
-    if(datosInmueble.zonas && datosInmueble.zonas.length>0){
-      await inmueble.addZonas(datosInmueble.zonas, {transaction});
+    if (datosInmueble.zonas && datosInmueble.zonas.length > 0) {
+      await inmueble.addZonas(datosInmueble.zonas, { transaction });
     }
 
     // Se obtiene el id del inmueble creado
@@ -44,17 +44,31 @@ const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
 
       //Se obtiene el id del proyecto si fue creado
       idProyecto = proyecto.idProyecto;
+      inmueble.proyecto = idProyecto;
     }
 
     // Iterar sobre los detalles y crear cada registro en DetalleInmueble
     const detalles = datosInmueble.detalles;
+
+    //Variable que guarda los detalles creados
+    const detallesCreados = [];
     for (const detalle of detalles) {
-      await DetalleInmueble.create({
+      let det = await DetalleInmueble.create({
         ...detalle,
         idInmueble: inmuebleId, // Usar el id del inmueble insertado
         idProyecto: idProyecto //Id del proyecto insertado o NULL
       }, { transaction });
+      // Si el detalle contenia un idTemporal se mantiene
+      if (detalle.idTemporal) {
+        det.idTemporal = detalle.idTemporal;
+      }
+
+      // Agregar el detalle creado
+      detallesCreados.push(det);
     }
+
+    // Agregar la lista de detallas creados al inmueble
+    inmueble.detalles = detallesCreados;
     await transaction.commit(); // Confirmar la transacción
     let msg = {};
     msg.message = "Inmueble con detalles creado correctamente.";
@@ -62,7 +76,21 @@ const insertarInmuebleDetalles = async (datosInmueble, isProyecto) => {
     if (isProyecto) {
       msg.message = "Proyecto creado correctamente."
     }
-    return msg;
+
+    // Estructurar la respuesta
+    const response = {
+      message: msg.message,
+      inmueble: {
+        ...msg.inmueble.toJSON(), // Convierte inmueble a objeto plano
+        detalles: msg.inmueble.detalles.map(detalle => ({
+          ...detalle.toJSON(),
+          idTemporal: detalle.idTemporal // Agregar idTemporal manualmente si existe
+        })),
+        // Convierte cada detalle a JSON
+        proyecto: msg.inmueble.proyecto // Si es un ID, se mantiene
+      }
+    };
+    return response;
   } catch (error) {
     await transaction.rollback(); // Revertir la transacción en caso de error
     throw error;
@@ -73,8 +101,8 @@ const traerAtributosAvanzados = (isFiltro = false) => {
 
   const attributes = [
     // Valor minimo y maximo de inmuebles
-    [sequelize.fn('MIN', sequelize.col('inmueble.detalles.valor_inmueble')), 'valorMinimoDetalles'],
-    [sequelize.fn('MAX', sequelize.col('inmueble.detalles.valor_inmueble')), 'valorMaximoDetalles'],
+    [sequelize.fn('MIN', sequelize.col('detalles.valor_inmueble')), 'valorMinimoDetalles'],
+    [sequelize.fn('MAX', sequelize.col('detalles.valor_inmueble')), 'valorMaximoDetalles'],
 
 
     // Obtener una foto del primer detalle     
@@ -85,13 +113,13 @@ const traerAtributosAvanzados = (isFiltro = false) => {
   if (isFiltro) {
     attributes.push(
       // Valor minimo de área (usando sequelize.fn y la relación)
-      [sequelize.fn('MIN', sequelize.col('inmueble.detalles.area')), 'areaMinima'],
+      [sequelize.fn('MIN', sequelize.col('detalles.area')), 'areaMinima'],
 
       // Valor minimo de baños (usando sequelize.fn y la relación)
-      [sequelize.fn('MIN', sequelize.col('inmueble.detalles.cantidad_baños')), 'cantidadMinBaños'],
+      [sequelize.fn('MIN', sequelize.col('detalles.cantidad_baños')), 'cantidadMinBaños'],
 
       // Valor minimo de habitaciones (usando sequelize.fn y la relación)
-      [sequelize.fn('MIN', sequelize.col('inmueble.detalles.cantidad_habitaciones')), 'cantidadMinHabitaciones'],
+      [sequelize.fn('MIN', sequelize.col('detalles.cantidad_habitaciones')), 'cantidadMinHabitaciones'],
     );
   }
 
@@ -99,74 +127,100 @@ const traerAtributosAvanzados = (isFiltro = false) => {
 };
 
 
-
-// Traer los inmuebles con el estado de publicado (incluyendo proyectos)
-const getPublicados = async () => {
+/*
+  Trae inmuebles segun filtros definidos en el modelo Inmueble
+*/
+const getPublicados = async (filtros = null) => {
   try {
-
-    const inmuebles = await VistaPublicados.findAll({
-      attributes: { exclude: ['idTipoInmueble', 'cod_ciudad', 'id_inmueble', 'idCustomer'] },
-      include: [
-        {
-          model: Inmueble, // Relacion con el modelo inmueble
-          as: 'inmueble',
-          attributes: [ // Traer ciertos campos para aplicar el filtro
-            'idInmueble', 'codigoInmueble', 'modalidadInmueble',
-            ...traerAtributosAvanzados(true)
-          ],
-          include: [ // Incluir por medio de inmueble
-            {
-              model: DetalleInmueble,
-              as: "detalles",
-              attributes: ["parqueadero", "amoblado",]
-            },
-            { // Incluir el tipo
-              model: TipoInmueble,
-              as: "tipoInmueble",
-              attributes: ["tipoInmueble", "idTipoInmueble"]
-            },
-            // Incluir zonas
-            {
-              model: Zona,
-              as: "zonas",
-              attributes: ['idZona'],
-              through: { attributes: [] }, // Excluir los atributos de la tabla pivote
-            },
-            // Incluir el customer
-            {
-              model: Customer,
-              as: "customer",
-              attributes: ['nombreCustomer', 'idCustomer']
-            },
-            // Agregar inmuebles en ascenso
-            {
-              model: InmuebleAscenso, // Relación con ascensos
-              as: "inmueblesAscenso",
-              attributes: ['idAscenso'], // Atributo necesario para identificar si está en ascenso
-              where: { estadoAscenso: 1 }, // Solo los que están activos
-              required: false// Incluye la relación solo si existe
-            },
-            // Agregar inmuebles en ascenso
-            {
-              model: InmuebleDestacado, // Relación con ascensos
-              as: "inmueblesDestacados",
-              attributes: ['idDestacado'], // Atributo necesario para identificar si está en ascenso
-              where: { estadoDestacado: 1 }, // Solo los que están activos
-              required: false// Incluye la relación solo si existe
-            },
-            // Informacion de la ciudad
-            {
-              as: 'ciudad', // Se usa el alias definido en la relacion
-              model: Ciudad,
-              attributes: ['nombreCiudad'], // Traer solo el nombre de la ciudad
-            }
-          ]
+    // Limpiar el objeto filtros para evitar errores en Sequelize
+    const filtrosLimpios = {};
+    if (filtros) {
+      Object.keys(filtros).forEach(key => {
+        if (filtros[key] !== undefined && filtros[key] !== null && filtros[key] !== '') {
+          filtrosLimpios[key] = filtros[key];
         }
-      ],
-      group: 'idInmueble' // Agrupar por ID inmueble
-    });
+      });
+    }
 
-    return inmuebles;
+    // Filtros avanzados
+    const filtrosAgregados = [
+      'valorMinimoDetalles',
+      'valorMaximoDetalles',
+      'areaMinima',
+      'cantidadMinBaños',
+      'cantidadMinHabitaciones'
+    ];
+
+    const filtrosNormales = {};
+    const filtrosHaving = {};
+
+    // Separar filtros según si están en la lista de agregaciones
+    for (const key in filtrosLimpios) {
+      if (filtrosAgregados.includes(key)) {
+        filtrosHaving[key] = filtrosLimpios[key];
+      } else {
+        filtrosNormales[key] = filtrosLimpios[key];
+      }
+    }
+
+    // Definir las relaciones que se incluyen en ambas consultas
+    const relaciones = [
+      {
+        model: TipoInmueble,
+        as: "tipoInmueble",
+        attributes: ["tipoInmueble", "idTipoInmueble"]
+      },
+      {
+        model: Customer,
+        as: "customer",
+        attributes: ['nombreCustomer', 'idCustomer']
+      },
+      {
+        as: 'ciudad',
+        model: Ciudad,
+        attributes: ['nombreCiudad']
+      },
+      {
+        model: DetalleInmueble,
+        as: "detalles",
+        attributes: ["parqueadero", "amoblado"]
+      },
+      {
+        model: Zona,
+        as: "zonas",
+        attributes: ["idZona", "nombreZona"],
+        through: { attributes: [] } // Evita traer datos innecesarios de la tabla intermedia
+      },
+      {
+        model: InmuebleAscenso,
+        as: "inmueblesAscenso",
+        attributes: ['idAscenso'],
+        where: { estadoAscenso: 1 },
+        required: false
+      },
+      {
+        model: InmuebleDestacado,
+        as: "inmueblesDestacados",
+        attributes: ['idDestacado'],
+        where: { estadoDestacado: 1 },
+        required: false
+      }
+    ];
+
+    return await Inmueble.findAll({
+      attributes: ['idInmueble', 'codigoInmueble', 'modalidadInmueble', ...traerAtributosAvanzados(true)],
+      where: filtrosNormales,
+      include: relaciones,
+      group: ['idInmueble', 'zonas.id_zona'],
+      // Filtrar por alias de agregaciones usando HAVING
+      having: Object.keys(filtrosHaving).length > 0
+      ? sequelize.literal(
+          Object.entries(filtrosHaving)
+            .map(([key, value]) => `${key} <= ${value}`)
+            .join(' AND ')
+        )
+      : undefined
+    });
   } catch (error) {
     throw error;
   }
@@ -190,14 +244,14 @@ const getInmueblesUsuario = async (idCustomer, codigoPeriodo = null) => {
       {
         model: InmuebleAscenso, // Relación con ascensos
         as: "inmueblesAscenso",
-        where: { codigoPeriodo: codigoPeriodo}, // Solo los que tienen el codigo requerido y existe
+        where: { codigoPeriodo: codigoPeriodo }, // Solo los que tienen el codigo requerido y existe
         required: false// Incluye la relación solo si existe
       },
       // Agregar inmuebles en ascenso
       {
         model: InmuebleDestacado, // Relación con ascensos
         as: "inmueblesDestacados",
-        where: { codigoPeriodo: codigoPeriodo}, // Solo los que tienen el código requerido
+        where: { codigoPeriodo: codigoPeriodo }, // Solo los que tienen el código requerido
         required: false// Incluye la relación solo si existe
       },
     ],
@@ -209,17 +263,13 @@ const getInmueblesUsuario = async (idCustomer, codigoPeriodo = null) => {
   return inmuebles;
 }
 
-// Traer los inmuebles con un codigo
+// Traer los inmuebles utilizando un código
 const getInmueblesCodigo = async (codigo) => {
 
   // Solamente trae el id si encuentra un inmueble con ese codigo
   const inmuebles = Inmueble.findAll({
     attributes: {
-      include: [
-        [sequelize.fn('MIN', sequelize.col('detalles.valor_inmueble')), 'valorMinimoDetalles'],
-        [sequelize.fn('MAX', sequelize.col('detalles.valor_inmueble')), 'valorMaximoDetalles'],
-        // Atributos avanzados agregados manualmente
-      ],
+      attributes: ['idInmueble', 'codigoInmueble', 'modalidadInmueble', ...traerAtributosAvanzados(true)],
       exclude: ['id_customer', 'idCustomer', 'codigoCiudad', 'cod_ciudad', 'idTipoInmueble', 'id_tipo_inmueble']
     },
     include: [ // Incluir detalles por medio de inmueble

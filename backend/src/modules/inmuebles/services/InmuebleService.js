@@ -21,7 +21,7 @@ const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig")
 
 const insertarInmueble = async (datosInmueble) => {
     try {
-        const { idTipoInmueble, estadoInmueble, modalidadInmueble, administracion } = datosInmueble.inmueble;
+        const { idTipoInmueble, estadoInmueble, modalidadInmueble, administracion, detalles } = datosInmueble.inmueble;
 
         // Buscar el tipo de inmueble por ID
         const tipoInmueble = await TipoInmueble.findByPk(idTipoInmueble);
@@ -41,9 +41,26 @@ const insertarInmueble = async (datosInmueble) => {
         await CaracteristicaService.verificarInmueblesCreacion(datosInmueble.inmueble.idCustomer);
 
         /* Verificar si el usuario puede insertar iFrame*/
+        let verificarFrame = false;
+
         if (datosInmueble.inmueble.frameMaps) {
+           verificarFrame = true;
+        }
+
+        if (detalles) {
+            // Validar si alguno de los detalles tiene el campo iframe
+            const tieneIframe = detalles.some(detalle => detalle.frameRecorrido);
+            /* Verificar si el usuario puede insertar iFrame*/
+            if (tieneIframe) {
+               verificarFrame = true;
+            }
+        }
+        // Si la variable es true se verifica si el usuario puede hacer uso de esa función
+        if(verificarFrame){
             await CaracteristicaService.verificarUsoIFrame(datosInmueble.inmueble.idCustomer);
         }
+       
+
         // Verificar si el tipo es "proyecto" y es valido
         if (tipoInmueble.tipoInmueble === 'proyecto' && estadoInmueble !== 'nuevo') {
             throw new ErrorNegocio("Los inmuebles de tipo 'proyecto' deben ser nuevos.");

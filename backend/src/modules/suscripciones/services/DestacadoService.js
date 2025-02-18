@@ -12,24 +12,6 @@ const { construirCondiciones } = require("../../../utils/utils");
 
 /* Metodos GET */
 
-// Trae un InmuebleDestacado segun su idInmueble y/o su codigo
-const getDestacadoInmueble = async (idInmueble = null, codigoPeriodo = null) => {
-    try {
-        // Construir condiciones a partir de idInmueble y/o codigoPeriodo
-        const condiciones = construirCondiciones({ idInmueble, codigoPeriodo });
-        let destacados = await destacadoRepo.traerDestacados(condiciones);
-        const destacadosConTiempo = destacados.map(destacado => {
-            const plano = destacado.get({ plain: true }); // Convertir el objeto a formato plano
-            const minutosRestantes = calcularMinutosRestantes(destacado);
-            return { ...plano, minutosRestantes }; // Crear un nuevo objeto con el campo adicional
-        });
-        return destacadosConTiempo;
-    } catch (err) {
-        console.log(err);
-        throw err;
-    }
-}
-
 // Traer destacados segun idCustomer o estado (0 o 1), se puede especificar si traer info especifica de inmueble
 const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, infoInmueble = null) => {
     try {
@@ -45,11 +27,12 @@ const getDestacadoCustomerEstado = async (estado = null, idCustomer = null, info
             atributosInmueble = [];
         }
 
-        let destacados = await destacadoRepo.traerDestacados(whereDestacado, whereInmueble, atributosInmueble);
-        const destacadosConTiempo = destacados.map(destacado => {
+        let inmueblesDestacadosActivos = await destacadoRepo.traerDestacados(whereDestacado, whereInmueble, atributosInmueble);
+
+        const destacadosConTiempo = inmueblesDestacadosActivos.map(destacado => {
             const plano = destacado.get({ plain: true }); // Convertir el objeto a formato plano
-            const minutosRestantes = calcularMinutosRestantes(destacado);
-            return { ...plano, minutosRestantes }; // Crear un nuevo objeto con el campo adicional
+            const minutosRestantes = calcularMinutosRestantes(destacado.inmueblesDestacados[0]);
+            return { ...plano   , minutosRestantes }; // Crear un nuevo objeto con el campo adicional
         });
 
         return destacadosConTiempo;
@@ -91,7 +74,11 @@ const manejarRegistroDestacado = async (idInmueble) => {
             }
             let codigo = destacadoRepo.generarCodigoPeriodo(suscripcionesActivas[0].fechaInicioSuscripcion, suscripcionesActivas[0].idSuscripcion)
             const condicionesDestacado = construirCondiciones({ idInmueble, codigoPeriodo:codigo });
-            let destacado = await destacadoRepo.traerDestacados(condicionesDestacado);
+            let inmueblesDestacadosActivos = await destacadoRepo.traerDestacados(condicionesDestacado);
+            const destacado = [];
+            for (const destacado of inmueblesDestacadosActivos) {
+                destacadosActivos.push(destacado.inmueblesDestacados[0])
+            }
 
             // Si existe cambiar el estado por el inverso al que tiene
             if (destacado && destacado.length > 0) {
@@ -170,7 +157,12 @@ const actualizarDestacadosActivos = async () => {
     try {
         /** 1. Traer todos los destacados activos **/
         let condiciones = { estadoDestacado: 1 }
-        let destacadosActivos = await destacadoRepo.traerDestacados(condiciones);
+        
+        let inmueblesDestacadosActivos = await destacadoRepo.traerDestacados(condiciones);
+        const destacadosActivos = [];
+        for (const destacado of inmueblesDestacadosActivos) {
+            destacadosActivos.push(destacado.inmueblesDestacados[0])
+        }
 
         if (destacadosActivos.length === 0) {
             console.log("No hay destacados activos para procesar.");
@@ -209,8 +201,11 @@ const actualizarDestacadosActivos = async () => {
 // Desactivar destacados cuyas suscripciones ya no apliquen
 const reiniciarDestacadosPorMes = async () => {
     // Obtener todos los destacados (con su códigoPeriodo) activos
-    let destacadosActivos = await destacadoRepo.traerDestacados({ estadoDestacado: 1 });
-
+    let inmueblesDestacadosActivos = await destacadoRepo.traerDestacados({ estadoDestacado: 1 });
+    const destacadosActivos = [];
+    for (const destacado of inmueblesDestacadosActivos) {
+        destacadosActivos.push(destacado.inmueblesDestacados[0])
+    }
     // Obtener todas las suscripciones necesarias de una sola vez
     const idSuscripciones = destacadosActivos.map(destacado => destacado.codigoPeriodo.split('-')[0]); // Obtener la parte de idSuscripcion
     let suscripciones = await suscripcionRepo.getSuscripciones({ idSuscripcion: idSuscripciones });
@@ -246,7 +241,11 @@ const reiniciarDestacadosPorMes = async () => {
 const desactivarDestacadosVencidos = async () => {
     /** 1. Traer todos los destacados activos **/
     let condiciones = { estadoDestacado: 1 }
-    let destacadosActivos = await destacadoRepo.traerDestacados(condiciones);
+    let inmueblesDestacadosActivos = await destacadoRepo.traerDestacados(condiciones);
+    const destacadosActivos = [];
+    for (const destacado of inmueblesDestacadosActivos) {
+        destacadosActivos.push(destacado.inmueblesDestacados[0])
+    }
 
     // Obtener todas las suscripciones inactivas de una sola vez
     const idSuscripciones = destacadosActivos.map(destacado => destacado.codigoPeriodo.split('-')[0]); // Obtener la parte de idSuscripcion
@@ -302,15 +301,20 @@ function calcularMinutosTranscurridos(destacado) {
 // Calcular minutos restantes de un inmueble en destacado
 // teniendo en cuenta la fecha de inicio y el acumulado de la BD
 function calcularMinutosRestantes(destacado) {
+    let tiempoAcumulado = 0;
+    if(destacado.tiempoAcumulado){
+        tiempoAcumulado= destacado.tiempoAcumulado;
+    }else if(destacado.inmueblesDestacados && destacado.inmueblesDestacados.length>0){
+        tiempoAcumulado = destacado.inmueblesDestacados[0].tiempoAcumulado;
+    }
     const LIMITE_MINUTOS = process.env.TIEMPO_MAX_DESTACADOS; // Límite 
 
     let minutosTranscurridos = calcularMinutosTranscurridos(destacado);
-    const minutosRestantes = LIMITE_MINUTOS - (destacado.tiempoAcumulado + minutosTranscurridos);
+    const minutosRestantes = LIMITE_MINUTOS - (tiempoAcumulado + minutosTranscurridos);
     return Math.max(minutosRestantes, 0);
 }
 
 module.exports = {
-    getDestacadoInmueble,
     manejarRegistroDestacado,
     calcularMinutosRestantes,
     getDestacadoCustomerEstado,

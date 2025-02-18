@@ -8,7 +8,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
-  "author": "Kevin Gomez",
+  "author": "Invermax Inmobiliaria SAS",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",

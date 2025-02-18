@@ -80,6 +80,9 @@ const getTipo = (mimetype) => {
 // Configuración de Multer con validación de tipo de archivo. GUARDA EN DISCO
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
+        console.log("---------");
+        console.log(file);
+        console.log(req.body);
         const tipoModulo = req.body.tipoModulo;
         if (!tipoModulo) {
             return cb(new multer.MulterError('Falta módulo en la solicitud.'), false);

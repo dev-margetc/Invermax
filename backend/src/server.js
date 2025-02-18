@@ -36,9 +36,10 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Permitir solicitudes desde el frontend (http://localhost:3001)
+// Permitir solicitudes desde el frontend
 app.use(cors({
-    origin: process.env.URL_FRONTEND, // Reemplazar con el origen del frontend
+    origin: "*", // Permitir peticiones desde cualquier origen
+    //origin: process.env.URL_FRONTEND, // Reemplazar con el origen del frontend
     methods: ["GET", "POST", "PUT", "DELETE"], // Métodos HTTP permitidos
     credentials: true, // enviar cookies o autenticación
 }));

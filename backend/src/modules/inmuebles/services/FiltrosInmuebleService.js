@@ -7,86 +7,51 @@ const SuscripcionRepo = require("../../suscripciones/repositories/SuscripcionRep
 const ErrorNegocio = require("../../../utils/errores/ErrorNegocio");
 const DetalleInmueble = require("../entities/DetalleInmueble");
 
-
-
-// Traer publicados
+// traer publicados
 const getPublicados = async (datos) => {
     try {
         const {
-            estadoInmueble, // categoria: nuevo o usado
-            modalidad, // compra o arriendo
+            estadoInmueble,
+            modalidad,
             codCiudad,
             montoMaximo,
-            habitacionesMinimas, // se usará un == 
-            bañosMinimos, // se usará un ==
-            parqueadero, // se usará un ==
-            amoblado, // se usará un ==
+            habitacionesMinimas,
+            bañosMinimos,
+            parqueadero,
+            amoblado,
             zonas,
-            idTipoInmueble, // Usar un ==
+            idTipoInmueble,
             idCustomer
         } = datos;
-        // Construir el objeto de filtros
-        // Por las multiples consultas a la BD en el metodo del repository el filtro se aplica aca
-        resultado = await inmuebleRepository.getPublicados();
-        // filtrar la lista
-        resultadoFiltrado = resultado.filter((dato) => {
-            /* 
-                Dato es un registro de la vista VistaInmueblesPublicados
-                Los datos que trae directamente de la vista se acceden por medio de 'dato.nombre_campo'
 
-                Los datos que se incluyan por medio de un modelo sequelize se traen como 'dato.inmueble.dataValues.campo'
-                - Si el modelo incluido a su vez involucra otro modelo se llama asi: 'dato.inmueble.dataValues.modelo.campo'
-            */
+        const filtrosAvanzados = {};
+        if (idCustomer) filtrosAvanzados["idCustomer"] = idCustomer;
+        if (estadoInmueble) filtrosAvanzados.estadoInmueble = estadoInmueble;
+        if (modalidad) filtrosAvanzados.modalidad = modalidad;
+        if (codCiudad) filtrosAvanzados.codCiudad = codCiudad;
+        if (idTipoInmueble) filtrosAvanzados["id_tipo_Inmueble"] = idTipoInmueble;
+        if (montoMaximo) filtrosAvanzados["valorMaximoDetalles"] = montoMaximo;
+        if (habitacionesMinimas) filtrosAvanzados["cantidadMinHabitaciones"] = habitacionesMinimas;
+        if (bañosMinimos) filtrosAvanzados["cantidadMinBaños"] = bañosMinimos;
 
-            // Datos del modelo inmueble generado
-            const inmuebleData = dato.inmueble.dataValues;
+        // Filtrar parqueadero y amoblado en los detalles
+        if (parqueadero) filtrosAvanzados["$detalles.parqueadero$"] = parqueadero;
 
-            // Filtrar por idCustomer
-            if (idCustomer && inmuebleData.customer.idCustomer!= idCustomer) return false;
+        if (amoblado) filtrosAvanzados["$detalles.amoblado$"] = amoblado;
 
-            // estado
-            if (estadoInmueble && dato.estadoInmueble !== estadoInmueble) return false;
-
-            if (modalidad && dato.modalidad !== modalidad) return false;
-
-            // La ciudad llegará como id
-            if (codCiudad && dato.codCiudad != codCiudad) return false;
-
-            // El tipo de inmueble llegará como id
-            if (idTipoInmueble && dato.inmueble.tipoInmueble.idTipoInmueble != idTipoInmueble) return false;
-
-            // Se quita si el montoMaximo es menor al valor mas bajo de los detalles del inmueble
-            if (montoMaximo && parseFloat(inmuebleData.valorMinimoDetalles) >= parseFloat(montoMaximo)) return false;
-
-            // El filtro tiene habitaciones minimas, por lo que se quita un inmueble si tiene menos
-            if (habitacionesMinimas && inmuebleData.cantidadMinHabitaciones < Number(habitacionesMinimas)) return false;//Quitar ;
-
-            // Se quita si la cantidad de baños del detalle es menor a la del filtro de baños minimos
-            if (bañosMinimos && inmuebleData.cantidadMinBaños < bañosMinimos) return false;
-
-
-            if (parqueadero) {
-                if (!verificarCoincidencia(inmuebleData.detalles, 'parqueadero', (parqueadero))) return false;
-            }
-
-            // Se quita si amoblado no coincide
-            // Se quita si el parqueadero de ningun detalle coincide
-
-            if (amoblado) {
-                if (!verificarCoincidencia(inmuebleData.detalles, 'amoblado', (amoblado))) return false;
-            }
-
-
-            // Verificar zonas
-            if (zonas) {
-                if (!tieneZonas(inmuebleData.zonas, zonas)) return false;
-            }
-            return true;
-        });
-
-        return resultadoFiltrado;
+        console.log(Object.keys(filtrosAvanzados));
+        // Obtener inmuebles aplicando filtros directamente en la base de datos
+        const resultado = await inmuebleRepository.getPublicados(filtrosAvanzados);
+        // Verificar zonas
+        if (zonas) {
+            let resultadoFiltrado = resultado.filter((dato) => {
+                return tieneZonas(dato.zonas, zonas);
+            })
+            return resultadoFiltrado;
+        }
+        return resultado;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         throw error;
     }
 }
@@ -101,7 +66,7 @@ const verificarCoincidencia = (detalles, campo, valor) => {
 const tieneZonas = (zonasInmueble, zonas) => {
     if (zonasInmueble.length === 0) return false; // Si no hay zonas en el inmueble, no coincide
     const zonasArray = Array.isArray(zonas) ? zonas : [zonas]; // Asegurarse de que sea un array
-    const idZonasInmueble = zonasInmueble.map(zona => zona.dataValues.idZona); // un array con solo id de zonas
+    const idZonasInmueble = zonasInmueble.map(zona => zona.idZona); // un array con solo id de zonas
     return zonasArray.every(zona => idZonasInmueble.includes(Number(zona))); // Verificar que todas las zonas del filtro estén en la del inmueble
 };
 
@@ -110,7 +75,7 @@ const getInmueblesUsuario = async (datosCustomer) => {
     const { idCustomer } = datosCustomer;
 
     // Generar el código de los inmuebles destacados y en ascenso
-    let condiciones = { idCustomer: idCustomer, estado: "activa" }; 
+    let condiciones = { idCustomer: idCustomer, estado: "activa" };
     let suscripcionesActivas = await SuscripcionRepo.getSuscripcionesPlan(condiciones);
     if (suscripcionesActivas.length == 0) {
         throw new ErrorNegocio("No cuenta con una suscripcion activa.");
@@ -130,7 +95,7 @@ const getInmueblesCodigo = async (datos) => {
 
     if (codigo) {
         const inmuebles = await inmuebleRepository.getInmueblesCodigo(codigo);
-        if(!inmuebles[0].idInmueble){
+        if (!inmuebles[0].idInmueble) {
             // Retornar una lista vacía si el id es null (no se encontró)
             return [];
         }

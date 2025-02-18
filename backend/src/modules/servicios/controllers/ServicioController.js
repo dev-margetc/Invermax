@@ -3,6 +3,7 @@ const errorHandler = require('../../../utils/ErrorHandler');
 const ServicioService = require('../services/ServicioService'); //Importar el servicio  
 
 const { traerToken } = require('../../../conf/firebaseAuth');
+const { deleteMultimediaServidor } = require("../../../middleware/uploadConfig");
 
 /* Metodos de lectura*/
 
@@ -53,6 +54,11 @@ const actualizarServicio = async (req, res) => {
 const eliminarServicio = async (req, res) => {
     try {
         const { idServicio } = req.params;
+        // Traer el servicio
+        const results = await ServicioService.getServicios({idServicio: idServicio});
+        // Traer las fotos del servicio
+        const nombreFoto = results[0].fotoServicio;
+        await deleteMultimediaServidor("fotos", nombreFoto, "servicios");
         msg = await ServicioService.eliminarServicio(idServicio);
         res.status(201).json(msg); //Se retorna un mensaje si se encuentra un error
     }
